@@ -3,6 +3,8 @@ import json
 import logging
 from botocore.exceptions import ValidationError, ClientError
 
+import libs.util as util
+
 """
 Apps Resource Definition
 
@@ -35,7 +37,7 @@ def get(name):
         r = cfn.describe_stacks(StackName=stack_name)
     except Exception as ex:
         logging.exception(ex)
-        raise ChaliceViewError('Internal server error.')
+        raise Exception('Internal server error.')
 
     # Filter stacks based on owner and retrieve wanted keys
     keys = ['StackName', 'Description', 'StackStatus', 'Tags', 'Outputs']
@@ -43,7 +45,7 @@ def get(name):
         apps = filter_stacks(r['Stacks'], keys, 'app')
     except Exception as ex:
         logging.exception(ex)
-        raise ChaliceViewError('Error while filtering stacks.')
+        raise Exception('Error while filtering stacks.')
 
     if 'Outputs' in apps[0]:
         outputs = util.kv_to_dict(apps[0]['Outputs'], 'OutputKey', 'OutputValue')
@@ -93,7 +95,7 @@ def patch(name):
 
     # Validate authorization
     if not validate_auth(stack_name):
-        raise ChaliceViewError('You do not have permission to modify this resource.')
+        raise Exception('You do not have permission to modify this resource.')
 
     if 'tasks' in payload:
         params['DesiredCount'] = payload['tasks']
@@ -155,10 +157,10 @@ def patch(name):
             Tags=tags
         )
     except ValidationError as e:
-        raise ChaliceViewError('No updates are to be performed. {}'.format(e))
+        raise Exception('No updates are to be performed. {}'.format(e))
     except Exception as ex:
         logging.exception(ex)
-        raise ChaliceViewError('Internal server error.')
+        raise Exception('Internal server error.')
 
     response = json.dumps(stack, default=util.datetime_serialize)
 
@@ -181,16 +183,16 @@ def delete(name):
 
     # Validate authorization
     if not validate_auth(stack_name):
-        raise ChaliceViewError('You do not have permission to modify this resource.')
+        raise Exception('You do not have permission to modify this resource.')
     
     try:
         stack = cfn.delete_stack(StackName=stack_name)
     except ValidationError as e:
         if e.response['Error']['Message'].endswidth('does not exist'):
-            raise ChaliceViewError('No such item.')
+            raise Exception('No such item.')
     except Exception as ex:
         logging.exception(ex)
-        raise ChaliceViewError('Internal server error.')
+        raise Exception('Internal server error.')
 
     response = json.dumps(stack, default=util.datetime_serialize)
 

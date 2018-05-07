@@ -3,6 +3,8 @@ import json
 import logging
 from botocore.exceptions import ValidationError, ClientError
 
+import libs.util as util
+
 """
 Events Resource Definition
 
@@ -30,7 +32,7 @@ def get_events(name):
     
     # Validate authorization
     if not validate_auth(name):
-        raise ChaliceViewError('You do not have permission to modify this resource.')
+        raise Exception('You do not have permission to modify this resource.')
     
     try:
         # List Events for Stack
@@ -56,7 +58,7 @@ def get_events(name):
                     })
     except Exception as ex:
         logging.exception(ex)
-        raise ChaliceViewError('Failed to list events')
+        raise Exception('Failed to list events')
 
     response = json.dumps(data, default=util.datetime_serialize)
 

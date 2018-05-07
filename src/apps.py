@@ -3,6 +3,8 @@ import json
 import logging
 from botocore.exceptions import ValidationError, ClientError
 
+import libs.util as util
+
 """
 Apps Resource Definition
 
@@ -35,7 +37,7 @@ def get():
         r = cfn.describe_stacks()
     except Exception as ex:
         logging.exception(ex)
-        raise ChaliceViewError('Failed to list apps')
+        raise Exception('Failed to list apps')
     
     # Filter stacks based on owner and retrieve wanted keys
     keys = ['StackName', 'Parameters', 'CreationTime', 'LastUpdatedTime']
@@ -53,7 +55,7 @@ def get():
                     'tasks': params['DesiredCount']
                 })
     except Exception as e:
-        raise ChaliceViewError(e)
+        raise Exception(e)
 
     response = json.dumps(data, default=util.datetime_serialize)
 
@@ -121,12 +123,12 @@ def post():
         )
     except ClientError as e:
         if e.response['Error']['Code'] == 'AlreadyExistsException':
-            raise ChaliceViewError('An application with that name already exists.')
+            raise Exception('An application with that name already exists.')
         else:
             print("Unexpected error: %s" % e)
     except Exception as ex:
         logging.exception(ex)
-        raise ChaliceViewError('Internal server error.')
+        raise Exception('Internal server error.')
 
     response = json.dumps(stack, default=util.datetime_serialize)
 

@@ -3,6 +3,8 @@ import json
 import logging
 from botocore.exceptions import ValidationError, ClientError
 
+import libs.util as util
+
 """
 Pipeline Resource Definition
 
@@ -14,9 +16,7 @@ Pipeline Resource Definition
 """
 
 
-@app.route('/pipelines/{name}',
-           authorizer=authorizer)
-def describe_pipeline(name):
+def get(name):
     """ Describes detailed information about a pipeline
 
     Args:
@@ -37,7 +37,7 @@ def describe_pipeline(name):
         r = cfn.describe_stacks(StackName=stack_name)
     except Exception as ex:
         logging.exception(ex)
-        raise ChaliceViewError('Internal server error.')
+        raise Exception('Internal server error.')
 
     # Filter stacks based on owner and retrieve wanted keys
     keys = ['StackName', 'Description', 'StackStatus', 'Tags', 'Outputs']
@@ -45,7 +45,7 @@ def describe_pipeline(name):
         pipelines = filter_stacks(r['Stacks'], keys, 'pipeline')
     except Exception as ex:
         logging.exception(ex)
-        raise ChaliceViewError('Error while filtering stacks.')
+        raise Exception('Error while filtering stacks.')
     
     if 'Outputs' in pipelines[0]:
         data['outputs'] = util.kv_to_dict(pipelines[0]['Outputs'], 'OutputKey', 'OutputValue')
@@ -59,10 +59,7 @@ def describe_pipeline(name):
     return response
 
 
-@app.route('/pipelines/{name}',
-           methods=['PATCH'],
-           authorizer=authorizer)
-def update_pipeline(name):
+def patch(name):
     """ Updates the pipeline belonging to the authenticated user.
 
     Args:
@@ -97,7 +94,7 @@ def update_pipeline(name):
 
     # Validate authorization
     if not validate_auth(stack_name):
-        raise ChaliceViewError('You do not have permission to modify this resource.')
+        raise Exception('You do not have permission to modify this resource.')
     
     if 'app_dev' in payload:
         params['ServiceDev'] = util.addprefix(payload['app_dev'])
@@ -130,23 +127,19 @@ def update_pipeline(name):
         )
     except ClientError as e:
         if e.response['Error']['Code'] == 'AlreadyExistsException':
-            raise ChaliceViewError('A pipeline with that name already exists.')
+            raise Exception('A pipeline with that name already exists.')
         else:
             print("Unexpected error: %s" % e)
     except Exception as ex:
         logging.exception(ex)
-        raise ChaliceViewError('Internal server error.')
+        raise Exception('Internal server error.')
 
     response = json.dumps(stack, default=util.datetime_serialize)
 
     return response
 
 
-# Delete pipeline
-@app.route('/pipelines/{name}',
-           methods=['DELETE'],
-           authorizer=authorizer)
-def delete_pipeline(name):
+def delete(name):
     """ Validates that the pipeline belongs to the authenticated user
     and deletes the pipeline.
 
@@ -161,16 +154,16 @@ def delete_pipeline(name):
 
     # Validate authorization
     if not validate_auth(stack_name):
-        raise ChaliceViewError('You do not have permission to modify this resource.')
+        raise Exception('You do not have permission to modify this resource.')
     
     try:
         stack = cfn.delete_stack(StackName=stack_name)
     except ValidationError as e:
         if e.response['Error']['Message'].endswidth('does not exist'):
-            raise ChaliceViewError('No such item.')
+            raise Exception('No such item.')
     except Exception as ex:
         logging.exception(ex)
-        raise ChaliceViewError('Internal server error.')
+        raise Exception('Internal server error.')
 
     response = json.dumps(stack, default=util.datetime_serialize)
 

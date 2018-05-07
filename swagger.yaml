@@ -158,11 +158,15 @@ paths:
       security:
       - null: []
 securityDefinitions:
-  null:
-    type: "apiKey"
+  cognitoUserPool:
+    type: apiKey,
     name: "Authorization"
-    in: "header"
-    x-amazon-apigateway-authtype: "cognito_user_pools"
+    in: header
+    x-amazon-apigateway-authtype: cognito_user_pools
+    x-amazon-apigateway-authorizer:
+      type: cognito_user_pools
+      providerARNs:
+        - arn:aws:cognito-idp:${AWS::Region}:{AWS::AccountId}:userpool/eu-west-1_MkM8NwiuN
 definitions:
   Empty:
     type: "object"

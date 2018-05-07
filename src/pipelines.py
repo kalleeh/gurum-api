@@ -3,25 +3,20 @@ import json
 import logging
 from botocore.exceptions import ValidationError, ClientError
 
+import libs.util as util
+
 """
 Pipeline Resource Definition
 
     URI: /pipelines
     Methods:
         GET - List all pipelines
-
-    URI: /pipelines/{name}
-    Methods:
         POST - Create new pipeline
-        GET - Get the details of app
-        PATCH - Update the specified pipeline
-        DELETE - Delete the pipeline
+
 """
 
 
-@app.route('/pipelines',
-           authorizer=authorizer)
-def list_pipelines():
+def get():
     """ Returns the pipelines belonging to the authenticated user.
     It uses filter_stacks() to filter the CloudFormation stacks with type 'pipeline'
     and owner belonging to the same Cognito group as the user is logged in as.
@@ -43,7 +38,7 @@ def list_pipelines():
         r = cfn.describe_stacks()
     except Exception as ex:
         logging.exception(ex)
-        raise ChaliceViewError('Failed to list pipelines')
+        raise Exception('Failed to list pipelines')
 
     # Filter stacks based on owner and retrieve wanted keys
     keys = ['StackName', 'Parameters', 'CreationTime', 'LastUpdatedTime']
@@ -63,17 +58,14 @@ def list_pipelines():
                     'app': params['ServiceProd']
                 })
     except Exception as e:
-        raise ChaliceViewError(e)
+        raise Exception(e)
 
     response = json.dumps(data, default=util.datetime_serialize)
 
     return response
 
 
-@app.route('/pipelines/{name}',
-           methods=['POST'],
-           authorizer=authorizer)
-def create_pipeline(name):
+def post(name):
     """ Creates a new pipeline belonging to the authenticated user.
     Pre-requisites: User must create a new OAuth token on his GitHub-account
     that allows repo access to the requested repository for the pipeline
@@ -141,12 +133,12 @@ def create_pipeline(name):
         )
     except ClientError as e:
         if e.response['Error']['Code'] == 'AlreadyExistsException':
-            raise ChaliceViewError('A pipeline with that name already exists.')
+            raise Exception('A pipeline with that name already exists.')
         else:
             print("Unexpected error: %s" % e)
     except Exception as ex:
         logging.exception(ex)
-        raise ChaliceViewError('Internal server error.')
+        raise Exception('Internal server error.')
 
     response = json.dumps(stack, default=util.datetime_serialize)
 
