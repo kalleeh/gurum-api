@@ -87,7 +87,6 @@ def post():
     groups = request.context['authorizer']['claims']['cognito:groups']
 
     payload = json.loads(request.json_body[0])
-    print(payload)
 
     stack_name = util.addprefix(payload['name'])
     app.log.debug('Creating App: ' + stack_name)
