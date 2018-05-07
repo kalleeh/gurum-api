@@ -1,0 +1,80 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: >
+    This SAM template creates the management API for the container platform.
+    Last Modified: May 7th 2018
+    Author: Karl Wallbom <wallbomk@amazon.com
+
+Globals:
+  Function:
+    Runtime: python3.6
+    Timeout: 180
+    Handler: index.handler
+    Environment:
+      Variables:
+        PLATFORM_REGION: "eu-west-1"
+        PLATFORM_PREFIX: "gureume-"
+        PLATFORM_NAME: "gureume"
+        PLATFORM_ECS_CLUSTER: "gureume"
+        PLATFORM_DEPLOYMENT_ROLE: "arn:aws:iam::789073296014:role/gureume-AppDeploymentRole-eu-west-1"
+        COGNITO_USER_POOL: "eu-west-1_MkM8NwiuN"
+        COGNITO_USER_POOL_ARN: "arn:aws:cognito-idp:eu-west-1:789073296014:userpool/eu-west-1_MkM8NwiuN"
+  Api:
+    EndpointConfiguration: REGIONAL
+  
+Resources:
+
+  ApiGatewayApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      DefinitionBody:
+          'Fn::Transform':
+            Name: 'AWS::Include'
+            Parameters:
+              Location: s3://<bucket>/swagger.yaml
+
+  EncryptionFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: apps.post
+      CodeUri: src/
+      Events:
+        encryptAction:
+          Type: Api
+          Properties:
+            Path: /encrypt
+            Method: post
+      Environment:
+        Variables:
+          keyId: !Ref EncryptionDecryptionKey
+
+  DecryptionFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: decryption.post
+      CodeUri: src/
+      Events:
+        decryptAction:
+          Type: Api
+          Properties:
+            Path: /decrypt
+            Method: post
+
+Outputs:
+
+    EncryptURL:
+      Description: "Encrypt endpoint URL for Stage environment"
+      Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Stage/encrypt"
+
+    DecryptURL:
+      Description: "Decrypt endpoint URL for Stage environment"
+      Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Stage/decrypt"
+
+    EncryptFunction:
+      Description: "Encryption Lambda Function ARN"
+      Value: !GetAtt EncryptionFunction.Arn
+
+    DecryptFunction:
+      Description: "Decryption Lambda Function ARN"
+      Value: !GetAtt DecryptionFunction.Arn
