@@ -1,4 +1,3 @@
----
 swagger: "2.0"
 info:
   version: "1.0"
@@ -6,6 +5,8 @@ info:
 host: "api.gureu.me"
 schemes:
 - "https"
+security:
+- cognitoUserPool: []
 paths:
   /:
     get:
@@ -16,8 +17,6 @@ paths:
           description: "200 response"
           schema:
             $ref: "#/definitions/Empty"
-      security:
-      - null: []
   /apps:
     get:
       produces:
@@ -27,8 +26,6 @@ paths:
           description: "200 response"
           schema:
             $ref: "#/definitions/Empty"
-      security:
-      - null: []
     post:
       produces:
       - "application/json"
@@ -37,8 +34,6 @@ paths:
           description: "200 response"
           schema:
             $ref: "#/definitions/Empty"
-      security:
-      - null: []
   /apps/{name}:
     get:
       produces:
@@ -53,8 +48,6 @@ paths:
           description: "200 response"
           schema:
             $ref: "#/definitions/Empty"
-      security:
-      - null: []
     delete:
       produces:
       - "application/json"
@@ -68,8 +61,6 @@ paths:
           description: "200 response"
           schema:
             $ref: "#/definitions/Empty"
-      security:
-      - null: []
     patch:
       produces:
       - "application/json"
@@ -83,8 +74,6 @@ paths:
           description: "200 response"
           schema:
             $ref: "#/definitions/Empty"
-      security:
-      - null: []
   /pipelines:
     get:
       produces:
@@ -94,8 +83,6 @@ paths:
           description: "200 response"
           schema:
             $ref: "#/definitions/Empty"
-      security:
-      - null: []
   /pipelines/{name}:
     get:
       produces:
@@ -110,8 +97,6 @@ paths:
           description: "200 response"
           schema:
             $ref: "#/definitions/Empty"
-      security:
-      - null: []
     post:
       produces:
       - "application/json"
@@ -125,8 +110,6 @@ paths:
           description: "200 response"
           schema:
             $ref: "#/definitions/Empty"
-      security:
-      - null: []
     delete:
       produces:
       - "application/json"
@@ -140,8 +123,6 @@ paths:
           description: "200 response"
           schema:
             $ref: "#/definitions/Empty"
-      security:
-      - null: []
     patch:
       produces:
       - "application/json"
@@ -155,18 +136,17 @@ paths:
           description: "200 response"
           schema:
             $ref: "#/definitions/Empty"
-      security:
-      - null: []
 securityDefinitions:
   cognitoUserPool:
-    type: apiKey,
+    type: apiKey
     name: "Authorization"
     in: header
     x-amazon-apigateway-authtype: cognito_user_pools
     x-amazon-apigateway-authorizer:
       type: cognito_user_pools
       providerARNs:
-        - arn:aws:cognito-idp:${AWS::Region}:{AWS::AccountId}:userpool/eu-west-1_MkM8NwiuN
+        # - arn:aws:cognito-idp:${AWS::Region}:{AWS::AccountId}:userpool/eu-west-1_MkM8NwiuN
+        - arn:aws:cognito-idp:eu-west-1:789073296014:userpool/eu-west-1_MkM8NwiuN
 definitions:
   Empty:
     type: "object"

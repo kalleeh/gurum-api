@@ -1,0 +1,60 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'This SAM template creates the management API for the container platform.
+  Last Modified: May 7th 2018 Author: Karl Wallbom <wallbomk@amazon.com
+
+  '
+Globals:
+  Api:
+    EndpointConfiguration: REGIONAL
+  Function:
+    Environment:
+      Variables:
+        COGNITO_USER_POOL: eu-west-1_MkM8NwiuN
+        COGNITO_USER_POOL_ARN: arn:aws:cognito-idp:eu-west-1:789073296014:userpool/eu-west-1_MkM8NwiuN
+        PLATFORM_DEPLOYMENT_ROLE: arn:aws:iam::789073296014:role/gureume-AppDeploymentRole-eu-west-1
+        PLATFORM_ECS_CLUSTER: gureume
+        PLATFORM_NAME: gureume
+        PLATFORM_PREFIX: gureume-
+        PLATFORM_REGION: eu-west-1
+    Handler: index.handler
+    Runtime: python3.6
+    Timeout: 180
+Parameters:
+  ApiSwaggerBucket:
+    Default: storage-kalleh/gureume
+    Description: The S3 bucket / prefix where you have your swagger.yaml definition.
+    Type: String
+Resources:
+  ApiGatewayApi:
+    Properties:
+      DefinitionBody:
+        Fn::Transform:
+          Name: AWS::Include
+          Parameters:
+            Location:
+              Fn::Sub: s3://${ApiSwaggerBucket}/swagger.yaml
+      StageName: Prod
+    Type: AWS::Serverless::Api
+  CreateApp:
+    Properties:
+      CodeUri: s3://storage-kalleh/gureume/7c8e6a20e041015a473abc4e3e757722
+      Events:
+        createAction:
+          Properties:
+            Method: post
+            Path: /apps
+          Type: Api
+      Handler: apps.post
+    Type: AWS::Serverless::Function
+  ListApps:
+    Properties:
+      CodeUri: s3://storage-kalleh/gureume/7c8e6a20e041015a473abc4e3e757722
+      Events:
+        listAction:
+          Properties:
+            Method: get
+            Path: /apps
+          Type: Api
+      Handler: apps.get
+    Type: AWS::Serverless::Function
+Transform: AWS::Serverless-2016-10-31

@@ -5,6 +5,12 @@ Description: >
     Last Modified: May 7th 2018
     Author: Karl Wallbom <wallbomk@amazon.com
 
+Parameters:
+  ApiSwaggerBucket: 
+    Type: String
+    Default: storage-kalleh/gureume
+    Description: The S3 bucket / prefix where you have your swagger.yaml definition.
+
 Globals:
   Function:
     Runtime: python3.6
@@ -32,49 +38,28 @@ Resources:
           'Fn::Transform':
             Name: 'AWS::Include'
             Parameters:
-              Location: s3://<bucket>/swagger.yaml
+              Location: !Sub s3://${ApiSwaggerBucket}/swagger.yaml
 
-  EncryptionFunction:
+  ListApps:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: apps.get
+      CodeUri: src/
+      Events:
+        listAction:
+          Type: Api
+          Properties:
+            Path: /apps
+            Method: get
+
+  CreateApp:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: apps.post
       CodeUri: src/
       Events:
-        encryptAction:
+        createAction:
           Type: Api
           Properties:
-            Path: /encrypt
+            Path: /apps
             Method: post
-      Environment:
-        Variables:
-          keyId: !Ref EncryptionDecryptionKey
-
-  DecryptionFunction:
-    Type: 'AWS::Serverless::Function'
-    Properties:
-      Handler: decryption.post
-      CodeUri: src/
-      Events:
-        decryptAction:
-          Type: Api
-          Properties:
-            Path: /decrypt
-            Method: post
-
-Outputs:
-
-    EncryptURL:
-      Description: "Encrypt endpoint URL for Stage environment"
-      Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Stage/encrypt"
-
-    DecryptURL:
-      Description: "Decrypt endpoint URL for Stage environment"
-      Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Stage/decrypt"
-
-    EncryptFunction:
-      Description: "Encryption Lambda Function ARN"
-      Value: !GetAtt EncryptionFunction.Arn
-
-    DecryptFunction:
-      Description: "Decryption Lambda Function ARN"
-      Value: !GetAtt DecryptionFunction.Arn
