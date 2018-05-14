@@ -33,33 +33,425 @@ Resources:
   ApiGatewayApi:
     Type: AWS::Serverless::Api
     Properties:
-      StageName: Prod
+      StageName: dev
       DefinitionBody:
-          'Fn::Transform':
-            Name: 'AWS::Include'
-            Parameters:
-              Location: !Sub s3://${ApiSwaggerBucket}/swagger.yaml
+        swagger: "2.0"
+        info:
+          version: "1.0"
+          title: "platform-api"
+        host: "api.gureu.me"
+        schemes:
+        - "https"
+        paths:
+          /apps:
+            get:
+              produces:
+              - "application/json"
+              responses:
+                '200':
+                  description: "200 response"
+                  schema:
+                    $ref: "#/definitions/Empty"
+              security:
+              - CognitoUserPool: []
+              x-amazon-apigateway-integration:
+                uri: !Join
+                  - ''
+                  - - !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function
+                    - :${stageVariables.ListAppsFunctionArn}/invocations
+                responses:
+                  default:
+                    statusCode: "200"
+                passthroughBehavior: "when_no_match"
+                httpMethod: "POST"
+                contentHandling: "CONVERT_TO_TEXT"
+                type: "aws_proxy"
+            post:
+              produces:
+              - "application/json"
+              responses:
+                '200':
+                  description: "200 response"
+                  schema:
+                    $ref: "#/definitions/Empty"
+              security:
+              - CognitoUserPool: []
+              x-amazon-apigateway-integration:
+                uri: !Join
+                  - ''
+                  - - !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function
+                    - :${stageVariables.CreateAppFunctionArn}/invocations
+                responses:
+                  default:
+                    statusCode: "200"
+                passthroughBehavior: "when_no_match"
+                httpMethod: "POST"
+                contentHandling: "CONVERT_TO_TEXT"
+                type: "aws_proxy"
+          /apps/{name}:
+            get:
+              produces:
+              - "application/json"
+              parameters:
+              - name: "name"
+                in: "path"
+                required: true
+                type: "string"
+              responses:
+                '200':
+                  description: "200 response"
+                  schema:
+                    $ref: "#/definitions/Empty"
+              security:
+              - CognitoUserPool: []
+              x-amazon-apigateway-integration:
+                uri: !Join
+                  - ''
+                  - - !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function
+                    - :${stageVariables.DescribeAppFunctionArn}/invocations
+                responses:
+                  default:
+                    statusCode: "200"
+                passthroughBehavior: "when_no_match"
+                httpMethod: "POST"
+                contentHandling: "CONVERT_TO_TEXT"
+                type: "aws_proxy"
+            delete:
+              produces:
+              - "application/json"
+              parameters:
+              - name: "name"
+                in: "path"
+                required: true
+                type: "string"
+              responses:
+                '200':
+                  description: "200 response"
+                  schema:
+                    $ref: "#/definitions/Empty"
+              security:
+              - CognitoUserPool: []
+              x-amazon-apigateway-integration:
+                uri: !Join
+                  - ''
+                  - - !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function
+                    - :${stageVariables.DeleteAppFunctionArn}/invocations
+                responses:
+                  default:
+                    statusCode: "200"
+                passthroughBehavior: "when_no_match"
+                httpMethod: "POST"
+                contentHandling: "CONVERT_TO_TEXT"
+                type: "aws_proxy"
+            patch:
+              produces:
+              - "application/json"
+              parameters:
+              - name: "name"
+                in: "path"
+                required: true
+                type: "string"
+              responses:
+                '200':
+                  description: "200 response"
+                  schema:
+                    $ref: "#/definitions/Empty"
+              security:
+              - CognitoUserPool: []
+              x-amazon-apigateway-integration:
+                uri: !Join
+                  - ''
+                  - - !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function
+                    - :${stageVariables.UpdateAppFunctionArn}/invocations
+                responses:
+                  default:
+                    statusCode: "200"
+                passthroughBehavior: "when_no_match"
+                httpMethod: "POST"
+                contentHandling: "CONVERT_TO_TEXT"
+                type: "aws_proxy"
+          /events/{name}:
+            get:
+              produces:
+              - "application/json"
+              parameters:
+              - name: "name"
+                in: "path"
+                required: true
+                type: "string"
+              responses:
+                '200':
+                  description: "200 response"
+                  schema:
+                    $ref: "#/definitions/Empty"
+              security:
+              - CognitoUserPool: []
+              x-amazon-apigateway-integration:
+                uri: !Join
+                  - ''
+                  - - !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function
+                    - :${stageVariables.DescribeEventsFunctionArn}/invocations
+                responses:
+                  default:
+                    statusCode: "200"
+                passthroughBehavior: "when_no_match"
+                httpMethod: "POST"
+                contentHandling: "CONVERT_TO_TEXT"
+                type: "aws_proxy"
+          /pipelines:
+            get:
+              produces:
+              - "application/json"
+              responses:
+                '200':
+                  description: "200 response"
+                  schema:
+                    $ref: "#/definitions/Empty"
+              security:
+              - CognitoUserPool: []
+              x-amazon-apigateway-integration:
+                uri: !Join
+                  - ''
+                  - - !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function
+                    - :${stageVariables.ListPipelinesFunctionArn}/invocations
+                responses:
+                  default:
+                    statusCode: "200"
+                passthroughBehavior: "when_no_match"
+                httpMethod: "POST"
+                contentHandling: "CONVERT_TO_TEXT"
+                type: "aws_proxy"
+          /pipelines/{name}:
+            get:
+              produces:
+              - "application/json"
+              parameters:
+              - name: "name"
+                in: "path"
+                required: true
+                type: "string"
+              responses:
+                '200':
+                  description: "200 response"
+                  schema:
+                    $ref: "#/definitions/Empty"
+              security:
+              - CognitoUserPool: []
+              x-amazon-apigateway-integration:
+                uri: !Join
+                  - ''
+                  - - !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function
+                    - :${stageVariables.DescribePipelineFunctionArn}/invocations
+                responses:
+                  default:
+                    statusCode: "200"
+                passthroughBehavior: "when_no_match"
+                httpMethod: "POST"
+                contentHandling: "CONVERT_TO_TEXT"
+                type: "aws_proxy"
+            post:
+              produces:
+              - "application/json"
+              parameters:
+              - name: "name"
+                in: "path"
+                required: true
+                type: "string"
+              responses:
+                '200':
+                  description: "200 response"
+                  schema:
+                    $ref: "#/definitions/Empty"
+              security:
+              - CognitoUserPool: []
+              x-amazon-apigateway-integration:
+                uri: !Join
+                  - ''
+                  - - !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function
+                    - :${stageVariables.CreatePipelineFunctionArn}/invocations
+                responses:
+                  default:
+                    statusCode: "200"
+                passthroughBehavior: "when_no_match"
+                httpMethod: "POST"
+                contentHandling: "CONVERT_TO_TEXT"
+                type: "aws_proxy"
+            delete:
+              produces:
+              - "application/json"
+              parameters:
+              - name: "name"
+                in: "path"
+                required: true
+                type: "string"
+              responses:
+                '200':
+                  description: "200 response"
+                  schema:
+                    $ref: "#/definitions/Empty"
+              security:
+              - CognitoUserPool: []
+              x-amazon-apigateway-integration:
+                uri: !Join
+                  - ''
+                  - - !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function
+                    - :${stageVariables.DeletePipelineFunctionArn}/invocations
+                responses:
+                  default:
+                    statusCode: "200"
+                passthroughBehavior: "when_no_match"
+                httpMethod: "POST"
+                contentHandling: "CONVERT_TO_TEXT"
+                type: "aws_proxy"
+            patch:
+              produces:
+              - "application/json"
+              parameters:
+              - name: "name"
+                in: "path"
+                required: true
+                type: "string"
+              responses:
+                '200':
+                  description: "200 response"
+                  schema:
+                    $ref: "#/definitions/Empty"
+              security:
+              - CognitoUserPool: []
+              x-amazon-apigateway-integration:
+                uri: !Join
+                  - ''
+                  - - !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function
+                    - :${stageVariables.UpdatePipelineFunctionArn}/invocations
+                responses:
+                  default:
+                    statusCode: "200"
+                passthroughBehavior: "when_no_match"
+                httpMethod: "POST"
+                contentHandling: "CONVERT_TO_TEXT"
+                type: "aws_proxy"
+        securityDefinitions:
+          CognitoUserPool:
+            type: "apiKey"
+            name: "Authorization"
+            in: "header"
+            x-amazon-apigateway-authtype: "cognito_user_pools"
+            x-amazon-apigateway-authorizer:
+              providerARNs:
+              - "arn:aws:cognito-idp:eu-west-1:789073296014:userpool/eu-west-1_MkM8NwiuN"
+              type: "cognito_user_pools"
+        definitions:
+          Empty:
+            type: "object"
+            title: "Empty Schema"
+        x-amazon-apigateway-binary-media-types:
+        - "application/octet-stream"
+        - "application/x-tar"
+        - "application/zip"
+        - "audio/basic"
+        - "audio/ogg"
+        - "audio/mp4"
+        - "audio/mpeg"
+        - "audio/wav"
+        - "audio/webm"
+        - "image/png"
+        - "image/jpg"
+        - "image/jpeg"
+        - "image/gif"
+        - "video/ogg"
+        - "video/mpeg"
+        - "video/webm"
+      Variables:
+        ListAppsFunctionArn: !GetAtt ListAppsFunction.Arn
+        CreateAppFunctionArn: !GetAtt CreateAppFunction.Arn
+        DescribeAppFunctionArn: !GetAtt DescribeAppFunction.Arn
+        DeleteAppFunctionArn: !GetAtt DeleteAppFunction.Arn
+        UpdateAppFunctionArn: !GetAtt UpdateAppFunction.Arn
+        ListPipelinesFunctionArn: !GetAtt ListPipelinesFunction.Arn
+        CreatePipelineFunctionArn: !GetAtt CreatePipelineFunction.Arn
+        DescribePipelineFunctionArn: !GetAtt DescribePipelineFunction.Arn
+        DeletePipelineFunctionArn: !GetAtt DeletePipelineFunction.Arn
+        UpdatePipelineFunctionArn: !GetAtt UpdatePipelineFunction.Arn
+        DescribeEventsFunctionArn: !GetAtt DescribeEventsFunction.Arn
 
-  ListApps:
+
+  # Authorizer:
+  #  Type: "AWS::ApiGateway::Authorizer"
+  #  Properties:
+  #    Type: "COGNITO_USER_POOLS"
+  #    IdentitySource: "method.request.header.Auth"
+  #    Name: "CognitoAuthorizer"
+  #    ProviderARNs: ["arn:aws:cognito-idp:eu-west-1:789073296014:userpool/eu-west-1_MkM8NwiuN"]
+  #    RestApiId:
+  #      !Ref ApiGatewayApi
+
+  # Apps definition
+
+  ListAppsFunction:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: apps.get
       CodeUri: src/
-      Events:
-        listAction:
-          Type: Api
-          Properties:
-            Path: /apps
-            Method: get
 
-  CreateApp:
+  CreateAppFunction:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: apps.post
       CodeUri: src/
-      Events:
-        createAction:
-          Type: Api
-          Properties:
-            Path: /apps
-            Method: post
+
+  DescribeAppFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: apps.name.get
+      CodeUri: src/
+
+  DeleteAppFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: apps.name.delete
+      CodeUri: src/
+
+  UpdateAppFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: apps.name.patch
+      CodeUri: src/
+
+# Pipelines definition
+
+  ListPipelinesFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: apps.get
+      CodeUri: src/
+
+  CreatePipelineFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: pipelines.post
+      CodeUri: src/
+
+  DescribePipelineFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: pipelines.name.get
+      CodeUri: src/
+
+  DeletePipelineFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: pipelines.name.delete
+      CodeUri: src/
+
+  UpdatePipelineFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: pipelines.name.patch
+      CodeUri: src/
+
+# Events definition
+  DescribeEventsFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: events.name.get
+      CodeUri: src/

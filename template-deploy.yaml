@@ -28,33 +28,443 @@ Resources:
   ApiGatewayApi:
     Properties:
       DefinitionBody:
-        Fn::Transform:
-          Name: AWS::Include
-          Parameters:
-            Location:
-              Fn::Sub: s3://${ApiSwaggerBucket}/swagger.yaml
-      StageName: Prod
+        definitions:
+          Empty:
+            title: Empty Schema
+            type: object
+        host: api.gureu.me
+        info:
+          title: platform-api
+          version: '1.0'
+        paths:
+          /apps:
+            get:
+              produces:
+              - application/json
+              responses:
+                '200':
+                  description: 200 response
+                  schema:
+                    $ref: '#/definitions/Empty'
+              security:
+              - CognitoUserPool: []
+              x-amazon-apigateway-integration:
+                contentHandling: CONVERT_TO_TEXT
+                httpMethod: POST
+                passthroughBehavior: when_no_match
+                responses:
+                  default:
+                    statusCode: '200'
+                type: aws_proxy
+                uri:
+                  Fn::Join:
+                  - ''
+                  - - Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function
+                    - :${stageVariables.ListAppsFunctionArn}/invocations
+            post:
+              produces:
+              - application/json
+              responses:
+                '200':
+                  description: 200 response
+                  schema:
+                    $ref: '#/definitions/Empty'
+              security:
+              - CognitoUserPool: []
+              x-amazon-apigateway-integration:
+                contentHandling: CONVERT_TO_TEXT
+                httpMethod: POST
+                passthroughBehavior: when_no_match
+                responses:
+                  default:
+                    statusCode: '200'
+                type: aws_proxy
+                uri:
+                  Fn::Join:
+                  - ''
+                  - - Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function
+                    - :${stageVariables.CreateAppFunctionArn}/invocations
+          /apps/{name}:
+            delete:
+              parameters:
+              - in: path
+                name: name
+                required: true
+                type: string
+              produces:
+              - application/json
+              responses:
+                '200':
+                  description: 200 response
+                  schema:
+                    $ref: '#/definitions/Empty'
+              security:
+              - CognitoUserPool: []
+              x-amazon-apigateway-integration:
+                contentHandling: CONVERT_TO_TEXT
+                httpMethod: POST
+                passthroughBehavior: when_no_match
+                responses:
+                  default:
+                    statusCode: '200'
+                type: aws_proxy
+                uri:
+                  Fn::Join:
+                  - ''
+                  - - Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function
+                    - :${stageVariables.DeleteAppFunctionArn}/invocations
+            get:
+              parameters:
+              - in: path
+                name: name
+                required: true
+                type: string
+              produces:
+              - application/json
+              responses:
+                '200':
+                  description: 200 response
+                  schema:
+                    $ref: '#/definitions/Empty'
+              security:
+              - CognitoUserPool: []
+              x-amazon-apigateway-integration:
+                contentHandling: CONVERT_TO_TEXT
+                httpMethod: POST
+                passthroughBehavior: when_no_match
+                responses:
+                  default:
+                    statusCode: '200'
+                type: aws_proxy
+                uri:
+                  Fn::Join:
+                  - ''
+                  - - Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function
+                    - :${stageVariables.DescribeAppFunctionArn}/invocations
+            patch:
+              parameters:
+              - in: path
+                name: name
+                required: true
+                type: string
+              produces:
+              - application/json
+              responses:
+                '200':
+                  description: 200 response
+                  schema:
+                    $ref: '#/definitions/Empty'
+              security:
+              - CognitoUserPool: []
+              x-amazon-apigateway-integration:
+                contentHandling: CONVERT_TO_TEXT
+                httpMethod: POST
+                passthroughBehavior: when_no_match
+                responses:
+                  default:
+                    statusCode: '200'
+                type: aws_proxy
+                uri:
+                  Fn::Join:
+                  - ''
+                  - - Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function
+                    - :${stageVariables.UpdateAppFunctionArn}/invocations
+          /events/{name}:
+            get:
+              parameters:
+              - in: path
+                name: name
+                required: true
+                type: string
+              produces:
+              - application/json
+              responses:
+                '200':
+                  description: 200 response
+                  schema:
+                    $ref: '#/definitions/Empty'
+              security:
+              - CognitoUserPool: []
+              x-amazon-apigateway-integration:
+                contentHandling: CONVERT_TO_TEXT
+                httpMethod: POST
+                passthroughBehavior: when_no_match
+                responses:
+                  default:
+                    statusCode: '200'
+                type: aws_proxy
+                uri:
+                  Fn::Join:
+                  - ''
+                  - - Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function
+                    - :${stageVariables.DescribeEventsFunctionArn}/invocations
+          /pipelines:
+            get:
+              produces:
+              - application/json
+              responses:
+                '200':
+                  description: 200 response
+                  schema:
+                    $ref: '#/definitions/Empty'
+              security:
+              - CognitoUserPool: []
+              x-amazon-apigateway-integration:
+                contentHandling: CONVERT_TO_TEXT
+                httpMethod: POST
+                passthroughBehavior: when_no_match
+                responses:
+                  default:
+                    statusCode: '200'
+                type: aws_proxy
+                uri:
+                  Fn::Join:
+                  - ''
+                  - - Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function
+                    - :${stageVariables.ListPipelinesFunctionArn}/invocations
+          /pipelines/{name}:
+            delete:
+              parameters:
+              - in: path
+                name: name
+                required: true
+                type: string
+              produces:
+              - application/json
+              responses:
+                '200':
+                  description: 200 response
+                  schema:
+                    $ref: '#/definitions/Empty'
+              security:
+              - CognitoUserPool: []
+              x-amazon-apigateway-integration:
+                contentHandling: CONVERT_TO_TEXT
+                httpMethod: POST
+                passthroughBehavior: when_no_match
+                responses:
+                  default:
+                    statusCode: '200'
+                type: aws_proxy
+                uri:
+                  Fn::Join:
+                  - ''
+                  - - Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function
+                    - :${stageVariables.DeletePipelineFunctionArn}/invocations
+            get:
+              parameters:
+              - in: path
+                name: name
+                required: true
+                type: string
+              produces:
+              - application/json
+              responses:
+                '200':
+                  description: 200 response
+                  schema:
+                    $ref: '#/definitions/Empty'
+              security:
+              - CognitoUserPool: []
+              x-amazon-apigateway-integration:
+                contentHandling: CONVERT_TO_TEXT
+                httpMethod: POST
+                passthroughBehavior: when_no_match
+                responses:
+                  default:
+                    statusCode: '200'
+                type: aws_proxy
+                uri:
+                  Fn::Join:
+                  - ''
+                  - - Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function
+                    - :${stageVariables.DescribePipelineFunctionArn}/invocations
+            patch:
+              parameters:
+              - in: path
+                name: name
+                required: true
+                type: string
+              produces:
+              - application/json
+              responses:
+                '200':
+                  description: 200 response
+                  schema:
+                    $ref: '#/definitions/Empty'
+              security:
+              - CognitoUserPool: []
+              x-amazon-apigateway-integration:
+                contentHandling: CONVERT_TO_TEXT
+                httpMethod: POST
+                passthroughBehavior: when_no_match
+                responses:
+                  default:
+                    statusCode: '200'
+                type: aws_proxy
+                uri:
+                  Fn::Join:
+                  - ''
+                  - - Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function
+                    - :${stageVariables.UpdatePipelineFunctionArn}/invocations
+            post:
+              parameters:
+              - in: path
+                name: name
+                required: true
+                type: string
+              produces:
+              - application/json
+              responses:
+                '200':
+                  description: 200 response
+                  schema:
+                    $ref: '#/definitions/Empty'
+              security:
+              - CognitoUserPool: []
+              x-amazon-apigateway-integration:
+                contentHandling: CONVERT_TO_TEXT
+                httpMethod: POST
+                passthroughBehavior: when_no_match
+                responses:
+                  default:
+                    statusCode: '200'
+                type: aws_proxy
+                uri:
+                  Fn::Join:
+                  - ''
+                  - - Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function
+                    - :${stageVariables.CreatePipelineFunctionArn}/invocations
+        schemes:
+        - https
+        securityDefinitions:
+          CognitoUserPool:
+            in: header
+            name: Authorization
+            type: apiKey
+            x-amazon-apigateway-authorizer:
+              providerARNs:
+              - arn:aws:cognito-idp:eu-west-1:789073296014:userpool/eu-west-1_MkM8NwiuN
+              type: cognito_user_pools
+            x-amazon-apigateway-authtype: cognito_user_pools
+        swagger: '2.0'
+        x-amazon-apigateway-binary-media-types:
+        - application/octet-stream
+        - application/x-tar
+        - application/zip
+        - audio/basic
+        - audio/ogg
+        - audio/mp4
+        - audio/mpeg
+        - audio/wav
+        - audio/webm
+        - image/png
+        - image/jpg
+        - image/jpeg
+        - image/gif
+        - video/ogg
+        - video/mpeg
+        - video/webm
+      StageName: dev
+      Variables:
+        CreateAppFunctionArn:
+          Fn::GetAtt:
+          - CreateAppFunction
+          - Arn
+        CreatePipelineFunctionArn:
+          Fn::GetAtt:
+          - CreatePipelineFunction
+          - Arn
+        DeleteAppFunctionArn:
+          Fn::GetAtt:
+          - DeleteAppFunction
+          - Arn
+        DeletePipelineFunctionArn:
+          Fn::GetAtt:
+          - DeletePipelineFunction
+          - Arn
+        DescribeAppFunctionArn:
+          Fn::GetAtt:
+          - DescribeAppFunction
+          - Arn
+        DescribeEventsFunctionArn:
+          Fn::GetAtt:
+          - DescribeEventsFunction
+          - Arn
+        DescribePipelineFunctionArn:
+          Fn::GetAtt:
+          - DescribePipelineFunction
+          - Arn
+        ListAppsFunctionArn:
+          Fn::GetAtt:
+          - ListAppsFunction
+          - Arn
+        ListPipelinesFunctionArn:
+          Fn::GetAtt:
+          - ListPipelinesFunction
+          - Arn
+        UpdateAppFunctionArn:
+          Fn::GetAtt:
+          - UpdateAppFunction
+          - Arn
+        UpdatePipelineFunctionArn:
+          Fn::GetAtt:
+          - UpdatePipelineFunction
+          - Arn
     Type: AWS::Serverless::Api
-  CreateApp:
+  CreateAppFunction:
     Properties:
       CodeUri: s3://storage-kalleh/gureume/7c8e6a20e041015a473abc4e3e757722
-      Events:
-        createAction:
-          Properties:
-            Method: post
-            Path: /apps
-          Type: Api
       Handler: apps.post
     Type: AWS::Serverless::Function
-  ListApps:
+  CreatePipelineFunction:
     Properties:
       CodeUri: s3://storage-kalleh/gureume/7c8e6a20e041015a473abc4e3e757722
-      Events:
-        listAction:
-          Properties:
-            Method: get
-            Path: /apps
-          Type: Api
+      Handler: pipelines.post
+    Type: AWS::Serverless::Function
+  DeleteAppFunction:
+    Properties:
+      CodeUri: s3://storage-kalleh/gureume/7c8e6a20e041015a473abc4e3e757722
+      Handler: apps.name.delete
+    Type: AWS::Serverless::Function
+  DeletePipelineFunction:
+    Properties:
+      CodeUri: s3://storage-kalleh/gureume/7c8e6a20e041015a473abc4e3e757722
+      Handler: pipelines.name.delete
+    Type: AWS::Serverless::Function
+  DescribeAppFunction:
+    Properties:
+      CodeUri: s3://storage-kalleh/gureume/7c8e6a20e041015a473abc4e3e757722
+      Handler: apps.name.get
+    Type: AWS::Serverless::Function
+  DescribeEventsFunction:
+    Properties:
+      CodeUri: s3://storage-kalleh/gureume/7c8e6a20e041015a473abc4e3e757722
+      Handler: events.name.get
+    Type: AWS::Serverless::Function
+  DescribePipelineFunction:
+    Properties:
+      CodeUri: s3://storage-kalleh/gureume/7c8e6a20e041015a473abc4e3e757722
+      Handler: pipelines.name.get
+    Type: AWS::Serverless::Function
+  ListAppsFunction:
+    Properties:
+      CodeUri: s3://storage-kalleh/gureume/7c8e6a20e041015a473abc4e3e757722
       Handler: apps.get
+    Type: AWS::Serverless::Function
+  ListPipelinesFunction:
+    Properties:
+      CodeUri: s3://storage-kalleh/gureume/7c8e6a20e041015a473abc4e3e757722
+      Handler: apps.get
+    Type: AWS::Serverless::Function
+  UpdateAppFunction:
+    Properties:
+      CodeUri: s3://storage-kalleh/gureume/7c8e6a20e041015a473abc4e3e757722
+      Handler: apps.name.patch
+    Type: AWS::Serverless::Function
+  UpdatePipelineFunction:
+    Properties:
+      CodeUri: s3://storage-kalleh/gureume/7c8e6a20e041015a473abc4e3e757722
+      Handler: pipelines.name.patch
     Type: AWS::Serverless::Function
 Transform: AWS::Serverless-2016-10-31
