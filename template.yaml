@@ -55,10 +55,8 @@ Resources:
               security:
               - CognitoUserPool: []
               x-amazon-apigateway-integration:
-                uri: !Join
-                  - ''
-                  - - !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function
-                    - :${stageVariables.ListAppsFunctionArn}/invocations
+                uri:
+                  !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ListAppsFunction.Arn}/invocations
                 responses:
                   default:
                     statusCode: "200"
@@ -77,10 +75,8 @@ Resources:
               security:
               - CognitoUserPool: []
               x-amazon-apigateway-integration:
-                uri: !Join
-                  - ''
-                  - - !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function
-                    - :${stageVariables.CreateAppFunctionArn}/invocations
+                uri:
+                  !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${CreateAppFunction.Arn}/invocations
                 responses:
                   default:
                     statusCode: "200"
@@ -105,10 +101,8 @@ Resources:
               security:
               - CognitoUserPool: []
               x-amazon-apigateway-integration:
-                uri: !Join
-                  - ''
-                  - - !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function
-                    - :${stageVariables.DescribeAppFunctionArn}/invocations
+                uri:
+                  !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DescribeAppFunction.Arn}/invocations
                 responses:
                   default:
                     statusCode: "200"
@@ -132,10 +126,8 @@ Resources:
               security:
               - CognitoUserPool: []
               x-amazon-apigateway-integration:
-                uri: !Join
-                  - ''
-                  - - !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function
-                    - :${stageVariables.DeleteAppFunctionArn}/invocations
+                uri:
+                  !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DeleteAppFunction.Arn}/invocations
                 responses:
                   default:
                     statusCode: "200"
@@ -159,10 +151,8 @@ Resources:
               security:
               - CognitoUserPool: []
               x-amazon-apigateway-integration:
-                uri: !Join
-                  - ''
-                  - - !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function
-                    - :${stageVariables.UpdateAppFunctionArn}/invocations
+                uri:
+                  !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UpdateAppFunction.Arn}/invocations
                 responses:
                   default:
                     statusCode: "200"
@@ -187,10 +177,8 @@ Resources:
               security:
               - CognitoUserPool: []
               x-amazon-apigateway-integration:
-                uri: !Join
-                  - ''
-                  - - !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function
-                    - :${stageVariables.DescribeEventsFunctionArn}/invocations
+                uri:
+                  !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DescribeEventsFunction.Arn}/invocations
                 responses:
                   default:
                     statusCode: "200"
@@ -210,10 +198,8 @@ Resources:
               security:
               - CognitoUserPool: []
               x-amazon-apigateway-integration:
-                uri: !Join
-                  - ''
-                  - - !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function
-                    - :${stageVariables.ListPipelinesFunctionArn}/invocations
+                uri:
+                  !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ListPipelinesFunction.Arn}/invocations
                 responses:
                   default:
                     statusCode: "200"
@@ -238,10 +224,8 @@ Resources:
               security:
               - CognitoUserPool: []
               x-amazon-apigateway-integration:
-                uri: !Join
-                  - ''
-                  - - !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function
-                    - :${stageVariables.DescribePipelineFunctionArn}/invocations
+                uri:
+                  !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DescribePipelineFunction.Arn}/invocations
                 responses:
                   default:
                     statusCode: "200"
@@ -265,10 +249,8 @@ Resources:
               security:
               - CognitoUserPool: []
               x-amazon-apigateway-integration:
-                uri: !Join
-                  - ''
-                  - - !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function
-                    - :${stageVariables.CreatePipelineFunctionArn}/invocations
+                uri:
+                  !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${CreatePipelineFunction.Arn}/invocations
                 responses:
                   default:
                     statusCode: "200"
@@ -292,10 +274,8 @@ Resources:
               security:
               - CognitoUserPool: []
               x-amazon-apigateway-integration:
-                uri: !Join
-                  - ''
-                  - - !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function
-                    - :${stageVariables.DeletePipelineFunctionArn}/invocations
+                uri:
+                  !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DeletePipelineFunction.Arn}/invocations
                 responses:
                   default:
                     statusCode: "200"
@@ -319,10 +299,8 @@ Resources:
               security:
               - CognitoUserPool: []
               x-amazon-apigateway-integration:
-                uri: !Join
-                  - ''
-                  - - !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function
-                    - :${stageVariables.UpdatePipelineFunctionArn}/invocations
+                uri:
+                  !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UpdatePipelineFunction.Arn}/invocations
                 responses:
                   default:
                     statusCode: "200"
@@ -332,14 +310,14 @@ Resources:
                 type: "aws_proxy"
         securityDefinitions:
           CognitoUserPool:
-            type: "apiKey"
-            name: "Authorization"
-            in: "header"
-            x-amazon-apigateway-authtype: "cognito_user_pools"
+            in: header
+            type: apiKey
+            name: Authorization
+            x-amazon-apigateway-authtype: cognito_user_pools
             x-amazon-apigateway-authorizer:
-              providerARNs:
-              - "arn:aws:cognito-idp:eu-west-1:789073296014:userpool/eu-west-1_MkM8NwiuN"
-              type: "cognito_user_pools"
+                type: cognito_user_pools
+                providerARNs:
+                    - 'arn:aws:cognito-idp:eu-west-1:789073296014:userpool/eu-west-1_MkM8NwiuN'
         definitions:
           Empty:
             type: "object"
@@ -402,19 +380,19 @@ Resources:
   DescribeAppFunction:
     Type: 'AWS::Serverless::Function'
     Properties:
-      Handler: apps.name.get
+      Handler: apps_name.get
       CodeUri: src/
 
   DeleteAppFunction:
     Type: 'AWS::Serverless::Function'
     Properties:
-      Handler: apps.name.delete
+      Handler: apps_name.delete
       CodeUri: src/
 
   UpdateAppFunction:
     Type: 'AWS::Serverless::Function'
     Properties:
-      Handler: apps.name.patch
+      Handler: apps_name.patch
       CodeUri: src/
 
 # Pipelines definition
@@ -434,24 +412,24 @@ Resources:
   DescribePipelineFunction:
     Type: 'AWS::Serverless::Function'
     Properties:
-      Handler: pipelines.name.get
+      Handler: pipelines_name.get
       CodeUri: src/
 
   DeletePipelineFunction:
     Type: 'AWS::Serverless::Function'
     Properties:
-      Handler: pipelines.name.delete
+      Handler: pipelines_name.delete
       CodeUri: src/
 
   UpdatePipelineFunction:
     Type: 'AWS::Serverless::Function'
     Properties:
-      Handler: pipelines.name.patch
+      Handler: pipelines_name.patch
       CodeUri: src/
 
 # Events definition
   DescribeEventsFunction:
     Type: 'AWS::Serverless::Function'
     Properties:
-      Handler: events.name.get
+      Handler: events_name.get
       CodeUri: src/
