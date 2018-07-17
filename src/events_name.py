@@ -31,7 +31,7 @@ def get_events(name):
     app.log.debug('Getting events for stack {}:'.format)
     
     # Validate authorization
-    if not validate_auth(name):
+    if not util.validate_auth(name):
         raise Exception('You do not have permission to modify this resource.')
     
     try:
