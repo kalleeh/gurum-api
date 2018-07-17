@@ -8,6 +8,9 @@ import libs.util as util
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
+# Create CloudFormation Client
+cfn = boto3.client('cloudformation', region_name=util.PLATFORM_REGION)
+
 """
 Pipeline Resource Definition
 
@@ -45,7 +48,7 @@ def get():
 
     # Filter stacks based on owner and retrieve wanted keys
     keys = ['StackName', 'Parameters', 'CreationTime', 'LastUpdatedTime']
-    stacks = filter_stacks(r['Stacks'], keys, 'pipeline')
+    stacks = util.filter_stacks(r['Stacks'], keys, 'pipeline')
 
     try:
         for stack in stacks:
@@ -68,7 +71,7 @@ def get():
     return response
 
 
-def post(name):
+def post(name, event, context):
     """ Creates a new pipeline belonging to the authenticated user.
     Pre-requisites: User must create a new OAuth token on his GitHub-account
     that allows repo access to the requested repository for the pipeline
@@ -94,7 +97,7 @@ def post(name):
     params = {}
     tags = {}
 
-    request = app.current_request
+    request = event.current_request
     # Get the user id for the request
     user = request.context['authorizer']['claims']['email']
     groups = request.context['authorizer']['claims']['cognito:groups']
@@ -115,11 +118,11 @@ def post(name):
     params['GitHubUser'] = payload['github_user']
     params = util.dict_to_kv(params, 'ParameterKey', 'ParameterValue')
 
-    tags[PLATFORM_TAGS['TYPE']] = 'pipeline'
-    tags[PLATFORM_TAGS['VERSION']] = '0.1'
-    tags[PLATFORM_TAGS['GROUPS']] = groups
-    tags[PLATFORM_TAGS['REGION']] = PLATFORM_REGION
-    tags[PLATFORM_TAGS['OWNER']] = user
+    tags[util.PLATFORM_TAGS['TYPE']] = 'pipeline'
+    tags[util.PLATFORM_TAGS['VERSION']] = '0.1'
+    tags[util.PLATFORM_TAGS['GROUPS']] = groups
+    tags[util.PLATFORM_TAGS['REGION']] = util.PLATFORM_REGION
+    tags[util.PLATFORM_TAGS['OWNER']] = user
     tags = util.dict_to_kv(tags, 'Key', 'Value')
 
     try:
@@ -131,7 +134,7 @@ def post(name):
             Capabilities=[
                 'CAPABILITY_NAMED_IAM',
             ],
-            RoleARN=PLATFORM_DEPLOYMENT_ROLE,
+            RoleARN=util.PLATFORM_DEPLOYMENT_ROLE,
             Tags=tags
         )
     except ClientError as e:

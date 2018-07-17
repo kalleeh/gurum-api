@@ -8,6 +8,9 @@ import libs.util as util
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
+# Create CloudFormation Client
+cfn = boto3.client('cloudformation', region_name=util.PLATFORM_REGION)
+
 """
 Apps Resource Definition
 
@@ -18,7 +21,7 @@ Apps Resource Definition
 """
 
 
-def get():
+def get(event, context):
     """ Returns the apps belonging to the authenticated user.
     It uses filter_stacks() to filter the CloudFormation stacks with type 'app'
     and owner belonging to the same Cognito group as the user is logged in as.
@@ -62,10 +65,10 @@ def get():
 
     response = json.dumps(data, default=util.datetime_serialize)
 
-    return response
+    return respond(None, response)
 
 
-def post():
+def post(event, context):
     """ Creates a new app belonging to the authenticated user.
 
     Args:
@@ -85,7 +88,8 @@ def post():
     params = {}
     tags = {}
 
-    request = app.current_request
+    request = event
+    print(request)
 
     # Get the user id for the request
     user = request.context['authorizer']['claims']['email']
@@ -105,11 +109,11 @@ def post():
     params['DockerImage'] = payload['image']
     params = util.dict_to_kv(params, 'ParameterKey', 'ParameterValue')
 
-    tags[PLATFORM_TAGS['TYPE']] = 'app'
-    tags[PLATFORM_TAGS['VERSION']] = '0.1'
-    tags[PLATFORM_TAGS['GROUPS']] = groups
-    tags[PLATFORM_TAGS['REGION']] = PLATFORM_REGION
-    tags[PLATFORM_TAGS['OWNER']] = user
+    tags[util.PLATFORM_TAGS['TYPE']] = 'app'
+    tags[util.PLATFORM_TAGS['VERSION']] = '0.1'
+    tags[util.PLATFORM_TAGS['GROUPS']] = groups
+    tags[util.PLATFORM_TAGS['REGION']] = util.PLATFORM_REGION
+    tags[util.PLATFORM_TAGS['OWNER']] = user
     tags = util.dict_to_kv(tags, 'Key', 'Value')
 
     try:
@@ -121,7 +125,7 @@ def post():
             Capabilities=[
                 'CAPABILITY_NAMED_IAM',
             ],
-            RoleARN=PLATFORM_DEPLOYMENT_ROLE,
+            RoleARN=util.PLATFORM_DEPLOYMENT_ROLE,
             Tags=tags
         )
     except ClientError as e:
@@ -135,7 +139,7 @@ def post():
 
     response = json.dumps(stack, default=util.datetime_serialize)
 
-    return response
+    return respond(None, response)
 
 
 def respond(err, res=None):

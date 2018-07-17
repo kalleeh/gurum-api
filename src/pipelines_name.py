@@ -8,6 +8,9 @@ import libs.util as util
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
+# Create CloudFormation Client
+cfn = boto3.client('cloudformation', region_name=util.PLATFORM_REGION)
+
 """
 Pipeline Resource Definition
 
@@ -45,7 +48,7 @@ def get(name):
     # Filter stacks based on owner and retrieve wanted keys
     keys = ['StackName', 'Description', 'StackStatus', 'Tags', 'Outputs']
     try:
-        pipelines = filter_stacks(r['Stacks'], keys, 'pipeline')
+        pipelines = util.filter_stacks(r['Stacks'], keys, 'pipeline')
     except Exception as ex:
         logging.exception(ex)
         raise Exception('Error while filtering stacks.')
@@ -62,7 +65,7 @@ def get(name):
     return response
 
 
-def patch(name):
+def patch(name, event, context):
     """ Updates the pipeline belonging to the authenticated user.
 
     Args:
@@ -85,7 +88,7 @@ def patch(name):
     params = {}
     tags = {}
 
-    request = app.current_request
+    request = event.current_request
     # Get the user id for the request
     user = request.context['authorizer']['claims']['email']
     groups = request.context['authorizer']['claims']['cognito:groups']
@@ -96,7 +99,7 @@ def patch(name):
     logger.debug('Updating Pipeline: ' + stack_name)
 
     # Validate authorization
-    if not validate_auth(stack_name):
+    if not util.validate_auth(stack_name):
         raise Exception('You do not have permission to modify this resource.')
     
     if 'app_dev' in payload:
@@ -110,11 +113,11 @@ def patch(name):
     params['GitHubUser'] = payload['github_user']
     params = util.dict_to_kv(params, 'ParameterKey', 'ParameterValue')
 
-    tags[PLATFORM_TAGS['TYPE']] = 'pipeline'
-    tags[PLATFORM_TAGS['VERSION']] = '0.2'
-    tags[PLATFORM_TAGS['GROUPS']] = groups
-    tags[PLATFORM_TAGS['REGION']] = PLATFORM_REGION
-    tags[PLATFORM_TAGS['OWNER']] = user
+    tags[util.PLATFORM_TAGS['TYPE']] = 'pipeline'
+    tags[util.PLATFORM_TAGS['VERSION']] = '0.2'
+    tags[util.PLATFORM_TAGS['GROUPS']] = groups
+    tags[util.PLATFORM_TAGS['REGION']] = util.PLATFORM_REGION
+    tags[util.PLATFORM_TAGS['OWNER']] = user
     tags = util.dict_to_kv(tags, 'Key', 'Value')
 
     try:
@@ -125,7 +128,7 @@ def patch(name):
             Capabilities=[
                 'CAPABILITY_NAMED_IAM',
             ],
-            RoleARN=PLATFORM_DEPLOYMENT_ROLE,
+            RoleARN=util.PLATFORM_DEPLOYMENT_ROLE,
             Tags=tags
         )
     except ClientError as e:
@@ -156,13 +159,14 @@ def delete(name):
     logger.debug('Deleting Pipeline: ' + stack_name)
 
     # Validate authorization
-    if not validate_auth(stack_name):
+    if not util.validate_auth(stack_name):
         raise Exception('You do not have permission to modify this resource.')
     
     try:
         stack = cfn.delete_stack(StackName=stack_name)
     except ValidationError as e:
-        if e.response['Error']['Message'].endswidth('does not exist'):
+        error_msg = util.boto_exception(e)
+        if error_msg.endswidth('does not exist'):
             raise Exception('No such item.')
     except Exception as ex:
         logging.exception(ex)

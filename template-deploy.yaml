@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: 'This SAM template creates the management API for the container platform.
-  Last Modified: May 7th 2018 Author: Karl Wallbom <wallbomk@amazon.com
+  Last Modified: July 17th 2018 Author: Karl Wallbom <wallbomk@amazon.com
 
   '
 Globals:
@@ -19,11 +19,6 @@ Globals:
     Handler: index.handler
     Runtime: python3.6
     Timeout: 180
-Parameters:
-  ApiSwaggerBucket:
-    Default: storage-kalleh/gureume
-    Description: The S3 bucket / prefix where you have your swagger.yaml definition.
-    Type: String
 Resources:
   ApiGatewayApi:
     Properties:
@@ -381,59 +376,59 @@ Resources:
     Type: AWS::Serverless::Api
   CreateAppFunction:
     Properties:
-      CodeUri: s3://storage-kalleh/gureume/538bf00cbf7104f44e5f2c25068e42e9
+      CodeUri: s3://storage-kalleh/gureume/2de67d27b7c080cdfebfad9a59a25fd6
       Handler: apps.post
     Type: AWS::Serverless::Function
   CreatePipelineFunction:
     Properties:
-      CodeUri: s3://storage-kalleh/gureume/538bf00cbf7104f44e5f2c25068e42e9
+      CodeUri: s3://storage-kalleh/gureume/2de67d27b7c080cdfebfad9a59a25fd6
       Handler: pipelines.post
     Type: AWS::Serverless::Function
   DeleteAppFunction:
     Properties:
-      CodeUri: s3://storage-kalleh/gureume/538bf00cbf7104f44e5f2c25068e42e9
+      CodeUri: s3://storage-kalleh/gureume/2de67d27b7c080cdfebfad9a59a25fd6
       Handler: apps_name.delete
     Type: AWS::Serverless::Function
   DeletePipelineFunction:
     Properties:
-      CodeUri: s3://storage-kalleh/gureume/538bf00cbf7104f44e5f2c25068e42e9
+      CodeUri: s3://storage-kalleh/gureume/2de67d27b7c080cdfebfad9a59a25fd6
       Handler: pipelines_name.delete
     Type: AWS::Serverless::Function
   DescribeAppFunction:
     Properties:
-      CodeUri: s3://storage-kalleh/gureume/538bf00cbf7104f44e5f2c25068e42e9
+      CodeUri: s3://storage-kalleh/gureume/2de67d27b7c080cdfebfad9a59a25fd6
       Handler: apps_name.get
     Type: AWS::Serverless::Function
   DescribeEventsFunction:
     Properties:
-      CodeUri: s3://storage-kalleh/gureume/538bf00cbf7104f44e5f2c25068e42e9
+      CodeUri: s3://storage-kalleh/gureume/2de67d27b7c080cdfebfad9a59a25fd6
       Handler: events_name.get
     Type: AWS::Serverless::Function
   DescribePipelineFunction:
     Properties:
-      CodeUri: s3://storage-kalleh/gureume/538bf00cbf7104f44e5f2c25068e42e9
+      CodeUri: s3://storage-kalleh/gureume/2de67d27b7c080cdfebfad9a59a25fd6
       Handler: pipelines_name.get
     Type: AWS::Serverless::Function
   ListAppsFunction:
     Properties:
-      CodeUri: s3://storage-kalleh/gureume/538bf00cbf7104f44e5f2c25068e42e9
+      CodeUri: s3://storage-kalleh/gureume/2de67d27b7c080cdfebfad9a59a25fd6
       Handler: apps.get
       Policies:
       - CloudFormationDescribeStacksPolicy: {}
     Type: AWS::Serverless::Function
   ListPipelinesFunction:
     Properties:
-      CodeUri: s3://storage-kalleh/gureume/538bf00cbf7104f44e5f2c25068e42e9
+      CodeUri: s3://storage-kalleh/gureume/2de67d27b7c080cdfebfad9a59a25fd6
       Handler: apps.get
     Type: AWS::Serverless::Function
   UpdateAppFunction:
     Properties:
-      CodeUri: s3://storage-kalleh/gureume/538bf00cbf7104f44e5f2c25068e42e9
+      CodeUri: s3://storage-kalleh/gureume/2de67d27b7c080cdfebfad9a59a25fd6
       Handler: apps_name.patch
     Type: AWS::Serverless::Function
   UpdatePipelineFunction:
     Properties:
-      CodeUri: s3://storage-kalleh/gureume/538bf00cbf7104f44e5f2c25068e42e9
+      CodeUri: s3://storage-kalleh/gureume/2de67d27b7c080cdfebfad9a59a25fd6
       Handler: pipelines_name.patch
     Type: AWS::Serverless::Function
 Transform: AWS::Serverless-2016-10-31

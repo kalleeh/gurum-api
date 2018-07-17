@@ -2,10 +2,8 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 Description: >
     This SAM template creates the management API for the container platform.
-    Last Modified: May 7th 2018
+    Last Modified: July 17th 2018
     Author: Karl Wallbom <wallbomk@amazon.com
-
-Parameters:
 
 Globals:
   Function:
@@ -335,18 +333,6 @@ Resources:
         - "video/ogg"
         - "video/mpeg"
         - "video/webm"
-      Variables:
-        ListAppsFunctionArn: !GetAtt ListAppsFunction.Arn
-        CreateAppFunctionArn: !GetAtt CreateAppFunction.Arn
-        DescribeAppFunctionArn: !GetAtt DescribeAppFunction.Arn
-        DeleteAppFunctionArn: !GetAtt DeleteAppFunction.Arn
-        UpdateAppFunctionArn: !GetAtt UpdateAppFunction.Arn
-        ListPipelinesFunctionArn: !GetAtt ListPipelinesFunction.Arn
-        CreatePipelineFunctionArn: !GetAtt CreatePipelineFunction.Arn
-        DescribePipelineFunctionArn: !GetAtt DescribePipelineFunction.Arn
-        DeletePipelineFunctionArn: !GetAtt DeletePipelineFunction.Arn
-        UpdatePipelineFunctionArn: !GetAtt UpdatePipelineFunction.Arn
-        DescribeEventsFunctionArn: !GetAtt DescribeEventsFunction.Arn
 
 
   # Authorizer:

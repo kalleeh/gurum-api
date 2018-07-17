@@ -8,6 +8,9 @@ import libs.util as util
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
+# Create CloudFormation Client
+cfn = boto3.client('cloudformation', region_name=util.PLATFORM_REGION)
+
 """
 Events Resource Definition
 

@@ -8,6 +8,9 @@ import libs.util as util
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
+# Create CloudFormation Client
+cfn = boto3.client('cloudformation', region_name=util.PLATFORM_REGION)
+
 """
 Apps Resource Definition
 
@@ -45,7 +48,7 @@ def get(name):
     # Filter stacks based on owner and retrieve wanted keys
     keys = ['StackName', 'Description', 'StackStatus', 'Tags', 'Outputs']
     try:
-        apps = filter_stacks(r['Stacks'], keys, 'app')
+        apps = util.filter_stacks(r['Stacks'], keys, 'app')
     except Exception as ex:
         logging.exception(ex)
         raise Exception('Error while filtering stacks.')
@@ -65,7 +68,7 @@ def get(name):
     return response
 
 
-def patch(name):
+def patch(name, event, context):
     """ Validates that the app belongs to the authenticated user
     and updates the configuration.
 
@@ -85,7 +88,7 @@ def patch(name):
     params = {}
     tags = {}
 
-    request = app.current_request
+    request = event.current_request
 
     # Get the user id for the request
     user = request.context['authorizer']['claims']['email']
@@ -97,7 +100,7 @@ def patch(name):
     logger.debug('Updating App: ' + str(stack_name))
 
     # Validate authorization
-    if not validate_auth(stack_name):
+    if not util.validate_auth(stack_name):
         raise Exception('You do not have permission to modify this resource.')
 
     if 'tasks' in payload:
@@ -141,11 +144,11 @@ def patch(name):
             }
         )
 
-    tags[PLATFORM_TAGS['TYPE']] = 'app'
-    tags[PLATFORM_TAGS['VERSION']] = '0.2'
-    tags[PLATFORM_TAGS['GROUPS']] = groups
-    tags[PLATFORM_TAGS['REGION']] = PLATFORM_REGION
-    tags[PLATFORM_TAGS['OWNER']] = user
+    tags[util.PLATFORM_TAGS['TYPE']] = 'app'
+    tags[util.PLATFORM_TAGS['VERSION']] = '0.2'
+    tags[util.PLATFORM_TAGS['GROUPS']] = groups
+    tags[util.PLATFORM_TAGS['REGION']] = util.PLATFORM_REGION
+    tags[util.PLATFORM_TAGS['OWNER']] = user
     tags = util.dict_to_kv(tags, 'Key', 'Value')
 
     try:
@@ -156,7 +159,7 @@ def patch(name):
             Capabilities=[
                 'CAPABILITY_NAMED_IAM',
             ],
-            RoleARN=PLATFORM_DEPLOYMENT_ROLE,
+            RoleARN=util.PLATFORM_DEPLOYMENT_ROLE,
             Tags=tags
         )
     except ValidationError as e:
@@ -185,13 +188,14 @@ def delete(name):
     logger.debug('Deleting App: ' + stack_name)
 
     # Validate authorization
-    if not validate_auth(stack_name):
+    if not util.validate_auth(stack_name):
         raise Exception('You do not have permission to modify this resource.')
     
     try:
         stack = cfn.delete_stack(StackName=stack_name)
     except ValidationError as e:
-        if e.response['Error']['Message'].endswidth('does not exist'):
+        error_msg = util.boto_exception(e)
+        if error_msg.endswidth('does not exist'):
             raise Exception('No such item.')
     except Exception as ex:
         logging.exception(ex)

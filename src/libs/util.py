@@ -8,6 +8,22 @@ PLATFORM_PREFIX = os.getenv('PLATFORM_PREFIX', 'platform-')
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
+PLATFORM_NAME = os.getenv('PLATFORM_NAME', 'platform')
+PLATFORM_PREFIX = os.getenv('PLATFORM_PREFIX', 'platform-')
+PLATFORM_REGION = os.getenv('PLATFORM_REGION', 'eu-west-1')
+PLATFORM_ECS_CLUSTER = os.getenv('PLATFORM_ECS_CLUSTER', PLATFORM_PREFIX + 'cluster')
+PLATFORM_DEPLOYMENT_ROLE = os.getenv('PLATFORM_DEPLOYMENT_ROLE', 'deployment_role')
+# Tags for the platform
+PLATFORM_TAGS = {}
+PLATFORM_TAGS['TYPE'] = os.getenv('PLATFORM_TAGS_TYPE', PLATFORM_PREFIX + 'platform-type')
+PLATFORM_TAGS['VERSION'] = os.getenv('PLATFORM_TAGS_VERSION', PLATFORM_PREFIX + 'platform-version')
+PLATFORM_TAGS['OWNER'] = os.getenv('PLATFORM_TAGS_OWNER', PLATFORM_PREFIX + 'owner')
+PLATFORM_TAGS['REGION'] = os.getenv('PLATFORM_TAGS_REGION', PLATFORM_PREFIX + 'region')
+PLATFORM_TAGS['GROUPS'] = os.getenv('PLATFORM_TAGS_GROUPS', PLATFORM_PREFIX + 'groups')
+
+# Create CloudFormation Client
+cfn = boto3.client('cloudformation', region_name=PLATFORM_REGION)
+
 
 def filter_stacks(stacks, keys, stack_type='any'):
     """ Filters a list of stacks validating they are stacks in the platform
@@ -79,7 +95,7 @@ def validate_auth(stack_name):
         r = cfn.describe_stacks(StackName=stack_name)
     except Exception as ex:
         logging.exception(ex)
-        raise ChaliceViewError('No such object.')
+        raise('No such object.')
     
     # Loop through stacks
     for stack in r['Stacks']:
@@ -94,10 +110,10 @@ def validate_auth(stack_name):
                 return True
             else:
                 logger.debug('{} does not belong to group: {}'.format(stack_name, groups))
-                raise ChaliceViewError('Permission denied.')
+                raise('Permission denied.')
         else:
             logger.debug('Stack {} does not have a platform type.'.format(stack_name))
-            raise ChaliceViewError('No such object.')
+            raise('No such object.')
 
     return False
 
@@ -120,7 +136,7 @@ def get_cfn_exports():
         cfn_exports = cfn.list_exports()
     except Exception as ex:
         logging.exception(ex)
-        raise ChaliceViewError('Internal server error.')
+        raise('Internal server error.')
 
     exports = {}
     for export in cfn_exports['Exports']:
@@ -148,7 +164,7 @@ def iterate_rule_priority(listener_arn):
         )['Rules']
     except Exception as ex:
         logging.exception(ex)
-        raise ChaliceViewError('Internal server error.')
+        raise('Internal server error.')
 
     rules = [rule for rule in rules if rule['Priority'].isdigit()]
 
@@ -265,3 +281,17 @@ def kv_to_dict(my_list, key_name, value_name):
         my_dict[item[key_name]] = item[value_name]
 
     return my_dict
+
+
+def boto_exception(err):
+    """
+    generic error message handler
+    """
+    if hasattr(err, 'error_message'):
+        error = err.error_message
+    elif hasattr(err, 'message'):
+        error = err.message + ' ' + str(err) + ' - ' + str(type(err))
+    else:
+        error = '%s: %s' % (Exception, err)
+
+    return error
