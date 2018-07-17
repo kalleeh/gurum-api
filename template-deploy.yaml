@@ -418,6 +418,8 @@ Resources:
     Properties:
       CodeUri: s3://storage-kalleh/gureume/538bf00cbf7104f44e5f2c25068e42e9
       Handler: apps.get
+      Policies:
+      - CloudFormationDescribeStacksPolicy: {}
     Type: AWS::Serverless::Function
   ListPipelinesFunction:
     Properties:

@@ -5,6 +5,9 @@ from botocore.exceptions import ValidationError, ClientError
 
 import libs.util as util
 
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
 """
 Apps Resource Definition
 
@@ -29,8 +32,8 @@ def get():
     """
     data = []
     stacks = []
-
-    app.log.debug('Listing Apps:')
+    
+    logger.debug('Listing Apps:')
 
     try:
         # List CloudFormation Stacks
@@ -41,7 +44,7 @@ def get():
     
     # Filter stacks based on owner and retrieve wanted keys
     keys = ['StackName', 'Parameters', 'CreationTime', 'LastUpdatedTime']
-    stacks = filter_stacks(r['Stacks'], keys, 'app')
+    stacks = util.filter_stacks(r['Stacks'], keys, 'app')
 
     try:
         for stack in stacks:
@@ -91,12 +94,12 @@ def post():
     payload = json.loads(request.json_body[0])
 
     stack_name = util.addprefix(payload['name'])
-    app.log.debug('Creating App: ' + stack_name)
+    logger.debug('Creating App: ' + stack_name)
 
-    exports = get_cfn_exports()
+    exports = util.get_cfn_exports()
 
     params['DesiredCount'] = payload['tasks']
-    params['Priority'] = str(iterate_rule_priority(exports['LoadBalancerListener']))
+    params['Priority'] = str(util.iterate_rule_priority(exports['LoadBalancerListener']))
     params['Listener'] = exports['LoadBalancerListener']
     params['HealthCheckPath'] = payload['health_check_path']
     params['DockerImage'] = payload['image']

@@ -1,8 +1,12 @@
 import os
 import datetime
 import logging
+import boto3
 
 PLATFORM_PREFIX = os.getenv('PLATFORM_PREFIX', 'platform-')
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 
 def filter_stacks(stacks, keys, stack_type='any'):
@@ -46,12 +50,12 @@ def filter_stacks(stacks, keys, stack_type='any'):
                     keys.remove('Outputs')
             # Check if app belongs to group by comparing groups tag to the cognito group in claim
             if stack_tags[PLATFORM_TAGS['GROUPS']] == groups:
-                app.log.debug('Found stack {} with owner group: {}'.format(stack_name, groups))
+                logger.debug('Found stack {} with owner group: {}'.format(stack_name, groups))
                 data.append(subdict(stack, keys))
             else:
-                app.log.debug('{} does not belong to group: {}'.format(stack_name, groups))
+                logger.debug('{} does not belong to group: {}'.format(stack_name, groups))
         else:
-            app.log.debug('Type is not {} for {}'.format(stack_type, stack_name))
+            logger.debug('Type is not {} for {}'.format(stack_type, stack_name))
 
     return data
 
@@ -86,13 +90,13 @@ def validate_auth(stack_name):
         if (PLATFORM_TAGS['TYPE'] in stack_tags):
             # Check if stack belongs to group by comparing groups tag to the cognito group in claim
             if stack_tags[PLATFORM_TAGS['GROUPS']] == groups:
-                app.log.debug('Authorization Successful: Stack {} owned by: {}'.format(stack_name, groups))
+                logger.debug('Authorization Successful: Stack {} owned by: {}'.format(stack_name, groups))
                 return True
             else:
-                app.log.debug('{} does not belong to group: {}'.format(stack_name, groups))
+                logger.debug('{} does not belong to group: {}'.format(stack_name, groups))
                 raise ChaliceViewError('Permission denied.')
         else:
-            app.log.debug('Stack {} does not have a platform type.'.format(stack_name))
+            logger.debug('Stack {} does not have a platform type.'.format(stack_name))
             raise ChaliceViewError('No such object.')
 
     return False

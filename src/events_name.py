@@ -5,6 +5,9 @@ from botocore.exceptions import ValidationError, ClientError
 
 import libs.util as util
 
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
 """
 Events Resource Definition
 
@@ -14,9 +17,7 @@ Events Resource Definition
 """
 
 
-@app.route('/events/{name}',
-           authorizer=authorizer)
-def get_events(name):
+def get(name):
     """ Fetches the 10 latest CloudFormation Events for App
 
     Args:
@@ -28,7 +29,7 @@ def get_events(name):
     """
     data = []
 
-    app.log.debug('Getting events for stack {}:'.format)
+    logger.debug('Getting events for stack {}:'.format)
     
     # Validate authorization
     if not util.validate_auth(name):

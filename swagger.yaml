@@ -6,39 +6,20 @@ host: "api.gureu.me"
 schemes:
 - "https"
 paths:
-  /:
-    get:
-      produces:
-      - "application/json"
-      responses:
-        200:
-          description: "200 response"
-          schema:
-            $ref: "#/definitions/Empty"
-      security:
-      - null: []
-      x-amazon-apigateway-integration:
-        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:789073296014:function:gureume-api-dev/invocations"
-        responses:
-          default:
-            statusCode: "200"
-        passthroughBehavior: "when_no_match"
-        httpMethod: "POST"
-        contentHandling: "CONVERT_TO_TEXT"
-        type: "aws_proxy"
   /apps:
     get:
       produces:
       - "application/json"
       responses:
-        200:
+        '200':
           description: "200 response"
           schema:
             $ref: "#/definitions/Empty"
       security:
-      - null: []
+      - CognitoUserPool: []
       x-amazon-apigateway-integration:
-        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:789073296014:function:gureume-api-dev/invocations"
+        uri:
+          !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ListAppsFunction.Arn}/invocations
         responses:
           default:
             statusCode: "200"
@@ -50,14 +31,15 @@ paths:
       produces:
       - "application/json"
       responses:
-        200:
+        '200':
           description: "200 response"
           schema:
             $ref: "#/definitions/Empty"
       security:
-      - null: []
+      - CognitoUserPool: []
       x-amazon-apigateway-integration:
-        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:789073296014:function:gureume-api-dev/invocations"
+        uri:
+          !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${CreateAppFunction.Arn}/invocations
         responses:
           default:
             statusCode: "200"
@@ -75,14 +57,15 @@ paths:
         required: true
         type: "string"
       responses:
-        200:
+        '200':
           description: "200 response"
           schema:
             $ref: "#/definitions/Empty"
       security:
-      - null: []
+      - CognitoUserPool: []
       x-amazon-apigateway-integration:
-        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:789073296014:function:gureume-api-dev/invocations"
+        uri:
+          !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DescribeAppFunction.Arn}/invocations
         responses:
           default:
             statusCode: "200"
@@ -99,14 +82,15 @@ paths:
         required: true
         type: "string"
       responses:
-        200:
+        '200':
           description: "200 response"
           schema:
             $ref: "#/definitions/Empty"
       security:
-      - null: []
+      - CognitoUserPool: []
       x-amazon-apigateway-integration:
-        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:789073296014:function:gureume-api-dev/invocations"
+        uri:
+          !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DeleteAppFunction.Arn}/invocations
         responses:
           default:
             statusCode: "200"
@@ -123,14 +107,15 @@ paths:
         required: true
         type: "string"
       responses:
-        200:
+        '200':
           description: "200 response"
           schema:
             $ref: "#/definitions/Empty"
       security:
-      - null: []
+      - CognitoUserPool: []
       x-amazon-apigateway-integration:
-        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:789073296014:function:gureume-api-dev/invocations"
+        uri:
+          !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UpdateAppFunction.Arn}/invocations
         responses:
           default:
             statusCode: "200"
@@ -148,14 +133,15 @@ paths:
         required: true
         type: "string"
       responses:
-        200:
+        '200':
           description: "200 response"
           schema:
             $ref: "#/definitions/Empty"
       security:
-      - null: []
+      - CognitoUserPool: []
       x-amazon-apigateway-integration:
-        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:789073296014:function:gureume-api-dev/invocations"
+        uri:
+          !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DescribeEventsFunction.Arn}/invocations
         responses:
           default:
             statusCode: "200"
@@ -168,14 +154,15 @@ paths:
       produces:
       - "application/json"
       responses:
-        200:
+        '200':
           description: "200 response"
           schema:
             $ref: "#/definitions/Empty"
       security:
-      - null: []
+      - CognitoUserPool: []
       x-amazon-apigateway-integration:
-        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:789073296014:function:gureume-api-dev/invocations"
+        uri:
+          !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ListPipelinesFunction.Arn}/invocations
         responses:
           default:
             statusCode: "200"
@@ -193,14 +180,15 @@ paths:
         required: true
         type: "string"
       responses:
-        200:
+        '200':
           description: "200 response"
           schema:
             $ref: "#/definitions/Empty"
       security:
-      - null: []
+      - CognitoUserPool: []
       x-amazon-apigateway-integration:
-        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:789073296014:function:gureume-api-dev/invocations"
+        uri:
+          !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DescribePipelineFunction.Arn}/invocations
         responses:
           default:
             statusCode: "200"
@@ -217,14 +205,15 @@ paths:
         required: true
         type: "string"
       responses:
-        200:
+        '200':
           description: "200 response"
           schema:
             $ref: "#/definitions/Empty"
       security:
-      - null: []
+      - CognitoUserPool: []
       x-amazon-apigateway-integration:
-        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:789073296014:function:gureume-api-dev/invocations"
+        uri:
+          !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${CreatePipelineFunction.Arn}/invocations
         responses:
           default:
             statusCode: "200"
@@ -241,14 +230,15 @@ paths:
         required: true
         type: "string"
       responses:
-        200:
+        '200':
           description: "200 response"
           schema:
             $ref: "#/definitions/Empty"
       security:
-      - null: []
+      - CognitoUserPool: []
       x-amazon-apigateway-integration:
-        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:789073296014:function:gureume-api-dev/invocations"
+        uri:
+          !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DeletePipelineFunction.Arn}/invocations
         responses:
           default:
             statusCode: "200"
@@ -265,14 +255,15 @@ paths:
         required: true
         type: "string"
       responses:
-        200:
+        '200':
           description: "200 response"
           schema:
             $ref: "#/definitions/Empty"
       security:
-      - null: []
+      - CognitoUserPool: []
       x-amazon-apigateway-integration:
-        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:789073296014:function:gureume-api-dev/invocations"
+        uri:
+          !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UpdatePipelineFunction.Arn}/invocations
         responses:
           default:
             statusCode: "200"
@@ -280,34 +271,3 @@ paths:
         httpMethod: "POST"
         contentHandling: "CONVERT_TO_TEXT"
         type: "aws_proxy"
-securityDefinitions:
-  null:
-    type: "apiKey"
-    name: "Authorization"
-    in: "header"
-    x-amazon-apigateway-authtype: "cognito_user_pools"
-    x-amazon-apigateway-authorizer:
-      providerARNs:
-      - "arn:aws:cognito-idp:eu-west-1:789073296014:userpool/eu-west-1_MkM8NwiuN"
-      type: "cognito_user_pools"
-definitions:
-  Empty:
-    type: "object"
-    title: "Empty Schema"
-x-amazon-apigateway-binary-media-types:
-- "application/octet-stream"
-- "application/x-tar"
-- "application/zip"
-- "audio/basic"
-- "audio/ogg"
-- "audio/mp4"
-- "audio/mpeg"
-- "audio/wav"
-- "audio/webm"
-- "image/png"
-- "image/jpg"
-- "image/jpeg"
-- "image/gif"
-- "video/ogg"
-- "video/mpeg"
-- "video/webm"

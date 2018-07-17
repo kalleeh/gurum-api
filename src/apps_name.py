@@ -5,6 +5,9 @@ from botocore.exceptions import ValidationError, ClientError
 
 import libs.util as util
 
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
 """
 Apps Resource Definition
 
@@ -29,7 +32,7 @@ def get(name):
     apps = {}
     data = {}
 
-    app.log.debug('Describing Stack:')
+    logger.debug('Describing Stack:')
     stack_name = util.addprefix(name)
 
     # List CloudFormation Stacks
@@ -91,7 +94,7 @@ def patch(name):
     payload = json.loads(request.json_body[0])
 
     stack_name = util.addprefix(name)
-    app.log.debug('Updating App: ' + str(stack_name))
+    logger.debug('Updating App: ' + str(stack_name))
 
     # Validate authorization
     if not validate_auth(stack_name):
@@ -179,7 +182,7 @@ def delete(name):
         List: List of JSON objects containing app information
     """
     stack_name = util.addprefix(name)
-    app.log.debug('Deleting App: ' + stack_name)
+    logger.debug('Deleting App: ' + stack_name)
 
     # Validate authorization
     if not validate_auth(stack_name):

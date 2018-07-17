@@ -5,6 +5,9 @@ from botocore.exceptions import ValidationError, ClientError
 
 import libs.util as util
 
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
 """
 Pipeline Resource Definition
 
@@ -31,7 +34,7 @@ def get():
     data = []
     stacks = []
 
-    app.log.debug('Listing Pipelines:')
+    logger.debug('Listing Pipelines:')
 
     try:
         # List CloudFormation Stacks
@@ -99,7 +102,7 @@ def post(name):
     payload = json.loads(request.json_body[0])
 
     stack_name = util.addprefix(name)
-    app.log.debug('Creating Pipeline: ' + stack_name)
+    logger.debug('Creating Pipeline: ' + stack_name)
 
     if 'app_dev' in payload:
         params['ServiceDev'] = util.addprefix(payload['app_dev'])

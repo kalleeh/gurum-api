@@ -6,10 +6,6 @@ Description: >
     Author: Karl Wallbom <wallbomk@amazon.com
 
 Parameters:
-  ApiSwaggerBucket: 
-    Type: String
-    Default: storage-kalleh/gureume
-    Description: The S3 bucket / prefix where you have your swagger.yaml definition.
 
 Globals:
   Function:
@@ -370,6 +366,8 @@ Resources:
     Properties:
       Handler: apps.get
       CodeUri: src/
+      Policies:
+        - CloudFormationDescribeStacksPolicy: {}
 
   CreateAppFunction:
     Type: 'AWS::Serverless::Function'
