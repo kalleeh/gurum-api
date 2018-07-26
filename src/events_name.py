@@ -20,7 +20,7 @@ Events Resource Definition
 """
 
 
-def get(name):
+def get(event, context):
     """ Fetches the 10 latest CloudFormation Events for App
 
     Args:
@@ -32,10 +32,14 @@ def get(name):
     """
     data = []
 
-    logger.debug('Getting events for stack {}:'.format)
+    name = util.addprefix(event['pathParameters']['name'])
+    logger.debug('Getting events for stack {}:'.format(name))
+
+    # Get the user id for the request
+    groups = event['requestContext']['authorizer']['claims']['cognito:groups']
     
     # Validate authorization
-    if not util.validate_auth(name):
+    if not util.validate_auth(name, groups):
         raise Exception('You do not have permission to modify this resource.')
     
     try:

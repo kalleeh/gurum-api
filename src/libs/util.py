@@ -25,7 +25,7 @@ PLATFORM_TAGS['GROUPS'] = os.getenv('PLATFORM_TAGS_GROUPS', PLATFORM_PREFIX + 'g
 cfn = boto3.client('cloudformation', region_name=PLATFORM_REGION)
 
 
-def filter_stacks(stacks, keys, stack_type='any'):
+def filter_stacks(stacks, keys, groups, stack_type='any'):
     """ Filters a list of stacks validating they are stacks in the platform
     and belongs to the user performing the request and returns the chosen
     keys (arg) for those stacks.
@@ -48,10 +48,6 @@ def filter_stacks(stacks, keys, stack_type='any'):
         ]
     """
     data = []
-
-    # Get the user id for the request
-    request = app.current_request
-    groups = request.context['authorizer']['claims']['cognito:groups']
 
     # Loop through stacks
     for stack in stacks:
@@ -76,7 +72,7 @@ def filter_stacks(stacks, keys, stack_type='any'):
     return data
 
 
-def validate_auth(stack_name):
+def validate_auth(stack_name, groups):
     """ Describes a stack validating they are in the platform
     and belongs to the user performing the request.
     Args:
@@ -87,9 +83,6 @@ def validate_auth(stack_name):
     Returns:
         Bool: True/False
     """
-    # Get the user id for the request
-    request = app.current_request
-    groups = request.context['authorizer']['claims']['cognito:groups']
 
     try:
         r = cfn.describe_stacks(StackName=stack_name)

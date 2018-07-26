@@ -22,7 +22,7 @@ Pipeline Resource Definition
 """
 
 
-def get():
+def get(event, context):
     """ Returns the pipelines belonging to the authenticated user.
     It uses filter_stacks() to filter the CloudFormation stacks with type 'pipeline'
     and owner belonging to the same Cognito group as the user is logged in as.
@@ -37,18 +37,21 @@ def get():
     data = []
     stacks = []
 
-    logger.debug('Listing Pipelines:')
+    logger.debug('Listing Pipelines:')    
+
+    # Get the user id for the request
+    groups = event['requestContext']['authorizer']['claims']['cognito:groups']
 
     try:
         # List CloudFormation Stacks
         r = cfn.describe_stacks()
     except Exception as ex:
         logging.exception(ex)
-        raise Exception('Failed to list pipelines')
+        raise Exception('Failed to list pipelines.')
 
     # Filter stacks based on owner and retrieve wanted keys
     keys = ['StackName', 'Parameters', 'CreationTime', 'LastUpdatedTime']
-    stacks = util.filter_stacks(r['Stacks'], keys, 'pipeline')
+    stacks = util.filter_stacks(r['Stacks'], keys, groups, 'pipeline')
 
     try:
         for stack in stacks:
@@ -104,7 +107,7 @@ def post(name, event, context):
 
     payload = json.loads(request.json_body[0])
 
-    stack_name = util.addprefix(name)
+    stack_name = util.addprefix(event['pathParameters']['name'])
     logger.debug('Creating Pipeline: ' + stack_name)
 
     if 'app_dev' in payload:

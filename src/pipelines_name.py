@@ -22,7 +22,7 @@ Pipeline Resource Definition
 """
 
 
-def get(name):
+def get(event, context):
     """ Describes detailed information about a pipeline
 
     Args:
@@ -36,7 +36,11 @@ def get(name):
     data = {}
 
     logger.debug('Describing Stack:')
-    stack_name = util.addprefix(name)
+
+    # Get the user id for the request
+    groups = event['requestContext']['authorizer']['claims']['cognito:groups']
+    
+    stack_name = util.addprefix(event['pathParameters']['name'])
 
     # List CloudFormation Stacks
     try:
@@ -48,7 +52,7 @@ def get(name):
     # Filter stacks based on owner and retrieve wanted keys
     keys = ['StackName', 'Description', 'StackStatus', 'Tags', 'Outputs']
     try:
-        pipelines = util.filter_stacks(r['Stacks'], keys, 'pipeline')
+        pipelines = util.filter_stacks(r['Stacks'], keys, groups, 'pipeline')
     except Exception as ex:
         logging.exception(ex)
         raise Exception('Error while filtering stacks.')
@@ -65,7 +69,7 @@ def get(name):
     return response
 
 
-def patch(name, event, context):
+def patch(event, context):
     """ Updates the pipeline belonging to the authenticated user.
 
     Args:
@@ -88,18 +92,17 @@ def patch(name, event, context):
     params = {}
     tags = {}
 
-    request = event.current_request
     # Get the user id for the request
-    user = request.context['authorizer']['claims']['email']
-    groups = request.context['authorizer']['claims']['cognito:groups']
+    user = event['requestContext']['authorizer']['claims']['email']
+    groups = event['requestContext']['authorizer']['claims']['cognito:groups']
 
-    payload = json.loads(request.json_body[0])
+    payload = json.loads(event['body'])
 
-    stack_name = util.addprefix(name)
+    stack_name = util.addprefix(event['pathParameters']['name'])
     logger.debug('Updating Pipeline: ' + stack_name)
 
     # Validate authorization
-    if not util.validate_auth(stack_name):
+    if not util.validate_auth(stack_name, groups):
         raise Exception('You do not have permission to modify this resource.')
     
     if 'app_dev' in payload:
@@ -145,7 +148,7 @@ def patch(name, event, context):
     return response
 
 
-def delete(name):
+def delete(event, context):
     """ Validates that the pipeline belongs to the authenticated user
     and deletes the pipeline.
 
@@ -155,11 +158,14 @@ def delete(name):
     Returns:
         List: List of JSON objects containing pipeline information
     """
-    stack_name = util.addprefix(name)
+    stack_name = util.addprefix(event['pathParameters']['name'])
     logger.debug('Deleting Pipeline: ' + stack_name)
 
+    # Get the user id for the request
+    groups = event['requestContext']['authorizer']['claims']['cognito:groups']
+
     # Validate authorization
-    if not util.validate_auth(stack_name):
+    if not util.validate_auth(stack_name, groups):
         raise Exception('You do not have permission to modify this resource.')
     
     try:

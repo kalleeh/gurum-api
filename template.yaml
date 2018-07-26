@@ -32,7 +32,7 @@ Resources:
         swagger: "2.0"
         info:
           version: "1.0"
-          title: "platform-api"
+          title: "gureume-api-sam"
         host: "api.gureu.me"
         schemes:
         - "https"
@@ -352,32 +352,73 @@ Resources:
     Properties:
       Handler: apps.get
       CodeUri: src/
+      Tracing: "Active"
+      Events:
+        ListApps:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGatewayApi
+            Path: /apps
+            Method: get
       Policies:
-        - CloudFormationDescribeStacksPolicy: {}
+        - Statement:
+            - Effect: Allow
+              Action:
+                - 'cloudformation:DescribeStacks'
+              Resource:
+                - '*'
 
   CreateAppFunction:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: apps.post
       CodeUri: src/
+      Events:
+        CreateApp:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGatewayApi
+            Path: /apps
+            Method: post
 
   DescribeAppFunction:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: apps_name.get
       CodeUri: src/
+      Events:
+        DescribeApp:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGatewayApi
+            Path: /apps/{name}
+            Method: get
 
   DeleteAppFunction:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: apps_name.delete
       CodeUri: src/
+      Events:
+        DeleteApp:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGatewayApi
+            Path: /apps/{name}
+            Method: delete
 
   UpdateAppFunction:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: apps_name.patch
       CodeUri: src/
+      Events:
+        UpdateApp:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGatewayApi
+            Path: /apps/{name}
+            Method: patch
 
 # Pipelines definition
 
@@ -386,30 +427,65 @@ Resources:
     Properties:
       Handler: apps.get
       CodeUri: src/
+      Events:
+        ListPipelines:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGatewayApi
+            Path: /pipelines
+            Method: get
 
   CreatePipelineFunction:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: pipelines.post
       CodeUri: src/
+      Events:
+        CreatePipeline:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGatewayApi
+            Path: /pipelines
+            Method: post
 
   DescribePipelineFunction:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: pipelines_name.get
       CodeUri: src/
+      Events:
+        DescribePipeline:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGatewayApi
+            Path: /pipelines/{name}
+            Method: get
 
   DeletePipelineFunction:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: pipelines_name.delete
       CodeUri: src/
+      Events:
+        DeletePipeline:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGatewayApi
+            Path: /pipelines/{name}
+            Method: delete
 
   UpdatePipelineFunction:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: pipelines_name.patch
       CodeUri: src/
+      Events:
+        UpdatePipeline:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGatewayApi
+            Path: /pipelines/{name}
+            Method: patch
 
 # Events definition
   DescribeEventsFunction:
@@ -417,3 +493,10 @@ Resources:
     Properties:
       Handler: events_name.get
       CodeUri: src/
+      Events:
+        DescribeEvents:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGatewayApi
+            Path: /events/{name}
+            Method: get

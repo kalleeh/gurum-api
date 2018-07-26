@@ -5,8 +5,13 @@ from botocore.exceptions import ValidationError, ClientError
 
 import libs.util as util
 
+from aws_xray_sdk.core import xray_recorder
+from aws_xray_sdk.core import patch_all
+
+patch_all()
+
 logger = logging.getLogger()
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.DEBUG)
 
 # Create CloudFormation Client
 cfn = boto3.client('cloudformation', region_name=util.PLATFORM_REGION)
@@ -38,16 +43,19 @@ def get(event, context):
     
     logger.debug('Listing Apps:')
 
+    # Get the user id for the request
+    groups = event['requestContext']['authorizer']['claims']['cognito:groups']
+
     try:
         # List CloudFormation Stacks
         r = cfn.describe_stacks()
     except Exception as ex:
         logging.exception(ex)
         raise Exception('Failed to list apps')
-    
+
     # Filter stacks based on owner and retrieve wanted keys
     keys = ['StackName', 'Parameters', 'CreationTime', 'LastUpdatedTime']
-    stacks = util.filter_stacks(r['Stacks'], keys, 'app')
+    stacks = util.filter_stacks(r['Stacks'], keys, groups, 'app')
 
     try:
         for stack in stacks:
@@ -88,14 +96,11 @@ def post(event, context):
     params = {}
     tags = {}
 
-    request = event
-    print(request)
-
     # Get the user id for the request
-    user = request.context['authorizer']['claims']['email']
-    groups = request.context['authorizer']['claims']['cognito:groups']
+    user = event['requestContext']['authorizer']['claims']['email']
+    groups = event['requestContext']['authorizer']['claims']['cognito:groups']
 
-    payload = json.loads(request.json_body[0])
+    payload = json.loads(event['body'])
 
     stack_name = util.addprefix(payload['name'])
     logger.debug('Creating App: ' + stack_name)

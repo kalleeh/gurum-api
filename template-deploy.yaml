@@ -29,7 +29,7 @@ Resources:
             type: object
         host: api.gureu.me
         info:
-          title: platform-api
+          title: gureume-api-sam
           version: '1.0'
         paths:
           /apps:
@@ -328,107 +328,156 @@ Resources:
         - video/mpeg
         - video/webm
       StageName: dev
-      Variables:
-        CreateAppFunctionArn:
-          Fn::GetAtt:
-          - CreateAppFunction
-          - Arn
-        CreatePipelineFunctionArn:
-          Fn::GetAtt:
-          - CreatePipelineFunction
-          - Arn
-        DeleteAppFunctionArn:
-          Fn::GetAtt:
-          - DeleteAppFunction
-          - Arn
-        DeletePipelineFunctionArn:
-          Fn::GetAtt:
-          - DeletePipelineFunction
-          - Arn
-        DescribeAppFunctionArn:
-          Fn::GetAtt:
-          - DescribeAppFunction
-          - Arn
-        DescribeEventsFunctionArn:
-          Fn::GetAtt:
-          - DescribeEventsFunction
-          - Arn
-        DescribePipelineFunctionArn:
-          Fn::GetAtt:
-          - DescribePipelineFunction
-          - Arn
-        ListAppsFunctionArn:
-          Fn::GetAtt:
-          - ListAppsFunction
-          - Arn
-        ListPipelinesFunctionArn:
-          Fn::GetAtt:
-          - ListPipelinesFunction
-          - Arn
-        UpdateAppFunctionArn:
-          Fn::GetAtt:
-          - UpdateAppFunction
-          - Arn
-        UpdatePipelineFunctionArn:
-          Fn::GetAtt:
-          - UpdatePipelineFunction
-          - Arn
     Type: AWS::Serverless::Api
   CreateAppFunction:
     Properties:
-      CodeUri: s3://storage-kalleh/gureume/2de67d27b7c080cdfebfad9a59a25fd6
+      CodeUri: s3://storage-kalleh/gureume/c99710984f0f66466d876d2120c9476b
+      Events:
+        CreateApp:
+          Properties:
+            Method: post
+            Path: /apps
+            RestApiId:
+              Ref: ApiGatewayApi
+          Type: Api
       Handler: apps.post
     Type: AWS::Serverless::Function
   CreatePipelineFunction:
     Properties:
-      CodeUri: s3://storage-kalleh/gureume/2de67d27b7c080cdfebfad9a59a25fd6
+      CodeUri: s3://storage-kalleh/gureume/c99710984f0f66466d876d2120c9476b
+      Events:
+        CreatePipeline:
+          Properties:
+            Method: post
+            Path: /pipelines
+            RestApiId:
+              Ref: ApiGatewayApi
+          Type: Api
       Handler: pipelines.post
     Type: AWS::Serverless::Function
   DeleteAppFunction:
     Properties:
-      CodeUri: s3://storage-kalleh/gureume/2de67d27b7c080cdfebfad9a59a25fd6
+      CodeUri: s3://storage-kalleh/gureume/c99710984f0f66466d876d2120c9476b
+      Events:
+        DeleteApp:
+          Properties:
+            Method: delete
+            Path: /apps/{name}
+            RestApiId:
+              Ref: ApiGatewayApi
+          Type: Api
       Handler: apps_name.delete
     Type: AWS::Serverless::Function
   DeletePipelineFunction:
     Properties:
-      CodeUri: s3://storage-kalleh/gureume/2de67d27b7c080cdfebfad9a59a25fd6
+      CodeUri: s3://storage-kalleh/gureume/c99710984f0f66466d876d2120c9476b
+      Events:
+        DeletePipeline:
+          Properties:
+            Method: delete
+            Path: /pipelines/{name}
+            RestApiId:
+              Ref: ApiGatewayApi
+          Type: Api
       Handler: pipelines_name.delete
     Type: AWS::Serverless::Function
   DescribeAppFunction:
     Properties:
-      CodeUri: s3://storage-kalleh/gureume/2de67d27b7c080cdfebfad9a59a25fd6
+      CodeUri: s3://storage-kalleh/gureume/c99710984f0f66466d876d2120c9476b
+      Events:
+        DescribeApp:
+          Properties:
+            Method: get
+            Path: /apps/{name}
+            RestApiId:
+              Ref: ApiGatewayApi
+          Type: Api
       Handler: apps_name.get
     Type: AWS::Serverless::Function
   DescribeEventsFunction:
     Properties:
-      CodeUri: s3://storage-kalleh/gureume/2de67d27b7c080cdfebfad9a59a25fd6
+      CodeUri: s3://storage-kalleh/gureume/c99710984f0f66466d876d2120c9476b
+      Events:
+        DescribeEvents:
+          Properties:
+            Method: get
+            Path: /events/{name}
+            RestApiId:
+              Ref: ApiGatewayApi
+          Type: Api
       Handler: events_name.get
     Type: AWS::Serverless::Function
   DescribePipelineFunction:
     Properties:
-      CodeUri: s3://storage-kalleh/gureume/2de67d27b7c080cdfebfad9a59a25fd6
+      CodeUri: s3://storage-kalleh/gureume/c99710984f0f66466d876d2120c9476b
+      Events:
+        DescribePipeline:
+          Properties:
+            Method: get
+            Path: /pipelines/{name}
+            RestApiId:
+              Ref: ApiGatewayApi
+          Type: Api
       Handler: pipelines_name.get
     Type: AWS::Serverless::Function
   ListAppsFunction:
     Properties:
-      CodeUri: s3://storage-kalleh/gureume/2de67d27b7c080cdfebfad9a59a25fd6
+      CodeUri: s3://storage-kalleh/gureume/c99710984f0f66466d876d2120c9476b
+      Events:
+        ListApps:
+          Properties:
+            Method: get
+            Path: /apps
+            RestApiId:
+              Ref: ApiGatewayApi
+          Type: Api
       Handler: apps.get
       Policies:
-      - CloudFormationDescribeStacksPolicy: {}
+      - Statement:
+        - Action:
+          - cloudformation:DescribeStacks
+          Effect: Allow
+          Resource:
+          - '*'
+      Tracing: Active
     Type: AWS::Serverless::Function
   ListPipelinesFunction:
     Properties:
-      CodeUri: s3://storage-kalleh/gureume/2de67d27b7c080cdfebfad9a59a25fd6
+      CodeUri: s3://storage-kalleh/gureume/c99710984f0f66466d876d2120c9476b
+      Events:
+        ListPipelines:
+          Properties:
+            Method: get
+            Path: /pipelines
+            RestApiId:
+              Ref: ApiGatewayApi
+          Type: Api
       Handler: apps.get
     Type: AWS::Serverless::Function
   UpdateAppFunction:
     Properties:
-      CodeUri: s3://storage-kalleh/gureume/2de67d27b7c080cdfebfad9a59a25fd6
+      CodeUri: s3://storage-kalleh/gureume/c99710984f0f66466d876d2120c9476b
+      Events:
+        UpdateApp:
+          Properties:
+            Method: patch
+            Path: /apps/{name}
+            RestApiId:
+              Ref: ApiGatewayApi
+          Type: Api
       Handler: apps_name.patch
     Type: AWS::Serverless::Function
   UpdatePipelineFunction:
     Properties:
-      CodeUri: s3://storage-kalleh/gureume/2de67d27b7c080cdfebfad9a59a25fd6
+      CodeUri: s3://storage-kalleh/gureume/c99710984f0f66466d876d2120c9476b
+      Events:
+        UpdatePipeline:
+          Properties:
+            Method: patch
+            Path: /pipelines/{name}
+            RestApiId:
+              Ref: ApiGatewayApi
+          Type: Api
       Handler: pipelines_name.patch
     Type: AWS::Serverless::Function
 Transform: AWS::Serverless-2016-10-31

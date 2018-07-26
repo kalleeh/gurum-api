@@ -5,8 +5,13 @@ from botocore.exceptions import ValidationError, ClientError
 
 import libs.util as util
 
+from aws_xray_sdk.core import xray_recorder
+from aws_xray_sdk.core import patch_all
+
+patch_all()
+
 logger = logging.getLogger()
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.ERROR)
 
 # Create CloudFormation Client
 cfn = boto3.client('cloudformation', region_name=util.PLATFORM_REGION)
@@ -22,7 +27,7 @@ Apps Resource Definition
 """
 
 
-def get(name):
+def get(event, context):
     """ Describes detailed information about an app
 
     Args:
@@ -36,7 +41,11 @@ def get(name):
     data = {}
 
     logger.debug('Describing Stack:')
-    stack_name = util.addprefix(name)
+
+    # Get the user id for the request
+    groups = event['requestContext']['authorizer']['claims']['cognito:groups']
+
+    stack_name = util.addprefix(event['pathParameters']['name'])
 
     # List CloudFormation Stacks
     try:
@@ -48,7 +57,7 @@ def get(name):
     # Filter stacks based on owner and retrieve wanted keys
     keys = ['StackName', 'Description', 'StackStatus', 'Tags', 'Outputs']
     try:
-        apps = util.filter_stacks(r['Stacks'], keys, 'app')
+        apps = util.filter_stacks(r['Stacks'], keys, groups, 'app')
     except Exception as ex:
         logging.exception(ex)
         raise Exception('Error while filtering stacks.')
@@ -88,19 +97,17 @@ def patch(name, event, context):
     params = {}
     tags = {}
 
-    request = event.current_request
-
     # Get the user id for the request
-    user = request.context['authorizer']['claims']['email']
-    groups = request.context['authorizer']['claims']['cognito:groups']
+    user = event['requestContext']['authorizer']['claims']['email']
+    groups = event['requestContext']['authorizer']['claims']['cognito:groups']
 
-    payload = json.loads(request.json_body[0])
+    payload = json.loads(event['body'])
 
-    stack_name = util.addprefix(name)
+    stack_name = util.addprefix(event['pathParameters']['name'])
     logger.debug('Updating App: ' + str(stack_name))
 
     # Validate authorization
-    if not util.validate_auth(stack_name):
+    if not util.validate_auth(stack_name, groups):
         raise Exception('You do not have permission to modify this resource.')
 
     if 'tasks' in payload:
@@ -173,7 +180,7 @@ def patch(name, event, context):
     return response
 
 
-def delete(name):
+def delete(event, context):
     """ Validates that the app belongs to the authenticated user
     and deletes the app.
 
@@ -184,11 +191,14 @@ def delete(name):
     Returns:
         List: List of JSON objects containing app information
     """
-    stack_name = util.addprefix(name)
+    stack_name = util.addprefix(event['pathParameters']['name'])
     logger.debug('Deleting App: ' + stack_name)
 
+    # Get the user id for the request
+    groups = event['requestContext']['authorizer']['claims']['cognito:groups']
+
     # Validate authorization
-    if not util.validate_auth(stack_name):
+    if not util.validate_auth(stack_name, groups):
         raise Exception('You do not have permission to modify this resource.')
     
     try:
