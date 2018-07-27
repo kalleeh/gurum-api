@@ -74,7 +74,7 @@ def get(event, context):
 
     response = json.dumps(data, default=util.datetime_serialize)
 
-    return response
+    return util.respond(None, response)
 
 
 def patch(name, event, context):
@@ -177,7 +177,7 @@ def patch(name, event, context):
 
     response = json.dumps(stack, default=util.datetime_serialize)
 
-    return response
+    return util.respond(None, response)
 
 
 def delete(event, context):
@@ -213,14 +213,4 @@ def delete(event, context):
 
     response = json.dumps(stack, default=util.datetime_serialize)
 
-    return response
-
-
-def respond(err, res=None):
-    return {
-        'statusCode': '400' if err else '200',
-        'body': err.message if err else json.dumps(res),
-        'headers': {
-            'Content-Type': 'application/json',
-        },
-    }
+    return util.respond(None, response)

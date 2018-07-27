@@ -66,7 +66,7 @@ def get(event, context):
 
     response = json.dumps(data, default=util.datetime_serialize)
 
-    return response
+    return util.respond(None, response)
 
 
 def patch(event, context):
@@ -145,7 +145,7 @@ def patch(event, context):
 
     response = json.dumps(stack, default=util.datetime_serialize)
 
-    return response
+    return util.respond(None, response)
 
 
 def delete(event, context):
@@ -180,4 +180,4 @@ def delete(event, context):
 
     response = json.dumps(stack, default=util.datetime_serialize)
 
-    return response
+    return util.respond(None, response)

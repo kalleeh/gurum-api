@@ -25,6 +25,16 @@ PLATFORM_TAGS['GROUPS'] = os.getenv('PLATFORM_TAGS_GROUPS', PLATFORM_PREFIX + 'g
 cfn = boto3.client('cloudformation', region_name=PLATFORM_REGION)
 
 
+def respond(err, res=None):
+    return {
+        'statusCode': '400' if err else '200',
+        'body': err.message if err else json.dumps(res),
+        'headers': {
+            'Content-Type': 'application/json',
+        },
+    }
+
+
 def filter_stacks(stacks, keys, groups, stack_type='any'):
     """ Filters a list of stacks validating they are stacks in the platform
     and belongs to the user performing the request and returns the chosen

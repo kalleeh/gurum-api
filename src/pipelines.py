@@ -71,7 +71,7 @@ def get(event, context):
 
     response = json.dumps(data, default=util.datetime_serialize)
 
-    return response
+    return util.respond(None, response)
 
 
 def post(name, event, context):
@@ -151,4 +151,4 @@ def post(name, event, context):
 
     response = json.dumps(stack, default=util.datetime_serialize)
 
-    return response
+    return util.respond(None, response)

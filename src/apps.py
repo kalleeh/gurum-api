@@ -72,8 +72,9 @@ def get(event, context):
         raise Exception(e)
 
     response = json.dumps(data, default=util.datetime_serialize)
+    print(response)
 
-    return respond(None, response)
+    return util.respond(None, response)
 
 
 def post(event, context):
@@ -144,14 +145,4 @@ def post(event, context):
 
     response = json.dumps(stack, default=util.datetime_serialize)
 
-    return respond(None, response)
-
-
-def respond(err, res=None):
-    return {
-        'statusCode': '400' if err else '200',
-        'body': err.message if err else json.dumps(res),
-        'headers': {
-            'Content-Type': 'application/json',
-        },
-    }
+    return util.respond(None, response)
