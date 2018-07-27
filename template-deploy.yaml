@@ -331,7 +331,7 @@ Resources:
     Type: AWS::Serverless::Api
   CreateAppFunction:
     Properties:
-      CodeUri: s3://storage-kalleh/gureume/36ea32d8cb654f2006f30e33656f7351
+      CodeUri: s3://storage-kalleh/gureume/99651618031f163ea99712ca5e5d2d25
       Events:
         CreateApp:
           Properties:
@@ -341,10 +341,18 @@ Resources:
               Ref: ApiGatewayApi
           Type: Api
       Handler: apps.post
+      Policies:
+      - Statement:
+        - Action:
+          - cloudformation:CreateStack
+          Effect: Allow
+          Resource:
+          - '*'
+      Tracing: Active
     Type: AWS::Serverless::Function
   CreatePipelineFunction:
     Properties:
-      CodeUri: s3://storage-kalleh/gureume/36ea32d8cb654f2006f30e33656f7351
+      CodeUri: s3://storage-kalleh/gureume/99651618031f163ea99712ca5e5d2d25
       Events:
         CreatePipeline:
           Properties:
@@ -354,10 +362,11 @@ Resources:
               Ref: ApiGatewayApi
           Type: Api
       Handler: pipelines.post
+      Tracing: Active
     Type: AWS::Serverless::Function
   DeleteAppFunction:
     Properties:
-      CodeUri: s3://storage-kalleh/gureume/36ea32d8cb654f2006f30e33656f7351
+      CodeUri: s3://storage-kalleh/gureume/99651618031f163ea99712ca5e5d2d25
       Events:
         DeleteApp:
           Properties:
@@ -367,10 +376,18 @@ Resources:
               Ref: ApiGatewayApi
           Type: Api
       Handler: apps_name.delete
+      Policies:
+      - Statement:
+        - Action:
+          - cloudformation:DeleteStack
+          Effect: Allow
+          Resource:
+          - '*'
+      Tracing: Active
     Type: AWS::Serverless::Function
   DeletePipelineFunction:
     Properties:
-      CodeUri: s3://storage-kalleh/gureume/36ea32d8cb654f2006f30e33656f7351
+      CodeUri: s3://storage-kalleh/gureume/99651618031f163ea99712ca5e5d2d25
       Events:
         DeletePipeline:
           Properties:
@@ -380,10 +397,11 @@ Resources:
               Ref: ApiGatewayApi
           Type: Api
       Handler: pipelines_name.delete
+      Tracing: Active
     Type: AWS::Serverless::Function
   DescribeAppFunction:
     Properties:
-      CodeUri: s3://storage-kalleh/gureume/36ea32d8cb654f2006f30e33656f7351
+      CodeUri: s3://storage-kalleh/gureume/99651618031f163ea99712ca5e5d2d25
       Events:
         DescribeApp:
           Properties:
@@ -393,10 +411,18 @@ Resources:
               Ref: ApiGatewayApi
           Type: Api
       Handler: apps_name.get
+      Policies:
+      - Statement:
+        - Action:
+          - cloudformation:DescribeStacks
+          Effect: Allow
+          Resource:
+          - '*'
+      Tracing: Active
     Type: AWS::Serverless::Function
   DescribeEventsFunction:
     Properties:
-      CodeUri: s3://storage-kalleh/gureume/36ea32d8cb654f2006f30e33656f7351
+      CodeUri: s3://storage-kalleh/gureume/99651618031f163ea99712ca5e5d2d25
       Events:
         DescribeEvents:
           Properties:
@@ -406,10 +432,11 @@ Resources:
               Ref: ApiGatewayApi
           Type: Api
       Handler: events_name.get
+      Tracing: Active
     Type: AWS::Serverless::Function
   DescribePipelineFunction:
     Properties:
-      CodeUri: s3://storage-kalleh/gureume/36ea32d8cb654f2006f30e33656f7351
+      CodeUri: s3://storage-kalleh/gureume/99651618031f163ea99712ca5e5d2d25
       Events:
         DescribePipeline:
           Properties:
@@ -419,10 +446,11 @@ Resources:
               Ref: ApiGatewayApi
           Type: Api
       Handler: pipelines_name.get
+      Tracing: Active
     Type: AWS::Serverless::Function
   ListAppsFunction:
     Properties:
-      CodeUri: s3://storage-kalleh/gureume/36ea32d8cb654f2006f30e33656f7351
+      CodeUri: s3://storage-kalleh/gureume/99651618031f163ea99712ca5e5d2d25
       Events:
         ListApps:
           Properties:
@@ -443,7 +471,7 @@ Resources:
     Type: AWS::Serverless::Function
   ListPipelinesFunction:
     Properties:
-      CodeUri: s3://storage-kalleh/gureume/36ea32d8cb654f2006f30e33656f7351
+      CodeUri: s3://storage-kalleh/gureume/99651618031f163ea99712ca5e5d2d25
       Events:
         ListPipelines:
           Properties:
@@ -453,10 +481,11 @@ Resources:
               Ref: ApiGatewayApi
           Type: Api
       Handler: apps.get
+      Tracing: Active
     Type: AWS::Serverless::Function
   UpdateAppFunction:
     Properties:
-      CodeUri: s3://storage-kalleh/gureume/36ea32d8cb654f2006f30e33656f7351
+      CodeUri: s3://storage-kalleh/gureume/99651618031f163ea99712ca5e5d2d25
       Events:
         UpdateApp:
           Properties:
@@ -466,10 +495,18 @@ Resources:
               Ref: ApiGatewayApi
           Type: Api
       Handler: apps_name.patch
+      Policies:
+      - Statement:
+        - Action:
+          - cloudformation:UpdateStack
+          Effect: Allow
+          Resource:
+          - '*'
+      Tracing: Active
     Type: AWS::Serverless::Function
   UpdatePipelineFunction:
     Properties:
-      CodeUri: s3://storage-kalleh/gureume/36ea32d8cb654f2006f30e33656f7351
+      CodeUri: s3://storage-kalleh/gureume/99651618031f163ea99712ca5e5d2d25
       Events:
         UpdatePipeline:
           Properties:
@@ -479,5 +516,6 @@ Resources:
               Ref: ApiGatewayApi
           Type: Api
       Handler: pipelines_name.patch
+      Tracing: Active
     Type: AWS::Serverless::Function
 Transform: AWS::Serverless-2016-10-31

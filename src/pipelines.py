@@ -5,6 +5,11 @@ from botocore.exceptions import ValidationError, ClientError
 
 import libs.util as util
 
+from aws_xray_sdk.core import xray_recorder
+from aws_xray_sdk.core import patch_all
+
+patch_all()
+
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 

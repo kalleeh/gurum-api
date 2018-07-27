@@ -2,6 +2,7 @@
 __pycache__/
 *.py[cod]
 *$py.class
+.gitignore
 
 # C extensions
 *.so
@@ -27,6 +28,8 @@ MANIFEST
 .chalice/deployed*
 .chalice/deployments*
 .DS_Store
+Pipfile
+Pipfile.lock
 
 # PyInstaller
 #  Usually these files are written by a python script from a template

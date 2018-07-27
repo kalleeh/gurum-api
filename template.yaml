@@ -346,7 +346,6 @@ Resources:
   #      !Ref ApiGatewayApi
 
   # Apps definition
-
   ListAppsFunction:
     Type: 'AWS::Serverless::Function'
     Properties:
@@ -373,6 +372,7 @@ Resources:
     Properties:
       Handler: apps.post
       CodeUri: src/
+      Tracing: "Active"
       Events:
         CreateApp:
           Type: Api
@@ -380,12 +380,20 @@ Resources:
             RestApiId: !Ref ApiGatewayApi
             Path: /apps
             Method: post
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - 'cloudformation:CreateStack'
+              Resource:
+                - '*'
 
   DescribeAppFunction:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: apps_name.get
       CodeUri: src/
+      Tracing: "Active"
       Events:
         DescribeApp:
           Type: Api
@@ -393,12 +401,20 @@ Resources:
             RestApiId: !Ref ApiGatewayApi
             Path: /apps/{name}
             Method: get
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - 'cloudformation:DescribeStacks'
+              Resource:
+                - '*'
 
   DeleteAppFunction:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: apps_name.delete
       CodeUri: src/
+      Tracing: "Active"
       Events:
         DeleteApp:
           Type: Api
@@ -406,12 +422,20 @@ Resources:
             RestApiId: !Ref ApiGatewayApi
             Path: /apps/{name}
             Method: delete
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - 'cloudformation:DeleteStack'
+              Resource:
+                - '*'
 
   UpdateAppFunction:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: apps_name.patch
       CodeUri: src/
+      Tracing: "Active"
       Events:
         UpdateApp:
           Type: Api
@@ -419,14 +443,21 @@ Resources:
             RestApiId: !Ref ApiGatewayApi
             Path: /apps/{name}
             Method: patch
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - 'cloudformation:UpdateStack'
+              Resource:
+                - '*'
 
-# Pipelines definition
-
+  # Pipelines definition
   ListPipelinesFunction:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: apps.get
       CodeUri: src/
+      Tracing: "Active"
       Events:
         ListPipelines:
           Type: Api
@@ -440,6 +471,7 @@ Resources:
     Properties:
       Handler: pipelines.post
       CodeUri: src/
+      Tracing: "Active"
       Events:
         CreatePipeline:
           Type: Api
@@ -453,6 +485,7 @@ Resources:
     Properties:
       Handler: pipelines_name.get
       CodeUri: src/
+      Tracing: "Active"
       Events:
         DescribePipeline:
           Type: Api
@@ -466,6 +499,7 @@ Resources:
     Properties:
       Handler: pipelines_name.delete
       CodeUri: src/
+      Tracing: "Active"
       Events:
         DeletePipeline:
           Type: Api
@@ -479,6 +513,7 @@ Resources:
     Properties:
       Handler: pipelines_name.patch
       CodeUri: src/
+      Tracing: "Active"
       Events:
         UpdatePipeline:
           Type: Api
@@ -493,6 +528,7 @@ Resources:
     Properties:
       Handler: events_name.get
       CodeUri: src/
+      Tracing: "Active"
       Events:
         DescribeEvents:
           Type: Api
