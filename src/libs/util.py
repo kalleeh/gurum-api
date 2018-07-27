@@ -2,6 +2,7 @@ import os
 import datetime
 import logging
 import boto3
+import json
 
 PLATFORM_PREFIX = os.getenv('PLATFORM_PREFIX', 'platform-')
 
