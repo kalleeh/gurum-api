@@ -69,9 +69,7 @@ def get(event, context):
     except Exception as e:
         raise Exception(e)
 
-    response = json.dumps(data, default=util.datetime_serialize)
-
-    return util.respond(None, response)
+    return util.respond(None, data)
 
 
 def post(name, event, context):
@@ -149,6 +147,4 @@ def post(name, event, context):
         logging.exception(ex)
         raise Exception('Internal server error.')
 
-    response = json.dumps(stack, default=util.datetime_serialize)
-
-    return util.respond(None, response)
+    return util.respond(None, stack)

@@ -72,9 +72,7 @@ def get(event, context):
     data['status'] = apps[0]['StackStatus']
     data['tags'] = util.kv_to_dict(apps[0]['Tags'], 'Key', 'Value')
 
-    response = json.dumps(data, default=util.datetime_serialize)
-
-    return util.respond(None, response)
+    return util.respond(None, data)
 
 
 def patch(name, event, context):
@@ -175,9 +173,7 @@ def patch(name, event, context):
         logging.exception(ex)
         raise Exception('Internal server error.')
 
-    response = json.dumps(stack, default=util.datetime_serialize)
-
-    return util.respond(None, response)
+    return util.respond(None, stack)
 
 
 def delete(event, context):
@@ -211,6 +207,4 @@ def delete(event, context):
         logging.exception(ex)
         raise Exception('Internal server error.')
 
-    response = json.dumps(stack, default=util.datetime_serialize)
-
-    return util.respond(None, response)
+    return util.respond(None, stack)

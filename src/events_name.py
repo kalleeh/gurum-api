@@ -68,6 +68,4 @@ def get(event, context):
         logging.exception(ex)
         raise Exception('Failed to list events')
 
-    response = json.dumps(data, default=util.datetime_serialize)
-
-    return util.respond(None, response)
+    return util.respond(None, data)
