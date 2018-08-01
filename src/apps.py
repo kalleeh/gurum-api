@@ -10,11 +10,11 @@ from aws_xray_sdk.core import patch_all
 
 patch_all()
 
-logger = logging.getLogger()
-logger.setLevel(logging.DEBUG)
+LOGGER = logging.getLogger()
+LOGGER.setLevel(logging.DEBUG)
 
 # Create CloudFormation Client
-cfn = boto3.client('cloudformation', region_name=util.PLATFORM_REGION)
+CFN_CLIENT = boto3.client('cloudformation', region_name=util.PLATFORM_REGION)
 
 """
 Apps Resource Definition
@@ -41,14 +41,14 @@ def get(event, context):
     data = []
     stacks = []
     
-    logger.debug('Listing Apps:')
+    LOGGER.debug('Listing Apps:')
 
     # Get the user id for the request
     groups = event['requestContext']['authorizer']['claims']['cognito:groups']
 
     try:
         # List CloudFormation Stacks
-        r = cfn.describe_stacks()
+        r = CFN_CLIENT.describe_stacks()
     except Exception as ex:
         logging.exception(ex)
         raise Exception('Failed to list apps')
@@ -101,7 +101,7 @@ def post(event, context):
     payload = json.loads(event['body'])
 
     stack_name = util.addprefix(payload['name'])
-    logger.debug('Creating App: ' + stack_name)
+    LOGGER.debug('Creating App: ' + stack_name)
 
     exports = util.get_cfn_exports()
 
@@ -120,9 +120,9 @@ def post(event, context):
     tags = util.dict_to_kv(tags, 'Key', 'Value')
 
     try:
-        stack = cfn.create_stack(
+        stack = CFN_CLIENT.create_stack(
             StackName=stack_name,
-            TemplateURL='https://s3-eu-west-1.amazonaws.com/storage-kalleh/cfn/app/app.yaml',
+            TemplateURL='https://s3-eu-west-1.amazonaws.com/storage-kalleh/CFN_CLIENT/app/app.yaml',
             TimeoutInMinutes=15,
             Parameters=params,
             Capabilities=[

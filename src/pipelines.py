@@ -10,11 +10,11 @@ from aws_xray_sdk.core import patch_all
 
 patch_all()
 
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
+LOGGER = logging.getLogger()
+LOGGER.setLevel(logging.INFO)
 
 # Create CloudFormation Client
-cfn = boto3.client('cloudformation', region_name=util.PLATFORM_REGION)
+CFN_CLIENT = boto3.client('cloudformation', region_name=util.PLATFORM_REGION)
 
 """
 Pipeline Resource Definition
@@ -42,14 +42,14 @@ def get(event, context):
     data = []
     stacks = []
 
-    logger.debug('Listing Pipelines:')    
+    LOGGER.debug('Listing Pipelines:')    
 
     # Get the user id for the request
     groups = event['requestContext']['authorizer']['claims']['cognito:groups']
 
     try:
         # List CloudFormation Stacks
-        r = cfn.describe_stacks()
+        r = CFN_CLIENT.describe_stacks()
     except Exception as ex:
         logging.exception(ex)
         raise Exception('Failed to list pipelines.')
@@ -111,7 +111,7 @@ def post(name, event, context):
     payload = json.loads(request.json_body[0])
 
     stack_name = util.addprefix(event['pathParameters']['name'])
-    logger.debug('Creating Pipeline: ' + stack_name)
+    LOGGER.debug('Creating Pipeline: ' + stack_name)
 
     if 'app_dev' in payload:
         params['ServiceDev'] = util.addprefix(payload['app_dev'])
@@ -132,9 +132,9 @@ def post(name, event, context):
     tags = util.dict_to_kv(tags, 'Key', 'Value')
 
     try:
-        stack = cfn.create_stack(
+        stack = CFN_CLIENT.create_stack(
             StackName=stack_name,
-            TemplateURL='https://s3-eu-west-1.amazonaws.com/storage-kalleh/cfn/app/pipeline.yaml',
+            TemplateURL='https://s3-eu-west-1.amazonaws.com/storage-kalleh/CFN_CLIENT/app/pipeline.yaml',
             TimeoutInMinutes=15,
             Parameters=params,
             Capabilities=[

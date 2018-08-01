@@ -10,11 +10,11 @@ from aws_xray_sdk.core import patch_all
 
 patch_all()
 
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
+LOGGER = logging.getLogger()
+LOGGER.setLevel(logging.INFO)
 
 # Create CloudFormation Client
-cfn = boto3.client('cloudformation', region_name=util.PLATFORM_REGION)
+CFN_CLIENT = boto3.client('cloudformation', region_name=util.PLATFORM_REGION)
 
 """
 Events Resource Definition
@@ -38,7 +38,7 @@ def get(event, context):
     data = []
 
     name = util.addprefix(event['pathParameters']['name'])
-    logger.debug('Getting events for stack {}:'.format(name))
+    LOGGER.debug('Getting events for stack {}:'.format(name))
 
     # Get the user id for the request
     groups = event['requestContext']['authorizer']['claims']['cognito:groups']
@@ -49,7 +49,7 @@ def get(event, context):
     
     try:
         # List Events for Stack
-        paginator = cfn.get_paginator('describe_stack_events')
+        paginator = CFN_CLIENT.get_paginator('describe_stack_events')
         response_iterator = paginator.paginate(
             StackName=name,
             PaginationConfig={

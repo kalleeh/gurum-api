@@ -6,8 +6,8 @@ import json
 
 PLATFORM_PREFIX = os.getenv('PLATFORM_PREFIX', 'platform-')
 
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
+LOGGER = logging.getLogger()
+LOGGER.setLevel(logging.INFO)
 
 PLATFORM_NAME = os.getenv('PLATFORM_NAME', 'platform')
 PLATFORM_PREFIX = os.getenv('PLATFORM_PREFIX', 'platform-')
@@ -23,7 +23,7 @@ PLATFORM_TAGS['REGION'] = os.getenv('PLATFORM_TAGS_REGION', PLATFORM_PREFIX + 'r
 PLATFORM_TAGS['GROUPS'] = os.getenv('PLATFORM_TAGS_GROUPS', PLATFORM_PREFIX + 'groups')
 
 # Create CloudFormation Client
-cfn = boto3.client('cloudformation', region_name=PLATFORM_REGION)
+CFN_CLIENT = boto3.client('cloudformation', region_name=PLATFORM_REGION)
 
 
 def respond(err, res=None):
@@ -43,6 +43,7 @@ def filter_stacks(stacks, keys, groups, stack_type='any'):
     Args:
         stacks (list): List of dicts representing AWS CloudFormation Stacks.
         keys (list): List of keys representing the desired information to return.
+        groups (string): The name of the group that the authenticated request belongs to.
         stack_type (string): Filter based on stack type, valid options are
             'app','pipeline' or 'any'
     Basic Usage:
@@ -73,12 +74,12 @@ def filter_stacks(stacks, keys, groups, stack_type='any'):
                     keys.remove('Outputs')
             # Check if app belongs to group by comparing groups tag to the cognito group in claim
             if stack_tags[PLATFORM_TAGS['GROUPS']] == groups:
-                logger.debug('Found stack {} with owner group: {}'.format(stack_name, groups))
+                LOGGER.debug('Found stack {} with owner group: {}'.format(stack_name, groups))
                 data.append(subdict(stack, keys))
             else:
-                logger.debug('{} does not belong to group: {}'.format(stack_name, groups))
+                LOGGER.debug('{} does not belong to group: {}'.format(stack_name, groups))
         else:
-            logger.debug('Type is not {} for {}'.format(stack_type, stack_name))
+            LOGGER.debug('Type is not {} for {}'.format(stack_type, stack_name))
 
     return data
 
@@ -88,15 +89,16 @@ def validate_auth(stack_name, groups):
     and belongs to the user performing the request.
     Args:
         stack_name (string): Name of stack to check permissions for
+        groups (string): The name of the group that the authenticated request belongs to
     Basic Usage:
         >>> stack_name = 'my-stack'
-        >>> validate_auth(stack_name)
+        >>> validate_auth(stack_name, "administrators")
     Returns:
         Bool: True/False
     """
 
     try:
-        r = cfn.describe_stacks(StackName=stack_name)
+        r = CFN_CLIENT.describe_stacks(StackName=stack_name)
     except Exception as ex:
         logging.exception(ex)
         raise('No such object.')
@@ -110,13 +112,13 @@ def validate_auth(stack_name, groups):
         if (PLATFORM_TAGS['TYPE'] in stack_tags):
             # Check if stack belongs to group by comparing groups tag to the cognito group in claim
             if stack_tags[PLATFORM_TAGS['GROUPS']] == groups:
-                logger.debug('Authorization Successful: Stack {} owned by: {}'.format(stack_name, groups))
+                LOGGER.debug('Authorization Successful: Stack {} owned by: {}'.format(stack_name, groups))
                 return True
             else:
-                logger.debug('{} does not belong to group: {}'.format(stack_name, groups))
+                LOGGER.debug('{} does not belong to group: {}'.format(stack_name, groups))
                 raise('Permission denied.')
         else:
-            logger.debug('Stack {} does not have a platform type.'.format(stack_name))
+            LOGGER.debug('Stack {} does not have a platform type.'.format(stack_name))
             raise('No such object.')
 
     return False
@@ -137,7 +139,7 @@ def get_cfn_exports():
     cfn_exports = {}
 
     try:
-        cfn_exports = cfn.list_exports()
+        cfn_exports = CFN_CLIENT.list_exports()
     except Exception as ex:
         logging.exception(ex)
         raise('Internal server error.')
@@ -237,12 +239,11 @@ def dict_to_kv(my_dict, key_name, value_name):
     Convert a flat dict of key:value pairs representing AWS resource tags to a boto3 list of dicts
     Args:
         my_dict (dict): Dict representing AWS resource dict.
+        key_name (string): String of the key name that holds the key name.
+        value_name (string): String of the key name that holds the value.
     Basic Usage:
         >>> my_dict = {'MyTagKey': 'MyTagValue'}
         >>> dict_to_kv(my_dict, 'Key', 'Value')
-        {
-            'MyKey': 'MyValue'
-        }
     Returns:
         List: List of dicts containing tag keys and values
         [
@@ -262,23 +263,19 @@ def dict_to_kv(my_dict, key_name, value_name):
 
 def kv_to_dict(my_list, key_name, value_name):
     """
-    Convert a flat dict of key:value pairs representing AWS resource tags to a boto3 list of dicts
+    Convert boto3 list of dicts to a flat dict of key:value pairs representing AWS resource tags
     Args:
-        my_dict (dict): Dict representing AWS resource dict.
+        my_list (list): List of dicts containing tag keys and values.
+        key_name (string): String of the key name that holds the key name.
+        value_name (string): String of the key name that holds the value.
     Basic Usage:
-        >>> my_dict = {'MyTagKey': 'MyTagValue'}
-        >>> dict_to_kv(my_dict, 'Key', 'Value')
-        {
-            'MyKey': 'MyValue'
-        }
+        >>> my_list = [{ 'Key': 'MyTagKey', 'Value': 'MyTagValue' }]
+        >>> dict_to_kv(my_list, 'Key', 'Value')
     Returns:
-        List: List of dicts containing tag keys and values
-        [
-            {
-                'Key': 'MyTagKey',
-                'Value': 'MyTagValue'
-            }
-        ]
+        my_dict (dict): Dict representing AWS resource dict.
+        {
+            'MyTagKey': 'MyTagValue'
+        }
     """
     my_dict = {}
     for item in my_list:

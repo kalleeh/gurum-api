@@ -10,11 +10,11 @@ from aws_xray_sdk.core import patch_all
 
 patch_all()
 
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
+LOGGER = logging.getLogger()
+LOGGER.setLevel(logging.INFO)
 
 # Create CloudFormation Client
-cfn = boto3.client('cloudformation', region_name=util.PLATFORM_REGION)
+CFN_CLIENT = boto3.client('cloudformation', region_name=util.PLATFORM_REGION)
 
 """
 Pipeline Resource Definition
@@ -40,7 +40,7 @@ def get(event, context):
     pipelines = []
     data = {}
 
-    logger.debug('Describing Stack:')
+    LOGGER.debug('Describing Stack:')
 
     # Get the user id for the request
     groups = event['requestContext']['authorizer']['claims']['cognito:groups']
@@ -49,7 +49,7 @@ def get(event, context):
 
     # List CloudFormation Stacks
     try:
-        r = cfn.describe_stacks(StackName=stack_name)
+        r = CFN_CLIENT.describe_stacks(StackName=stack_name)
     except Exception as ex:
         logging.exception(ex)
         raise Exception('Internal server error.')
@@ -102,7 +102,7 @@ def patch(event, context):
     payload = json.loads(event['body'])
 
     stack_name = util.addprefix(event['pathParameters']['name'])
-    logger.debug('Updating Pipeline: ' + stack_name)
+    LOGGER.debug('Updating Pipeline: ' + stack_name)
 
     # Validate authorization
     if not util.validate_auth(stack_name, groups):
@@ -127,7 +127,7 @@ def patch(event, context):
     tags = util.dict_to_kv(tags, 'Key', 'Value')
 
     try:
-        stack = cfn.update_stack(
+        stack = CFN_CLIENT.update_stack(
             StackName=stack_name,
             UsePreviousTemplate=True,
             Parameters=params,
@@ -160,7 +160,7 @@ def delete(event, context):
         List: List of JSON objects containing pipeline information
     """
     stack_name = util.addprefix(event['pathParameters']['name'])
-    logger.debug('Deleting Pipeline: ' + stack_name)
+    LOGGER.debug('Deleting Pipeline: ' + stack_name)
 
     # Get the user id for the request
     groups = event['requestContext']['authorizer']['claims']['cognito:groups']
@@ -170,7 +170,7 @@ def delete(event, context):
         raise Exception('You do not have permission to modify this resource.')
     
     try:
-        stack = cfn.delete_stack(StackName=stack_name)
+        stack = CFN_CLIENT.delete_stack(StackName=stack_name)
     except ValidationError as e:
         error_msg = util.boto_exception(e)
         if error_msg.endswidth('does not exist'):
