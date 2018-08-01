@@ -134,7 +134,7 @@ def post(name, event, context):
     try:
         stack = CFN_CLIENT.create_stack(
             StackName=stack_name,
-            TemplateURL='https://s3-eu-west-1.amazonaws.com/storage-kalleh/CFN_CLIENT/app/pipeline.yaml',
+            TemplateURL='https://s3-eu-west-1.amazonaws.com/storage-kalleh/cfn/app/pipeline.yaml',
             TimeoutInMinutes=15,
             Parameters=params,
             Capabilities=[
