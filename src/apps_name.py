@@ -37,22 +37,23 @@ def get(event, context):
     Returns:
         List: List of JSON object containing app information
     """
-    apps = {}
+    apps = []
     data = {}
 
     LOGGER.debug('Describing Stack:')
 
     # Get the user id for the request
     groups = event['requestContext']['authorizer']['claims']['cognito:groups']
+    name = event['pathParameters']['name']
 
-    stack_name = util.addprefix(event['pathParameters']['name'])
+    stack_name = util.addprefix(name)
 
     # List CloudFormation Stacks
     try:
         r = CFN_CLIENT.describe_stacks(StackName=stack_name)
     except Exception as ex:
         logging.exception(ex)
-        raise Exception('Internal server error.')
+        raise
 
     # Filter stacks based on owner and retrieve wanted keys
     keys = ['StackName', 'Description', 'StackStatus', 'Tags', 'Outputs']
@@ -67,6 +68,7 @@ def get(event, context):
         data['endpoint'] = outputs['Endpoint']
         if 'Repository' in outputs:
             data['repository'] = outputs['Repository']
+
     data['name'] = util.remprefix(apps[0]['StackName'])
     data['description'] = apps[0]['Description']
     data['status'] = apps[0]['StackStatus']
@@ -75,7 +77,7 @@ def get(event, context):
     return util.respond(None, data)
 
 
-def patch(name, event, context):
+def patch(event, context):
     """ Validates that the app belongs to the authenticated user
     and updates the configuration.
 
@@ -98,10 +100,11 @@ def patch(name, event, context):
     # Get the user id for the request
     user = event['requestContext']['authorizer']['claims']['email']
     groups = event['requestContext']['authorizer']['claims']['cognito:groups']
+    name = event['pathParameters']['name']
 
     payload = json.loads(event['body'])
 
-    stack_name = util.addprefix(event['pathParameters']['name'])
+    stack_name = util.addprefix(name)
     LOGGER.debug('Updating App: ' + str(stack_name))
 
     # Validate authorization
@@ -171,7 +174,7 @@ def patch(name, event, context):
         raise Exception('No updates are to be performed. {}'.format(e))
     except Exception as ex:
         logging.exception(ex)
-        raise Exception('Internal server error.')
+        raise
 
     return util.respond(None, stack)
 
@@ -187,11 +190,12 @@ def delete(event, context):
     Returns:
         List: List of JSON objects containing app information
     """
-    stack_name = util.addprefix(event['pathParameters']['name'])
-    LOGGER.debug('Deleting App: ' + stack_name)
-
     # Get the user id for the request
     groups = event['requestContext']['authorizer']['claims']['cognito:groups']
+    name = event['pathParameters']['name']
+
+    stack_name = util.addprefix(name)
+    LOGGER.debug('Deleting App: ' + stack_name)
 
     # Validate authorization
     if not util.validate_auth(stack_name, groups):
@@ -205,6 +209,6 @@ def delete(event, context):
             raise Exception('No such item.')
     except Exception as ex:
         logging.exception(ex)
-        raise Exception('Internal server error.')
+        raise
 
     return util.respond(None, stack)

@@ -42,6 +42,7 @@ def get(event, context):
 
     # Get the user id for the request
     groups = event['requestContext']['authorizer']['claims']['cognito:groups']
+    name = event['pathParameters']['name']
     
     # Validate authorization
     if not util.validate_auth(name, groups):

@@ -98,10 +98,11 @@ def patch(event, context):
     # Get the user id for the request
     user = event['requestContext']['authorizer']['claims']['email']
     groups = event['requestContext']['authorizer']['claims']['cognito:groups']
+    name = event['pathParameters']['name']
 
     payload = json.loads(event['body'])
 
-    stack_name = util.addprefix(event['pathParameters']['name'])
+    stack_name = util.addprefix(name)
     LOGGER.debug('Updating Pipeline: ' + stack_name)
 
     # Validate authorization
@@ -159,11 +160,12 @@ def delete(event, context):
     Returns:
         List: List of JSON objects containing pipeline information
     """
-    stack_name = util.addprefix(event['pathParameters']['name'])
-    LOGGER.debug('Deleting Pipeline: ' + stack_name)
-
     # Get the user id for the request
     groups = event['requestContext']['authorizer']['claims']['cognito:groups']
+    name = event['pathParameters']['name']
+
+    stack_name = util.addprefix(name)
+    LOGGER.debug('Deleting Pipeline: ' + stack_name)
 
     # Validate authorization
     if not util.validate_auth(stack_name, groups):

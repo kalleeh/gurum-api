@@ -331,7 +331,7 @@ Resources:
     Type: AWS::Serverless::Api
   CreateAppFunction:
     Properties:
-      CodeUri: s3://storage-kalleh/gureume/99651618031f163ea99712ca5e5d2d25
+      CodeUri: s3://storage-kalleh/gureume/ba4640015ce0bf18e8e32f9d02b988b2
       Events:
         CreateApp:
           Properties:
@@ -352,7 +352,7 @@ Resources:
     Type: AWS::Serverless::Function
   CreatePipelineFunction:
     Properties:
-      CodeUri: s3://storage-kalleh/gureume/99651618031f163ea99712ca5e5d2d25
+      CodeUri: s3://storage-kalleh/gureume/ba4640015ce0bf18e8e32f9d02b988b2
       Events:
         CreatePipeline:
           Properties:
@@ -366,7 +366,7 @@ Resources:
     Type: AWS::Serverless::Function
   DeleteAppFunction:
     Properties:
-      CodeUri: s3://storage-kalleh/gureume/99651618031f163ea99712ca5e5d2d25
+      CodeUri: s3://storage-kalleh/gureume/ba4640015ce0bf18e8e32f9d02b988b2
       Events:
         DeleteApp:
           Properties:
@@ -387,7 +387,7 @@ Resources:
     Type: AWS::Serverless::Function
   DeletePipelineFunction:
     Properties:
-      CodeUri: s3://storage-kalleh/gureume/99651618031f163ea99712ca5e5d2d25
+      CodeUri: s3://storage-kalleh/gureume/ba4640015ce0bf18e8e32f9d02b988b2
       Events:
         DeletePipeline:
           Properties:
@@ -401,7 +401,7 @@ Resources:
     Type: AWS::Serverless::Function
   DescribeAppFunction:
     Properties:
-      CodeUri: s3://storage-kalleh/gureume/99651618031f163ea99712ca5e5d2d25
+      CodeUri: s3://storage-kalleh/gureume/ba4640015ce0bf18e8e32f9d02b988b2
       Events:
         DescribeApp:
           Properties:
@@ -422,7 +422,7 @@ Resources:
     Type: AWS::Serverless::Function
   DescribeEventsFunction:
     Properties:
-      CodeUri: s3://storage-kalleh/gureume/99651618031f163ea99712ca5e5d2d25
+      CodeUri: s3://storage-kalleh/gureume/ba4640015ce0bf18e8e32f9d02b988b2
       Events:
         DescribeEvents:
           Properties:
@@ -432,11 +432,18 @@ Resources:
               Ref: ApiGatewayApi
           Type: Api
       Handler: events_name.get
+      Policies:
+      - Statement:
+        - Action:
+          - cloudformation:DescribeStacks
+          Effect: Allow
+          Resource:
+          - '*'
       Tracing: Active
     Type: AWS::Serverless::Function
   DescribePipelineFunction:
     Properties:
-      CodeUri: s3://storage-kalleh/gureume/99651618031f163ea99712ca5e5d2d25
+      CodeUri: s3://storage-kalleh/gureume/ba4640015ce0bf18e8e32f9d02b988b2
       Events:
         DescribePipeline:
           Properties:
@@ -446,11 +453,18 @@ Resources:
               Ref: ApiGatewayApi
           Type: Api
       Handler: pipelines_name.get
+      Policies:
+      - Statement:
+        - Action:
+          - cloudformation:DescribeStacks
+          Effect: Allow
+          Resource:
+          - '*'
       Tracing: Active
     Type: AWS::Serverless::Function
   ListAppsFunction:
     Properties:
-      CodeUri: s3://storage-kalleh/gureume/99651618031f163ea99712ca5e5d2d25
+      CodeUri: s3://storage-kalleh/gureume/ba4640015ce0bf18e8e32f9d02b988b2
       Events:
         ListApps:
           Properties:
@@ -471,7 +485,7 @@ Resources:
     Type: AWS::Serverless::Function
   ListPipelinesFunction:
     Properties:
-      CodeUri: s3://storage-kalleh/gureume/99651618031f163ea99712ca5e5d2d25
+      CodeUri: s3://storage-kalleh/gureume/ba4640015ce0bf18e8e32f9d02b988b2
       Events:
         ListPipelines:
           Properties:
@@ -485,7 +499,7 @@ Resources:
     Type: AWS::Serverless::Function
   UpdateAppFunction:
     Properties:
-      CodeUri: s3://storage-kalleh/gureume/99651618031f163ea99712ca5e5d2d25
+      CodeUri: s3://storage-kalleh/gureume/ba4640015ce0bf18e8e32f9d02b988b2
       Events:
         UpdateApp:
           Properties:
@@ -506,7 +520,7 @@ Resources:
     Type: AWS::Serverless::Function
   UpdatePipelineFunction:
     Properties:
-      CodeUri: s3://storage-kalleh/gureume/99651618031f163ea99712ca5e5d2d25
+      CodeUri: s3://storage-kalleh/gureume/ba4640015ce0bf18e8e32f9d02b988b2
       Events:
         UpdatePipeline:
           Properties:

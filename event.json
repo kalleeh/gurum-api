@@ -1,6 +1,6 @@
 {
-    "resource": "/apps",
-    "path": "/apps",
+    "resource": "/apps/karl",
+    "path": "/apps/karl",
     "httpMethod": "GET",
     "headers": {
         "Accept": "*/*",
@@ -14,7 +14,7 @@
         "X-Forwarded-Proto": "https"
     },
     "queryStringParameters": "None",
-    "pathParameters": "None",
+    "pathParameters": "{'name', 'karl'}",
     "stageVariables": "None",
     "requestContext": {
         "resourceId": "a7a5i6",
@@ -35,11 +35,11 @@
                 "email": "wallbomk@amazon.com"
             }
         },
-        "resourcePath": "/apps",
+        "resourcePath": "/apps/karl",
         "httpMethod": "GET",
         "extendedRequestId": "KpfFEa3kDoEFnMg=",
         "requestTime": "26/Jul/2018:18:30:42 +0000",
-        "path": "/apps",
+        "path": "/apps/karl",
         "accountId": "789073296014",
         "protocol": "HTTP/1.1",
         "stage": "dev",

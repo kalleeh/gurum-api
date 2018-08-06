@@ -493,6 +493,13 @@ Resources:
             RestApiId: !Ref ApiGatewayApi
             Path: /pipelines/{name}
             Method: get
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - 'cloudformation:DescribeStacks'
+              Resource:
+                - '*'
 
   DeletePipelineFunction:
     Type: 'AWS::Serverless::Function'
@@ -536,3 +543,10 @@ Resources:
             RestApiId: !Ref ApiGatewayApi
             Path: /events/{name}
             Method: get
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - 'cloudformation:DescribeStacks'
+              Resource:
+                - '*'
