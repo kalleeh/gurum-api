@@ -436,6 +436,7 @@ Resources:
       - Statement:
         - Action:
           - cloudformation:DescribeStacks
+          - cloudformation:DescribeStackEvents
           Effect: Allow
           Resource:
           - '*'

@@ -548,5 +548,6 @@ Resources:
             - Effect: Allow
               Action:
                 - 'cloudformation:DescribeStacks'
+                - 'cloudformation:DescribeStackEvents'
               Resource:
                 - '*'
