@@ -5,6 +5,13 @@ Description: >
     Last Modified: July 17th 2018
     Author: Karl Wallbom <wallbomk@amazon.com
 
+Parameters:
+
+  CUPArn:
+    Description: ARN to the Cognito User Pool to use
+    Type: String
+    Default: "arn:aws:cognito-idp:eu-west-1:789073296014:userpool/eu-west-1_MkM8NwiuN"
+
 Globals:
   Function:
     Runtime: python3.6
@@ -21,7 +28,7 @@ Globals:
         COGNITO_USER_POOL_ARN: "arn:aws:cognito-idp:eu-west-1:789073296014:userpool/eu-west-1_MkM8NwiuN"
   Api:
     EndpointConfiguration: REGIONAL
-  
+
 Resources:
 
   ApiGatewayApi:
@@ -311,7 +318,7 @@ Resources:
             x-amazon-apigateway-authorizer:
                 type: cognito_user_pools
                 providerARNs:
-                    - 'arn:aws:cognito-idp:eu-west-1:789073296014:userpool/eu-west-1_MkM8NwiuN'
+                    - !Ref CUPArn
         definitions:
           Empty:
             type: "object"
