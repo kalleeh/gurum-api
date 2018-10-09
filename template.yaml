@@ -22,6 +22,7 @@ Globals:
         PLATFORM_REGION: "eu-west-1"
         PLATFORM_PREFIX: "gureume-"
         PLATFORM_NAME: "gureume"
+        PLATFORM_BUCKET: "storage-kalleh"
         PLATFORM_ECS_CLUSTER: "gureume"
         PLATFORM_DEPLOYMENT_ROLE: "arn:aws:iam::789073296014:role/gureume-AppDeploymentRole-eu-west-1"
         COGNITO_USER_POOL: "eu-west-1_MkM8NwiuN"
@@ -57,7 +58,7 @@ Resources:
               - CognitoUserPool: []
               x-amazon-apigateway-integration:
                 uri:
-                  !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ListAppsFunction.Arn}/invocations
+                  !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ListApps.Arn}/invocations
                 responses:
                   default:
                     statusCode: "200"
@@ -77,7 +78,7 @@ Resources:
               - CognitoUserPool: []
               x-amazon-apigateway-integration:
                 uri:
-                  !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${CreateAppFunction.Arn}/invocations
+                  !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${CreateApp.Arn}/invocations
                 responses:
                   default:
                     statusCode: "200"
@@ -103,7 +104,7 @@ Resources:
               - CognitoUserPool: []
               x-amazon-apigateway-integration:
                 uri:
-                  !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DescribeAppFunction.Arn}/invocations
+                  !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DescribeApp.Arn}/invocations
                 responses:
                   default:
                     statusCode: "200"
@@ -128,7 +129,7 @@ Resources:
               - CognitoUserPool: []
               x-amazon-apigateway-integration:
                 uri:
-                  !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DeleteAppFunction.Arn}/invocations
+                  !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DeleteApp.Arn}/invocations
                 responses:
                   default:
                     statusCode: "200"
@@ -153,7 +154,7 @@ Resources:
               - CognitoUserPool: []
               x-amazon-apigateway-integration:
                 uri:
-                  !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UpdateAppFunction.Arn}/invocations
+                  !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UpdateApp.Arn}/invocations
                 responses:
                   default:
                     statusCode: "200"
@@ -179,7 +180,7 @@ Resources:
               - CognitoUserPool: []
               x-amazon-apigateway-integration:
                 uri:
-                  !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DescribeEventsFunction.Arn}/invocations
+                  !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DescribeEvents.Arn}/invocations
                 responses:
                   default:
                     statusCode: "200"
@@ -200,7 +201,7 @@ Resources:
               - CognitoUserPool: []
               x-amazon-apigateway-integration:
                 uri:
-                  !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ListPipelinesFunction.Arn}/invocations
+                  !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ListPipelines.Arn}/invocations
                 responses:
                   default:
                     statusCode: "200"
@@ -226,7 +227,7 @@ Resources:
               - CognitoUserPool: []
               x-amazon-apigateway-integration:
                 uri:
-                  !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DescribePipelineFunction.Arn}/invocations
+                  !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DescribePipeline.Arn}/invocations
                 responses:
                   default:
                     statusCode: "200"
@@ -251,7 +252,7 @@ Resources:
               - CognitoUserPool: []
               x-amazon-apigateway-integration:
                 uri:
-                  !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${CreatePipelineFunction.Arn}/invocations
+                  !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${CreatePipeline.Arn}/invocations
                 responses:
                   default:
                     statusCode: "200"
@@ -276,7 +277,7 @@ Resources:
               - CognitoUserPool: []
               x-amazon-apigateway-integration:
                 uri:
-                  !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DeletePipelineFunction.Arn}/invocations
+                  !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DeletePipeline.Arn}/invocations
                 responses:
                   default:
                     statusCode: "200"
@@ -301,7 +302,7 @@ Resources:
               - CognitoUserPool: []
               x-amazon-apigateway-integration:
                 uri:
-                  !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UpdatePipelineFunction.Arn}/invocations
+                  !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UpdatePipeline.Arn}/invocations
                 responses:
                   default:
                     statusCode: "200"
@@ -353,7 +354,7 @@ Resources:
   #      !Ref ApiGatewayApi
 
   # Apps definition
-  ListAppsFunction:
+  ListApps:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: apps.get
@@ -374,7 +375,7 @@ Resources:
               Resource:
                 - '*'
 
-  CreateAppFunction:
+  CreateApp:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: apps.post
@@ -395,7 +396,7 @@ Resources:
               Resource:
                 - '*'
 
-  DescribeAppFunction:
+  DescribeApp:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: apps_name.get
@@ -416,7 +417,7 @@ Resources:
               Resource:
                 - '*'
 
-  DeleteAppFunction:
+  DeleteApp:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: apps_name.delete
@@ -433,11 +434,12 @@ Resources:
         - Statement:
             - Effect: Allow
               Action:
+                - 'cloudformation:DescribeStacks'
                 - 'cloudformation:DeleteStack'
               Resource:
                 - '*'
 
-  UpdateAppFunction:
+  UpdateApp:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: apps_name.patch
@@ -454,12 +456,13 @@ Resources:
         - Statement:
             - Effect: Allow
               Action:
+                - 'cloudformation:DescribeStacks'
                 - 'cloudformation:UpdateStack'
               Resource:
                 - '*'
 
   # Pipelines definition
-  ListPipelinesFunction:
+  ListPipelines:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: apps.get
@@ -480,7 +483,7 @@ Resources:
               Resource:
                 - '*'
 
-  CreatePipelineFunction:
+  CreatePipeline:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: pipelines.post
@@ -493,8 +496,15 @@ Resources:
             RestApiId: !Ref ApiGatewayApi
             Path: /pipelines
             Method: post
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - 'cloudformation:CreateStack'
+              Resource:
+                - '*'
 
-  DescribePipelineFunction:
+  DescribePipeline:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: pipelines_name.get
@@ -515,7 +525,7 @@ Resources:
               Resource:
                 - '*'
 
-  DeletePipelineFunction:
+  DeletePipeline:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: pipelines_name.delete
@@ -528,8 +538,16 @@ Resources:
             RestApiId: !Ref ApiGatewayApi
             Path: /pipelines/{name}
             Method: delete
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - 'cloudformation:DescribeStacks'
+                - 'cloudformation:DeleteStack'
+              Resource:
+                - '*'
 
-  UpdatePipelineFunction:
+  UpdatePipeline:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: pipelines_name.patch
@@ -542,9 +560,17 @@ Resources:
             RestApiId: !Ref ApiGatewayApi
             Path: /pipelines/{name}
             Method: patch
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - 'cloudformation:DescribeStacks'
+                - 'cloudformation:UpdateStack'
+              Resource:
+                - '*'
 
 # Events definition
-  DescribeEventsFunction:
+  DescribeEvents:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: events_name.get

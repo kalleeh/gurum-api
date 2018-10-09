@@ -1,6 +1,7 @@
 import boto3
 import json
 import logging
+import os
 from botocore.exceptions import ValidationError, ClientError
 
 import libs.util as util
@@ -15,6 +16,9 @@ LOGGER.setLevel(logging.INFO)
 
 # Create CloudFormation Client
 CFN_CLIENT = boto3.client('cloudformation', region_name=util.PLATFORM_REGION)
+
+# Set constant S3 bucket for template files
+PLATFORM_BUCKET = os.environ['PLATFORM_BUCKET']
 
 """
 Pipeline Resource Definition
@@ -134,7 +138,7 @@ def post(name, event, context):
     try:
         stack = CFN_CLIENT.create_stack(
             StackName=stack_name,
-            TemplateURL='https://s3-eu-west-1.amazonaws.com/storage-kalleh/cfn/app/pipeline.yaml',
+            TemplateURL='https://s3-eu-west-1.amazonaws.com/' + PLATFORM_BUCKET + '/cfn/app/pipeline.yaml',
             TimeoutInMinutes=15,
             Parameters=params,
             Capabilities=[
