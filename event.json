@@ -60,6 +60,6 @@
         },
         "apiId": "53d9klsi0a"
     },
-    "body": "None",
+    "body": "[{'name': 'bitter-silence-4428', 'tasks': '1', 'health_check_path': '/health', 'image': 'nginx:latest'}]",
     "isBase64Encoded": "False"
 }

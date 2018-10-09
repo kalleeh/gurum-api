@@ -1,6 +1,3 @@
-# repo exclusions for cfn and other tools
-template-deploy.yaml
-
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

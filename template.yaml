@@ -465,6 +465,13 @@ Resources:
             RestApiId: !Ref ApiGatewayApi
             Path: /pipelines
             Method: get
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - 'cloudformation:DescribeStacks'
+              Resource:
+                - '*'
 
   CreatePipelineFunction:
     Type: 'AWS::Serverless::Function'

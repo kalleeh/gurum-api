@@ -21,7 +21,7 @@ Pipeline Resource Definition
 
     URI: /pipelines/{name}
     Methods:
-        GET - Get the details of app
+        GET - Get the details of pipeline
         PATCH - Update the specified pipeline
         DELETE - Delete the pipeline
 """

@@ -1,6 +1,7 @@
 import boto3
 import json
 import logging
+import ast
 from botocore.exceptions import ValidationError, ClientError
 
 import libs.util as util
@@ -98,7 +99,10 @@ def post(event, context):
     user = event['requestContext']['authorizer']['claims']['email']
     groups = event['requestContext']['authorizer']['claims']['cognito:groups']
 
-    payload = json.loads(event['body'])
+    payload = ast.literal_eval(event['body'])
+    print(type(payload))
+    payload = {item['name']:item for item in payload}
+    print(payload)
 
     stack_name = util.addprefix(payload['name'])
     LOGGER.debug('Creating App: ' + stack_name)
