@@ -1,48 +1,62 @@
-Gureume Management API
-==============================================
+# Gureume Management API
 
-This is the management interfae for the Gureume Container Platform.
+This reference architecture provides a set of YAML templates for deploying the Gureume Management API with [AWS CloudFormation](https://aws.amazon.com/cloudformation/).
 
-What's Here
------------
+## Overview
 
-This repository includes:
+![architecture-overview](images/architecture-overview.png)
 
-* README.md - this file
-* buildspec.yml - this file is used by AWS CodeBuild to package your
-  application for deployment to AWS Lambda and API Gateway
-* template.yml - this file contains the AWS Serverless Application Model (AWS SAM) used
-  by AWS CloudFormation to deploy your application to AWS Lambda and Amazon API
-  Gateway.
-* src/ - this directory contains the source code for the AWS Lambda functions
-* tests/ - this directory contains unit tests for your application
+The architecture consists of two parts, the supporting platform and the management API.
 
+This repository consists of a set of nested templates to deploy the supporting platform:
 
-What Do I Do Next?
-------------------
+- A tiered [VPC](http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_Introduction.html) with public and private subnets, spanning an AWS region.
 
-To run your tests locally, go to the root directory of the
-sample code and run the `python -m unittest discover tests` command, which
-AWS CodeBuild also runs through your `buildspec.yml` file.
+## Template details
 
-To test your new code during the release process, modify the existing tests or
-add tests to the tests directory. AWS CodeBuild will run the tests during the
-build stage of your project pipeline. You can find the test results
-in the AWS CodeBuild console.
+The templates below are included in this repository and reference architecture:
 
-Learn more about AWS CodeBuild and how it builds and tests your application here:
-https://docs.aws.amazon.com/codebuild/latest/userguide/concepts.html
+| Template | Description |
+| --- | --- |
+| [template.yaml](template.yaml) | This is the master template - deploy it to CloudFormation and it includes all of the others automatically. |
 
-Learn more about AWS Serverless Application Model (AWS SAM) and how it works here:
-https://github.com/awslabs/serverless-application-model/blob/master/HOWTO.md
+After the CloudFormation templates have been deployed, the [stack outputs](http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/outputs-section-structure.html) contain a
 
-AWS Lambda Developer Guide:
-http://docs.aws.amazon.com/lambda/latest/dg/deploying-lambda-apps.html
+The ECS instances should also appear in the Managed Instances section of the EC2 console.
 
-What Should I Do Before Running My Project in Production?
-------------------
+## Deployment Instructions
 
-AWS recommends you review the security best practices recommended by the framework
-author of your selected sample application before running it in production. You
-should also regularly review and apply any available patches or associated security
-advisories for dependencies used within your application.
+### Prerequisites
+
+#### Cognito User Pool
+
+You'll need a Cognito User Pool to manage the identities that will authenticate through your API. [ECS Service Discovery](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/service-discovery.html#create-service-discovery)
+
+1. Create a new service discovery namespace for our cluster
+
+    ``` bash
+    aws servicediscovery create-private-dns-namespace --name PLATFORM_NAME --vpc vpc-abcd1234 --region us-east-1
+    ```
+
+2. Using the OperationId from the previous output, verify that the private namespace was created successfully.
+
+    ``` bash
+    aws servicediscovery get-operation --operation-id h2qe3s6dxftvvt7riu6lfy2f6c3jlhf4-je6chs2e
+    ```
+
+### Configure the template to use the Cognito User Pool
+
+You can adjust the Cognito User Pool ID used in this section of the [template.yaml](template.yaml) template:
+
+``` YAML
+securityDefinitions:
+    CognitoUserPool:
+    in: header
+    type: apiKey
+    name: Authorization
+    x-amazon-apigateway-authtype: cognito_user_pools
+    x-amazon-apigateway-authorizer:
+        type: cognito_user_pools
+        providerARNs:
+            - 'arn:aws:cognito-idp:REGION:ACCOUNT_ID:userpool/eu-west-1_MkMfew8eN'
+```
