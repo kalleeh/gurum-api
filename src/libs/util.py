@@ -4,8 +4,6 @@ import logging
 import boto3
 import json
 
-PLATFORM_PREFIX = os.getenv('PLATFORM_PREFIX', 'platform-')
-
 LOGGER = logging.getLogger()
 LOGGER.setLevel(logging.INFO)
 

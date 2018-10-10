@@ -17,6 +17,16 @@ Parameters:
     Type: String
     Default: "storage-kalleh"
 
+  PlatformRegion:
+    Description: Region to deploy the platform resources in
+    Type: String
+    Default: "eu-west-1"
+
+  PlatformPrefix:
+    Description: String to use as prefix for platform resources
+    Type: String
+    Default: "gureume"
+
 Globals:
   Function:
     Runtime: python3.6
@@ -24,11 +34,9 @@ Globals:
     Handler: index.handler
     Environment:
       Variables:
-        PLATFORM_REGION: "eu-west-1"
-        PLATFORM_PREFIX: "gureume-"
-        PLATFORM_NAME: "gureume"
+        PLATFORM_REGION: !Ref PlatformRegion
+        PLATFORM_PREFIX: !Sub "${PlatformPrefix}-"
         PLATFORM_BUCKET: !Ref PlatformBucket
-        PLATFORM_ECS_CLUSTER: "gureume"
         PLATFORM_DEPLOYMENT_ROLE: !Ref DeploymentRole
   Api:
     EndpointConfiguration: REGIONAL
