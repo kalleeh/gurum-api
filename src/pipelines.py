@@ -51,7 +51,7 @@ def get(event, context):
     LOGGER.debug('Listing Pipelines:')    
 
     # Get the user id for the request
-    groups = event['requestContext']['authorizer']['claims']['cognito:groups']
+    groups = event['claims']['groups']
 
     try:
         # List CloudFormation Stacks
@@ -111,8 +111,8 @@ def post(name, event, context):
 
     request = event.current_request
     # Get the user id for the request
-    user = request.context['authorizer']['claims']['email']
-    groups = request.context['authorizer']['claims']['cognito:groups']
+    user = event['claims']['email']
+    groups = event['claims']['groups']
 
     payload = json.loads(request.json_body[0])
 
@@ -146,6 +146,7 @@ def post(name, event, context):
             Capabilities=[
                 'CAPABILITY_NAMED_IAM',
             ],
+            RoleARN=util.PLATFORM_DEPLOYMENT_ROLE,
             Tags=tags
         )
     except ClientError as e:

@@ -24,7 +24,7 @@ Globals:
         PLATFORM_NAME: "gureume"
         PLATFORM_BUCKET: "storage-kalleh"
         PLATFORM_ECS_CLUSTER: "gureume"
-        PLATFORM_DEPLOYMENT_ROLE: "arn:aws:iam::789073296014:role/gureume-AppDeploymentRole-eu-west-1"
+        PLATFORM_DEPLOYMENT_ROLE: !Ref DeploymentRole
         COGNITO_USER_POOL: "eu-west-1_MkM8NwiuN"
         COGNITO_USER_POOL_ARN: "arn:aws:cognito-idp:eu-west-1:789073296014:userpool/eu-west-1_MkM8NwiuN"
   Api:
@@ -90,6 +90,15 @@ Resources:
                 responses:
                   default:
                     statusCode: "200"
+                requestTemplates:
+                  application/json: |
+                    #set($allParams = $input.params())
+                    {
+                      "claims" : {
+                        "email" : "$context.authorizer.claims['email']",
+                        "groups" : "$context.authorizer.claims['cognito:groups']"
+                      }
+                    }
                 passthroughBehavior: "when_no_match"
                 httpMethod: "POST"
                 contentHandling: "CONVERT_TO_TEXT"
@@ -156,6 +165,18 @@ Resources:
                 responses:
                   default:
                     statusCode: "200"
+                requestTemplates:
+                  application/json: |
+                    #set($allParams = $input.params())
+                    {
+                      "claims" : {
+                        "email" : "$context.authorizer.claims['email']",
+                        "groups" : "$context.authorizer.claims['cognito:groups']"
+                      },
+                      "params" : {
+                        "name" : "$input.params('name')"
+                      }
+                    }
                 passthroughBehavior: "when_no_match"
                 httpMethod: "POST"
                 contentHandling: "CONVERT_TO_TEXT"
@@ -183,6 +204,18 @@ Resources:
                 responses:
                   default:
                     statusCode: "200"
+                requestTemplates:
+                  application/json: |
+                    #set($allParams = $input.params())
+                    {
+                      "claims" : {
+                        "email" : "$context.authorizer.claims['email']",
+                        "groups" : "$context.authorizer.claims['cognito:groups']"
+                      },
+                      "params" : {
+                        "name" : "$input.params('name')"
+                      }
+                    }
                 passthroughBehavior: "when_no_match"
                 httpMethod: "POST"
                 contentHandling: "CONVERT_TO_TEXT"
@@ -210,6 +243,19 @@ Resources:
                 responses:
                   default:
                     statusCode: "200"
+                requestTemplates:
+                  application/json: |
+                    #set($allParams = $input.params())
+                    {
+                      "claims" : {
+                        "email" : "$context.authorizer.claims['email']",
+                        "groups" : "$context.authorizer.claims['cognito:groups']"
+                      },
+                      "params" : {
+                        "name" : "$input.params('name')"
+                      },
+                      "body-json" : $input.json('$')
+                    }
                 passthroughBehavior: "when_no_match"
                 httpMethod: "POST"
                 contentHandling: "CONVERT_TO_TEXT"
@@ -238,6 +284,18 @@ Resources:
                 responses:
                   default:
                     statusCode: "200"
+                requestTemplates:
+                  application/json: |
+                    #set($allParams = $input.params())
+                    {
+                      "claims" : {
+                        "email" : "$context.authorizer.claims['email']",
+                        "groups" : "$context.authorizer.claims['cognito:groups']"
+                      },
+                      "params" : {
+                        "name" : "$input.params('name')"
+                      }
+                    }
                 passthroughBehavior: "when_no_match"
                 httpMethod: "POST"
                 contentHandling: "CONVERT_TO_TEXT"
@@ -261,6 +319,15 @@ Resources:
                 responses:
                   default:
                     statusCode: "200"
+                requestTemplates:
+                  application/json: |
+                    #set($allParams = $input.params())
+                    {
+                      "claims" : {
+                        "email" : "$context.authorizer.claims['email']",
+                        "groups" : "$context.authorizer.claims['cognito:groups']"
+                      }
+                    }
                 passthroughBehavior: "when_no_match"
                 httpMethod: "POST"
                 contentHandling: "CONVERT_TO_TEXT"
@@ -289,6 +356,18 @@ Resources:
                 responses:
                   default:
                     statusCode: "200"
+                requestTemplates:
+                  application/json: |
+                    #set($allParams = $input.params())
+                    {
+                      "claims" : {
+                        "email" : "$context.authorizer.claims['email']",
+                        "groups" : "$context.authorizer.claims['cognito:groups']"
+                      },
+                      "params" : {
+                        "name" : "$input.params('name')"
+                      }
+                    }
                 passthroughBehavior: "when_no_match"
                 httpMethod: "POST"
                 contentHandling: "CONVERT_TO_TEXT"
@@ -316,6 +395,16 @@ Resources:
                 responses:
                   default:
                     statusCode: "200"
+                requestTemplates:
+                  application/json: |
+                    #set($allParams = $input.params())
+                    {
+                      "claims" : {
+                        "email" : "$context.authorizer.claims['email']",
+                        "groups" : "$context.authorizer.claims['cognito:groups']"
+                      },
+                      "body-json" : $input.json('$')
+                    }
                 passthroughBehavior: "when_no_match"
                 httpMethod: "POST"
                 contentHandling: "CONVERT_TO_TEXT"
@@ -343,6 +432,18 @@ Resources:
                 responses:
                   default:
                     statusCode: "200"
+                requestTemplates:
+                  application/json: |
+                    #set($allParams = $input.params())
+                    {
+                      "claims" : {
+                        "email" : "$context.authorizer.claims['email']",
+                        "groups" : "$context.authorizer.claims['cognito:groups']"
+                      },
+                      "params" : {
+                        "name" : "$input.params('name')"
+                      }
+                    }
                 passthroughBehavior: "when_no_match"
                 httpMethod: "POST"
                 contentHandling: "CONVERT_TO_TEXT"
@@ -370,6 +471,19 @@ Resources:
                 responses:
                   default:
                     statusCode: "200"
+                requestTemplates:
+                  application/json: |
+                    #set($allParams = $input.params())
+                    {
+                      "claims" : {
+                        "email" : "$context.authorizer.claims['email']",
+                        "groups" : "$context.authorizer.claims['cognito:groups']"
+                      },
+                      "params" : {
+                        "name" : "$input.params('name')"
+                      },
+                      "body-json" : $input.json('$')
+                    }
                 passthroughBehavior: "when_no_match"
                 httpMethod: "POST"
                 contentHandling: "CONVERT_TO_TEXT"

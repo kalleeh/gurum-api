@@ -45,8 +45,8 @@ def get(event, context):
     LOGGER.debug('Describing Stack:')
 
     # Get the user id for the request
-    groups = event['requestContext']['authorizer']['claims']['cognito:groups']
-    name = event['pathParameters']['name']
+    groups = event['claims']['groups']
+    name = event['params']['name']
 
     stack_name = util.addprefix(name)
 
@@ -100,9 +100,9 @@ def patch(event, context):
     tags = {}
 
     # Get the user id for the request
-    user = event['requestContext']['authorizer']['claims']['email']
-    groups = event['requestContext']['authorizer']['claims']['cognito:groups']
-    name = event['pathParameters']['name']
+    user = event['claims']['email']
+    groups = event['claims']['groups']
+    name = event['params']['name']
 
     payload = json.loads(event['body'])
 
@@ -193,8 +193,8 @@ def delete(event, context):
         List: List of JSON objects containing app information
     """
     # Get the user id for the request
-    groups = event['requestContext']['authorizer']['claims']['cognito:groups']
-    name = event['pathParameters']['name']
+    groups = event['claims']['groups']
+    name = event['params']['name']
 
     stack_name = util.addprefix(name)
     LOGGER.debug('Deleting App: ' + stack_name)

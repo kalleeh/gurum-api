@@ -39,12 +39,13 @@ def get(event, context):
     """
     data = []
 
-    name = util.addprefix(event['pathParameters']['name'])
+    # Get the user id for the request
+    groups = event['claims']['groups']
+    name = event['params']['name']
+    
     LOGGER.debug('Getting events for stack {}:'.format(name))
 
-    # Get the user id for the request
-    groups = event['requestContext']['authorizer']['claims']['cognito:groups']
-    name = event['pathParameters']['name']
+    name = util.addprefix(name)
     
     # Validate authorization
     if not util.validate_auth(name, groups):

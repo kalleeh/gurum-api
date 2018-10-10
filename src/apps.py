@@ -50,7 +50,7 @@ def get(event, context):
     LOGGER.debug('Listing Apps:')
 
     # Get the user id for the request
-    groups = event['requestContext']['authorizer']['claims']['cognito:groups']
+    groups = event['claims']['groups']
 
     try:
         # List CloudFormation Stacks
@@ -100,8 +100,6 @@ def post(event, context):
     params = {}
     tags = {}
 
-    print(event)
-
     # Get the user id for the request
     user = event['claims']['email']
     groups = event['claims']['groups']
@@ -138,6 +136,7 @@ def post(event, context):
             Capabilities=[
                 'CAPABILITY_NAMED_IAM',
             ],
+            RoleARN=util.PLATFORM_DEPLOYMENT_ROLE,
             Tags=tags
         )
     except ClientError as e:
