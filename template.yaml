@@ -12,6 +12,11 @@ Parameters:
     Type: String
     Default: "arn:aws:cognito-idp:eu-west-1:789073296014:userpool/eu-west-1_MkM8NwiuN"
 
+  PlatformBucket:
+    Description: S3 Bucket to get the product templates from
+    Type: String
+    Default: "storage-kalleh"
+
 Globals:
   Function:
     Runtime: python3.6
@@ -22,11 +27,9 @@ Globals:
         PLATFORM_REGION: "eu-west-1"
         PLATFORM_PREFIX: "gureume-"
         PLATFORM_NAME: "gureume"
-        PLATFORM_BUCKET: "storage-kalleh"
+        PLATFORM_BUCKET: !Ref PlatformBucket
         PLATFORM_ECS_CLUSTER: "gureume"
         PLATFORM_DEPLOYMENT_ROLE: !Ref DeploymentRole
-        COGNITO_USER_POOL: "eu-west-1_MkM8NwiuN"
-        COGNITO_USER_POOL_ARN: "arn:aws:cognito-idp:eu-west-1:789073296014:userpool/eu-west-1_MkM8NwiuN"
   Api:
     EndpointConfiguration: REGIONAL
 
@@ -598,17 +601,6 @@ Resources:
         - "video/ogg"
         - "video/mpeg"
         - "video/webm"
-
-
-  # Authorizer:
-  #  Type: "AWS::ApiGateway::Authorizer"
-  #  Properties:
-  #    Type: "COGNITO_USER_POOLS"
-  #    IdentitySource: "method.request.header.Auth"
-  #    Name: "CognitoAuthorizer"
-  #    ProviderARNs: ["arn:aws:cognito-idp:eu-west-1:789073296014:userpool/eu-west-1_MkM8NwiuN"]
-  #    RestApiId:
-  #      !Ref ApiGatewayApi
 
   # Apps definition
   ListApps:

@@ -9,7 +9,6 @@ PLATFORM_PREFIX = os.getenv('PLATFORM_PREFIX', 'platform-')
 LOGGER = logging.getLogger()
 LOGGER.setLevel(logging.INFO)
 
-PLATFORM_NAME = os.getenv('PLATFORM_NAME', 'platform')
 PLATFORM_PREFIX = os.getenv('PLATFORM_PREFIX', 'platform-')
 PLATFORM_REGION = os.getenv('PLATFORM_REGION', 'eu-west-1')
 PLATFORM_ECS_CLUSTER = os.getenv('PLATFORM_ECS_CLUSTER', PLATFORM_PREFIX + 'cluster')

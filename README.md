@@ -44,11 +44,11 @@ You'll need a Cognito User Pool to manage the identities that will authenticate 
     aws servicediscovery get-operation --operation-id h2qe3s6dxftvvt7riu6lfy2f6c3jlhf4-je6chs2e
     ```
 
-### Configure the template to use the Cognito User Pool
+#### Configure the template to use the Cognito User Pool
 
 You can adjust the Cognito User Pool ID used in this section of the [template.yaml](template.yaml) template:
 
-``` YAML
+```yaml
 securityDefinitions:
     CognitoUserPool:
     in: header
@@ -59,4 +59,28 @@ securityDefinitions:
         type: cognito_user_pools
         providerARNs:
             - 'arn:aws:cognito-idp:REGION:ACCOUNT_ID:userpool/eu-west-1_MkMfew8eN'
+```
+
+#### S3 Bucket for the Product templates
+
+The CreateApp and CreatePipeline lambda requires permissions to read the templates from an S3-bucket in order to provision applications and pipelines. The templates that the functions need access to is already synchronized as part of the platform deployment however you need to add the necessary permissions for these functions to get the templates to deploy.
+Update the bucket policy to something similar,
+
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": [
+                    "arn:aws:iam::ACCOUNT_ID:role/gureume-api-CreatePipelineRole-19IKJ4QRFEF4J",
+                    "arn:aws:iam::ACCOUNT_ID:role/gureume-api-CreateAppRole-WH212SG7TQVR"
+                ]
+            },
+            "Action": "s3:GetObject",
+            "Resource": "arn:aws:s3:::STORAGE_BUCKET/cfn/app/*"
+        }
+    ]
+}
 ```
