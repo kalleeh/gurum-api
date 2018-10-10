@@ -37,7 +37,7 @@ Globals:
         PLATFORM_REGION: !Ref PlatformRegion
         PLATFORM_PREFIX: !Sub "${PlatformPrefix}-"
         PLATFORM_BUCKET: !Ref PlatformBucket
-        PLATFORM_DEPLOYMENT_ROLE: !Ref DeploymentRole
+        PLATFORM_DEPLOYMENT_ROLE: !GetAtt DeploymentRole.Arn
   Api:
     EndpointConfiguration: REGIONAL
 
