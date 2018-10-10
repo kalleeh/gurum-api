@@ -105,8 +105,6 @@ def post(event, context):
     groups = event['claims']['groups']
 
     payload = json.loads(event['body-json'][0])
-    
-    # payload = {item['name']:item for item in payload}
 
     stack_name = util.addprefix(payload['name'])
     LOGGER.debug('Creating App: ' + stack_name)

@@ -83,7 +83,7 @@ def get(event, context):
     return util.respond(None, data)
 
 
-def post(name, event, context):
+def post(event, context):
     """ Creates a new pipeline belonging to the authenticated user.
     Pre-requisites: User must create a new OAuth token on his GitHub-account
     that allows repo access to the requested repository for the pipeline
@@ -109,14 +109,14 @@ def post(name, event, context):
     params = {}
     tags = {}
 
-    request = event.current_request
     # Get the user id for the request
     user = event['claims']['email']
     groups = event['claims']['groups']
 
-    payload = json.loads(request.json_body[0])
+    payload = json.loads(event['body-json'][0])
+    print(payload)
 
-    stack_name = util.addprefix(event['pathParameters']['name'])
+    stack_name = util.addprefix(payload['name'])
     LOGGER.debug('Creating Pipeline: ' + stack_name)
 
     if 'app_dev' in payload:

@@ -332,6 +332,44 @@ Resources:
                 httpMethod: "POST"
                 contentHandling: "CONVERT_TO_TEXT"
                 type: "aws"
+            post:
+              consumes:
+              - "application/json"
+              produces:
+              - "application/json"
+              parameters:
+                - name: body
+                  in: body
+                  required: true
+                  schema:
+                    $ref: '#/definitions/CreatePipelineRequest'
+              responses:
+                '200':
+                  description: "200 response"
+                  schema:
+                    $ref: "#/definitions/Empty"
+              security:
+              - CognitoUserPool: []
+              x-amazon-apigateway-integration:
+                uri:
+                  !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${CreatePipeline.Arn}/invocations
+                responses:
+                  default:
+                    statusCode: "200"
+                requestTemplates:
+                  application/json: |
+                    #set($allParams = $input.params())
+                    {
+                      "claims" : {
+                        "email" : "$context.authorizer.claims['email']",
+                        "groups" : "$context.authorizer.claims['cognito:groups']"
+                      },
+                      "body-json" : $input.json('$')
+                    }
+                passthroughBehavior: "when_no_match"
+                httpMethod: "POST"
+                contentHandling: "CONVERT_TO_TEXT"
+                type: "aws"
           /pipelines/{name}:
             get:
               consumes:
@@ -517,6 +555,32 @@ Resources:
               - name
               - tasks
               - health_check_path
+          CreatePipelineRequest:
+            type: object
+            properties:
+              name:
+                type: string
+              app_name:
+                type: string
+              app_dev:
+                type: string
+              app_test:
+                type: string
+              github_repo:
+                type: string
+              github_branch:
+                type: string
+              github_token:
+                type: string
+              github_user:
+                type: string
+            required:
+              - name
+              - app_name
+              - github_repo
+              - github_branch
+              - github_token
+              - github_user
         x-amazon-apigateway-binary-media-types:
         - "application/octet-stream"
         - "application/x-tar"
@@ -654,6 +718,7 @@ Resources:
               Action:
                 - 'cloudformation:DescribeStacks'
                 - 'cloudformation:UpdateStack'
+                - 'iam:PassRole'
               Resource:
                 - '*'
 
@@ -764,6 +829,7 @@ Resources:
               Action:
                 - 'cloudformation:DescribeStacks'
                 - 'cloudformation:UpdateStack'
+                - 'iam:PassRole'
               Resource:
                 - '*'
 
