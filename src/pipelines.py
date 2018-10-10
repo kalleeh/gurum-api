@@ -114,7 +114,6 @@ def post(event, context):
     groups = event['claims']['groups']
 
     payload = json.loads(event['body-json'][0])
-    print(payload)
 
     stack_name = util.addprefix(payload['name'])
     LOGGER.debug('Creating Pipeline: ' + stack_name)
