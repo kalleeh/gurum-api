@@ -95,13 +95,14 @@ def patch(event, context):
     """
     params = {}
     tags = {}
+    stack = {}
 
     # Get the user id for the request
     user = event['claims']['email']
     groups = event['claims']['groups']
     name = event['params']['name']
 
-    payload = json.loads(event['body'])
+    payload = json.loads(event['body-json'][0])
 
     stack_name = util.addprefix(name)
     LOGGER.debug('Updating Pipeline: ' + stack_name)
@@ -114,11 +115,16 @@ def patch(event, context):
         params['ServiceDev'] = util.addprefix(payload['app_dev'])
     if 'app_test' in payload:
         params['ServiceTest'] = util.addprefix(payload['app_test'])
-    params['ServiceProd'] = util.addprefix(payload['app_name'])
-    params['GitHubRepo'] = payload['github_repo']
-    params['GitHubBranch'] = payload['github_branch']
-    params['GitHubToken'] = payload['github_token']
-    params['GitHubUser'] = payload['github_user']
+    if 'app_name' in payload:
+        params['ServiceProd'] = util.addprefix(payload['app_name'])
+    if 'github_repo' in payload:
+        params['GitHubRepo'] = payload['github_repo']
+    if 'github_branch' in payload:
+        params['GitHubBranch'] = payload['github_branch']
+    if 'github_token' in payload:
+        params['GitHubToken'] = payload['github_token']
+    if 'github_user' in payload:
+        params['GitHubUser'] = payload['github_user']
     params = util.dict_to_kv(params, 'ParameterKey', 'ParameterValue')
 
     tags[util.PLATFORM_TAGS['TYPE']] = 'pipeline'

@@ -98,6 +98,7 @@ def patch(event, context):
     """
     params = {}
     tags = {}
+    stack = {}
 
     # Get the user id for the request
     user = event['claims']['email']

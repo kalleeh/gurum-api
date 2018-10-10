@@ -726,7 +726,7 @@ Resources:
   ListPipelines:
     Type: 'AWS::Serverless::Function'
     Properties:
-      Handler: apps.get
+      Handler: pipelines.get
       CodeUri: src/
       Tracing: "Active"
       Events:
