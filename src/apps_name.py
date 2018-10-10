@@ -13,7 +13,7 @@ patch_all()
 """
 
 LOGGER = logging.getLogger()
-LOGGER.setLevel(logging.ERROR)
+LOGGER.setLevel(logging.INFO)
 
 # Create CloudFormation Client
 CFN_CLIENT = boto3.client('cloudformation', region_name=util.PLATFORM_REGION)

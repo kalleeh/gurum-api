@@ -146,7 +146,6 @@ def post(name, event, context):
             Capabilities=[
                 'CAPABILITY_NAMED_IAM',
             ],
-            RoleARN=util.PLATFORM_DEPLOYMENT_ROLE,
             Tags=tags
         )
     except ClientError as e:

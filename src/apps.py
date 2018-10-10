@@ -1,7 +1,6 @@
 import boto3
 import json
 import logging
-import ast
 import os
 from botocore.exceptions import ValidationError, ClientError
 
@@ -15,7 +14,7 @@ patch_all()
 """
 
 LOGGER = logging.getLogger()
-LOGGER.setLevel(logging.DEBUG)
+LOGGER.setLevel(logging.INFO)
 
 # Create CloudFormation Client
 CFN_CLIENT = boto3.client('cloudformation', region_name=util.PLATFORM_REGION)
@@ -89,26 +88,27 @@ def post(event, context):
     Basic Usage:
         >>> POST /apps
         >>> Payload Example:
-            [{
+            {
                 "name": "my-app",
                 "tasks": "1",
                 "health_check_path": "/health",
                 "image": "nginx:latest"     [Optional]
-            }]
+            }
     Returns:
         List: List of JSON objects containing app information
     """
     params = {}
     tags = {}
 
-    # Get the user id for the request
-    user = event['requestContext']['authorizer']['claims']['email']
-    groups = event['requestContext']['authorizer']['claims']['cognito:groups']
+    print(event)
 
-    payload = ast.literal_eval(event['body'])
-    print(type(payload))
-    payload = {item['name']:item for item in payload}
-    print(payload)
+    # Get the user id for the request
+    user = event['claims']['email']
+    groups = event['claims']['groups']
+
+    payload = json.loads(event['body-json'][0])
+    
+    # payload = {item['name']:item for item in payload}
 
     stack_name = util.addprefix(payload['name'])
     LOGGER.debug('Creating App: ' + stack_name)
@@ -138,7 +138,6 @@ def post(event, context):
             Capabilities=[
                 'CAPABILITY_NAMED_IAM',
             ],
-            RoleARN=util.PLATFORM_DEPLOYMENT_ROLE,
             Tags=tags
         )
     except ClientError as e:

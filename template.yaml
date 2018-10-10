@@ -32,6 +32,32 @@ Globals:
 
 Resources:
 
+  DeploymentRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /
+      AssumeRolePolicyDocument: 
+        Version: "2012-10-17"
+        Statement:
+          - 
+            Effect: "Allow"
+            Principal: 
+              Service: 
+                - "cloudformation.amazonaws.com"
+            Action: 
+              - "sts:AssumeRole"
+          - 
+            Effect: "Allow"
+            Principal: 
+              AWS: 
+                - !GetAtt CreateAppRole.Arn
+                - !GetAtt CreatePipelineRole.Arn
+            Action: 
+              - "sts:AssumeRole"
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/PowerUserAccess
+      - arn:aws:iam::aws:policy/IAMFullAccess
+
   ApiGatewayApi:
     Type: AWS::Serverless::Api
     Properties:
@@ -40,13 +66,15 @@ Resources:
         swagger: "2.0"
         info:
           version: "1.0"
-          title: "gureume-api-sam"
+          title: "gureume-api"
         host: "api.gureu.me"
         schemes:
         - "https"
         paths:
           /apps:
             get:
+              consumes:
+              - "application/json"
               produces:
               - "application/json"
               responses:
@@ -65,10 +93,18 @@ Resources:
                 passthroughBehavior: "when_no_match"
                 httpMethod: "POST"
                 contentHandling: "CONVERT_TO_TEXT"
-                type: "aws_proxy"
+                type: "aws"
             post:
+              consumes:
+              - "application/json"
               produces:
               - "application/json"
+              parameters:
+                - name: body
+                  in: body
+                  required: true
+                  schema:
+                    $ref: '#/definitions/CreateAppRequest'
               responses:
                 '200':
                   description: "200 response"
@@ -82,12 +118,24 @@ Resources:
                 responses:
                   default:
                     statusCode: "200"
+                requestTemplates:
+                  application/json: |
+                    #set($allParams = $input.params())
+                    {
+                      "claims" : {
+                        "email" : "$context.authorizer.claims['email']",
+                        "groups" : "$context.authorizer.claims['cognito:groups']"
+                      },
+                      "body-json" : $input.json('$')
+                    }
                 passthroughBehavior: "when_no_match"
                 httpMethod: "POST"
                 contentHandling: "CONVERT_TO_TEXT"
-                type: "aws_proxy"
+                type: "aws"
           /apps/{name}:
             get:
+              consumes:
+              - "application/json"
               produces:
               - "application/json"
               parameters:
@@ -111,8 +159,10 @@ Resources:
                 passthroughBehavior: "when_no_match"
                 httpMethod: "POST"
                 contentHandling: "CONVERT_TO_TEXT"
-                type: "aws_proxy"
+                type: "aws"
             delete:
+              consumes:
+              - "application/json"
               produces:
               - "application/json"
               parameters:
@@ -136,8 +186,10 @@ Resources:
                 passthroughBehavior: "when_no_match"
                 httpMethod: "POST"
                 contentHandling: "CONVERT_TO_TEXT"
-                type: "aws_proxy"
+                type: "aws"
             patch:
+              consumes:
+              - "application/json"
               produces:
               - "application/json"
               parameters:
@@ -161,9 +213,11 @@ Resources:
                 passthroughBehavior: "when_no_match"
                 httpMethod: "POST"
                 contentHandling: "CONVERT_TO_TEXT"
-                type: "aws_proxy"
+                type: "aws"
           /events/{name}:
             get:
+              consumes:
+              - "application/json"
               produces:
               - "application/json"
               parameters:
@@ -187,9 +241,11 @@ Resources:
                 passthroughBehavior: "when_no_match"
                 httpMethod: "POST"
                 contentHandling: "CONVERT_TO_TEXT"
-                type: "aws_proxy"
+                type: "aws"
           /pipelines:
             get:
+              consumes:
+              - "application/json"
               produces:
               - "application/json"
               responses:
@@ -208,9 +264,11 @@ Resources:
                 passthroughBehavior: "when_no_match"
                 httpMethod: "POST"
                 contentHandling: "CONVERT_TO_TEXT"
-                type: "aws_proxy"
+                type: "aws"
           /pipelines/{name}:
             get:
+              consumes:
+              - "application/json"
               produces:
               - "application/json"
               parameters:
@@ -234,8 +292,10 @@ Resources:
                 passthroughBehavior: "when_no_match"
                 httpMethod: "POST"
                 contentHandling: "CONVERT_TO_TEXT"
-                type: "aws_proxy"
+                type: "aws"
             post:
+              consumes:
+              - "application/json"
               produces:
               - "application/json"
               parameters:
@@ -259,8 +319,10 @@ Resources:
                 passthroughBehavior: "when_no_match"
                 httpMethod: "POST"
                 contentHandling: "CONVERT_TO_TEXT"
-                type: "aws_proxy"
+                type: "aws"
             delete:
+              consumes:
+              - "application/json"
               produces:
               - "application/json"
               parameters:
@@ -284,8 +346,10 @@ Resources:
                 passthroughBehavior: "when_no_match"
                 httpMethod: "POST"
                 contentHandling: "CONVERT_TO_TEXT"
-                type: "aws_proxy"
+                type: "aws"
             patch:
+              consumes:
+              - "application/json"
               produces:
               - "application/json"
               parameters:
@@ -309,7 +373,7 @@ Resources:
                 passthroughBehavior: "when_no_match"
                 httpMethod: "POST"
                 contentHandling: "CONVERT_TO_TEXT"
-                type: "aws_proxy"
+                type: "aws"
         securityDefinitions:
           CognitoUserPool:
             in: header
@@ -324,6 +388,21 @@ Resources:
           Empty:
             type: "object"
             title: "Empty Schema"
+          CreateAppRequest:
+            type: object
+            properties:
+              name:
+                type: string
+              tasks:
+                type: int
+              health_check_path:
+                type: string
+              image:
+                type: string
+            required:
+              - name
+              - tasks
+              - health_check_path
         x-amazon-apigateway-binary-media-types:
         - "application/octet-stream"
         - "application/x-tar"
@@ -393,6 +472,9 @@ Resources:
             - Effect: Allow
               Action:
                 - 'cloudformation:CreateStack'
+                - 'cloudformation:ListExports'
+                - 'elasticloadbalancing:DescribeRules'
+                - 'iam:PassRole'
               Resource:
                 - '*'
 
@@ -501,6 +583,8 @@ Resources:
             - Effect: Allow
               Action:
                 - 'cloudformation:CreateStack'
+                - 'cloudformation:ListExports'
+                - 'iam:PassRole'
               Resource:
                 - '*'
 
