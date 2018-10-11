@@ -105,7 +105,7 @@ def patch(event, context):
     groups = event['claims']['groups']
     name = event['params']['name']
 
-    payload = json.loads(event['body'])
+    payload = json.loads(event['body-json'][0])
 
     stack_name = util.addprefix(name)
     LOGGER.debug('Updating App: ' + str(stack_name))
