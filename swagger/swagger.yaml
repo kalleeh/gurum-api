@@ -1,14 +1,16 @@
-
+---
 swagger: "2.0"
 info:
   version: "1.0"
-  title: "gureume-api-sam"
+  title: "gureume-api"
 host: "api.gureu.me"
 schemes:
 - "https"
 paths:
   /apps:
     get:
+      consumes:
+      - "application/json"
       produces:
       - "application/json"
       responses:
@@ -20,58 +22,34 @@ paths:
       - CognitoUserPool: []
       x-amazon-apigateway-integration:
         uri:
-          !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ListAppsFunction.Arn}/
-        requestTemplates: &json_request_template
-          application/json: |
-            #set($allParams = $input.params())
-            {
-            "body-json" : $input.json('$'),
-            "params" : {
-            #foreach($type in $allParams.keySet())
-                #set($params = $allParams.get($type))
-            "$type" : {
-                #foreach($paramName in $params.keySet())
-                "$paramName" : "$util.escapeJavaScript($params.get($paramName))"
-                    #if($foreach.hasNext),#end
-                #end
-            }
-                #if($foreach.hasNext),#end
-            #end
-            },
-            "stage-variables" : {
-            #foreach($key in $stageVariables.keySet())
-            "$key" : "$util.escapeJavaScript($stageVariables.get($key))"
-                #if($foreach.hasNext),#end
-            #end
-            }
-            }
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ListApps.Arn}/invocations
         responses:
           default:
             statusCode: "200"
-          .*type.*BadRequest.*:
-            statusCode: "400"
-            responseTemplates: &error_response_template
-              application/json: |
-                #set ($errorMessageObj = $util.parseJson($input.path('$.errorMessage')))
-                {
-                  "error": {
-                    "message": "$errorMessageObj.error.message",
-                    "code" : "$errorMessageObj.error.code"
-                  }
-                }
-          .*type.*NotFound.*:
-            statusCode: "404"
-            responseTemplates: *error_response_template
-          (.*type.*InternalServerError.*)|(.+):
-            statusCode: "500"
-            responseTemplates: *error_response_template
+        requestTemplates:
+          application/json: |
+            #set($allParams = $input.params())
+            {
+              "claims" : {
+                "email" : "$context.authorizer.claims['email']",
+                "groups" : "$context.authorizer.claims['cognito:groups']"
+              }
+            }
         passthroughBehavior: "when_no_match"
         httpMethod: "POST"
         contentHandling: "CONVERT_TO_TEXT"
         type: "aws"
     post:
+      consumes:
+      - "application/json"
       produces:
       - "application/json"
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/CreateAppRequest'
       responses:
         '200':
           description: "200 response"
@@ -81,26 +59,28 @@ paths:
       - CognitoUserPool: []
       x-amazon-apigateway-integration:
         uri:
-          !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${CreateAppFunction.Arn}/invocations
-        requestTemplates: *json_request_template
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${CreateApp.Arn}/invocations
         responses:
           default:
             statusCode: "200"
-          .*type.*BadRequest.*:
-            statusCode: "400"
-            responseTemplates: *error_response_template
-          .*type.*NotFound.*:
-            statusCode: "404"
-            responseTemplates: *error_response_template
-          (.*type.*InternalServerError.*)|(.+):
-            statusCode: "500"
-            responseTemplates: *error_response_template
+        requestTemplates:
+          application/json: |
+            #set($allParams = $input.params())
+            {
+              "claims" : {
+                "email" : "$context.authorizer.claims['email']",
+                "groups" : "$context.authorizer.claims['cognito:groups']"
+              },
+              "body-json" : $input.json('$')
+            }
         passthroughBehavior: "when_no_match"
         httpMethod: "POST"
         contentHandling: "CONVERT_TO_TEXT"
         type: "aws"
   /apps/{name}:
     get:
+      consumes:
+      - "application/json"
       produces:
       - "application/json"
       parameters:
@@ -117,25 +97,29 @@ paths:
       - CognitoUserPool: []
       x-amazon-apigateway-integration:
         uri:
-          !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DescribeAppFunction.Arn}/
-        requestTemplates: *json_request_template
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DescribeApp.Arn}/invocations
         responses:
           default:
             statusCode: "200"
-          .*type.*BadRequest.*:
-            statusCode: "400"
-            responseTemplates: *error_response_template
-          .*type.*NotFound.*:
-            statusCode: "404"
-            responseTemplates: *error_response_template
-          (.*type.*InternalServerError.*)|(.+):
-            statusCode: "500"
-            responseTemplates: *error_response_template
+        requestTemplates:
+          application/json: |
+            #set($allParams = $input.params())
+            {
+              "claims" : {
+                "email" : "$context.authorizer.claims['email']",
+                "groups" : "$context.authorizer.claims['cognito:groups']"
+              },
+              "params" : {
+                "name" : "$input.params('name')"
+              }
+            }
         passthroughBehavior: "when_no_match"
         httpMethod: "POST"
         contentHandling: "CONVERT_TO_TEXT"
         type: "aws"
     delete:
+      consumes:
+      - "application/json"
       produces:
       - "application/json"
       parameters:
@@ -152,25 +136,29 @@ paths:
       - CognitoUserPool: []
       x-amazon-apigateway-integration:
         uri:
-          !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DeleteAppFunction.Arn}/
-        requestTemplates: *json_request_template
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DeleteApp.Arn}/invocations
         responses:
           default:
             statusCode: "200"
-          .*type.*BadRequest.*:
-            statusCode: "400"
-            responseTemplates: *error_response_template
-          .*type.*NotFound.*:
-            statusCode: "404"
-            responseTemplates: *error_response_template
-          (.*type.*InternalServerError.*)|(.+):
-            statusCode: "500"
-            responseTemplates: *error_response_template
+        requestTemplates:
+          application/json: |
+            #set($allParams = $input.params())
+            {
+              "claims" : {
+                "email" : "$context.authorizer.claims['email']",
+                "groups" : "$context.authorizer.claims['cognito:groups']"
+              },
+              "params" : {
+                "name" : "$input.params('name')"
+              }
+            }
         passthroughBehavior: "when_no_match"
         httpMethod: "POST"
         contentHandling: "CONVERT_TO_TEXT"
         type: "aws"
     patch:
+      consumes:
+      - "application/json"
       produces:
       - "application/json"
       parameters:
@@ -187,26 +175,31 @@ paths:
       - CognitoUserPool: []
       x-amazon-apigateway-integration:
         uri:
-          !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UpdateAppFunction.Arn}/invocations
-        requestTemplates: *json_request_template
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UpdateApp.Arn}/invocations
         responses:
           default:
             statusCode: "200"
-          .*type.*BadRequest.*:
-            statusCode: "400"
-            responseTemplates: *error_response_template
-          .*type.*NotFound.*:
-            statusCode: "404"
-            responseTemplates: *error_response_template
-          (.*type.*InternalServerError.*)|(.+):
-            statusCode: "500"
-            responseTemplates: *error_response_template
+        requestTemplates:
+          application/json: |
+            #set($allParams = $input.params())
+            {
+              "claims" : {
+                "email" : "$context.authorizer.claims['email']",
+                "groups" : "$context.authorizer.claims['cognito:groups']"
+              },
+              "params" : {
+                "name" : "$input.params('name')"
+              },
+              "body-json" : $input.json('$')
+            }
         passthroughBehavior: "when_no_match"
         httpMethod: "POST"
         contentHandling: "CONVERT_TO_TEXT"
         type: "aws"
   /events/{name}:
     get:
+      consumes:
+      - "application/json"
       produces:
       - "application/json"
       parameters:
@@ -223,26 +216,30 @@ paths:
       - CognitoUserPool: []
       x-amazon-apigateway-integration:
         uri:
-          !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DescribeEventsFunction.Arn}/invocations
-        requestTemplates: *json_request_template
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DescribeEvents.Arn}/invocations
         responses:
           default:
             statusCode: "200"
-          .*type.*BadRequest.*:
-            statusCode: "400"
-            responseTemplates: *error_response_template
-          .*type.*NotFound.*:
-            statusCode: "404"
-            responseTemplates: *error_response_template
-          (.*type.*InternalServerError.*)|(.+):
-            statusCode: "500"
-            responseTemplates: *error_response_template
+        requestTemplates:
+          application/json: |
+            #set($allParams = $input.params())
+            {
+              "claims" : {
+                "email" : "$context.authorizer.claims['email']",
+                "groups" : "$context.authorizer.claims['cognito:groups']"
+              },
+              "params" : {
+                "name" : "$input.params('name')"
+              }
+            }
         passthroughBehavior: "when_no_match"
         httpMethod: "POST"
         contentHandling: "CONVERT_TO_TEXT"
         type: "aws"
   /pipelines:
     get:
+      consumes:
+      - "application/json"
       produces:
       - "application/json"
       responses:
@@ -254,26 +251,65 @@ paths:
       - CognitoUserPool: []
       x-amazon-apigateway-integration:
         uri:
-          !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ListPipelinesFunction.Arn}/invocations
-        requestTemplates: *json_request_template
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ListPipelines.Arn}/invocations
         responses:
           default:
             statusCode: "200"
-          .*type.*BadRequest.*:
-            statusCode: "400"
-            responseTemplates: *error_response_template
-          .*type.*NotFound.*:
-            statusCode: "404"
-            responseTemplates: *error_response_template
-          (.*type.*InternalServerError.*)|(.+):
-            statusCode: "500"
-            responseTemplates: *error_response_template
+        requestTemplates:
+          application/json: |
+            #set($allParams = $input.params())
+            {
+              "claims" : {
+                "email" : "$context.authorizer.claims['email']",
+                "groups" : "$context.authorizer.claims['cognito:groups']"
+              }
+            }
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws"
+    post:
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/CreatePipelineRequest'
+      responses:
+        '200':
+          description: "200 response"
+          schema:
+            $ref: "#/definitions/Empty"
+      security:
+      - CognitoUserPool: []
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${CreatePipeline.Arn}/invocations
+        responses:
+          default:
+            statusCode: "200"
+        requestTemplates:
+          application/json: |
+            #set($allParams = $input.params())
+            {
+              "claims" : {
+                "email" : "$context.authorizer.claims['email']",
+                "groups" : "$context.authorizer.claims['cognito:groups']"
+              },
+              "body-json" : $input.json('$')
+            }
         passthroughBehavior: "when_no_match"
         httpMethod: "POST"
         contentHandling: "CONVERT_TO_TEXT"
         type: "aws"
   /pipelines/{name}:
     get:
+      consumes:
+      - "application/json"
       produces:
       - "application/json"
       parameters:
@@ -290,25 +326,29 @@ paths:
       - CognitoUserPool: []
       x-amazon-apigateway-integration:
         uri:
-          !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DescribePipelineFunction.Arn}/invocations
-        requestTemplates: *json_request_template
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DescribePipeline.Arn}/invocations
         responses:
           default:
             statusCode: "200"
-          .*type.*BadRequest.*:
-            statusCode: "400"
-            responseTemplates: *error_response_template
-          .*type.*NotFound.*:
-            statusCode: "404"
-            responseTemplates: *error_response_template
-          (.*type.*InternalServerError.*)|(.+):
-            statusCode: "500"
-            responseTemplates: *error_response_template
+        requestTemplates:
+          application/json: |
+            #set($allParams = $input.params())
+            {
+              "claims" : {
+                "email" : "$context.authorizer.claims['email']",
+                "groups" : "$context.authorizer.claims['cognito:groups']"
+              },
+              "params" : {
+                "name" : "$input.params('name')"
+              }
+            }
         passthroughBehavior: "when_no_match"
         httpMethod: "POST"
         contentHandling: "CONVERT_TO_TEXT"
         type: "aws"
     post:
+      consumes:
+      - "application/json"
       produces:
       - "application/json"
       parameters:
@@ -325,25 +365,27 @@ paths:
       - CognitoUserPool: []
       x-amazon-apigateway-integration:
         uri:
-          !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${CreatePipelineFunction.Arn}/invocations
-        requestTemplates: *json_request_template
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${CreatePipeline.Arn}/invocations
         responses:
           default:
             statusCode: "200"
-          .*type.*BadRequest.*:
-            statusCode: "400"
-            responseTemplates: *error_response_template
-          .*type.*NotFound.*:
-            statusCode: "404"
-            responseTemplates: *error_response_template
-          (.*type.*InternalServerError.*)|(.+):
-            statusCode: "500"
-            responseTemplates: *error_response_template
+        requestTemplates:
+          application/json: |
+            #set($allParams = $input.params())
+            {
+              "claims" : {
+                "email" : "$context.authorizer.claims['email']",
+                "groups" : "$context.authorizer.claims['cognito:groups']"
+              },
+              "body-json" : $input.json('$')
+            }
         passthroughBehavior: "when_no_match"
         httpMethod: "POST"
         contentHandling: "CONVERT_TO_TEXT"
         type: "aws"
     delete:
+      consumes:
+      - "application/json"
       produces:
       - "application/json"
       parameters:
@@ -360,25 +402,29 @@ paths:
       - CognitoUserPool: []
       x-amazon-apigateway-integration:
         uri:
-          !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DeletePipelineFunction.Arn}/invocations
-        requestTemplates: *json_request_template
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DeletePipeline.Arn}/invocations
         responses:
           default:
             statusCode: "200"
-          .*type.*BadRequest.*:
-            statusCode: "400"
-            responseTemplates: *error_response_template
-          .*type.*NotFound.*:
-            statusCode: "404"
-            responseTemplates: *error_response_template
-          (.*type.*InternalServerError.*)|(.+):
-            statusCode: "500"
-            responseTemplates: *error_response_template
+        requestTemplates:
+          application/json: |
+            #set($allParams = $input.params())
+            {
+              "claims" : {
+                "email" : "$context.authorizer.claims['email']",
+                "groups" : "$context.authorizer.claims['cognito:groups']"
+              },
+              "params" : {
+                "name" : "$input.params('name')"
+              }
+            }
         passthroughBehavior: "when_no_match"
         httpMethod: "POST"
         contentHandling: "CONVERT_TO_TEXT"
         type: "aws"
     patch:
+      consumes:
+      - "application/json"
       produces:
       - "application/json"
       parameters:
@@ -395,20 +441,23 @@ paths:
       - CognitoUserPool: []
       x-amazon-apigateway-integration:
         uri:
-          !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UpdatePipelineFunction.Arn}/
-        requestTemplates: *json_request_template
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UpdatePipeline.Arn}/invocations
         responses:
           default:
             statusCode: "200"
-          .*type.*BadRequest.*:
-            statusCode: "400"
-            responseTemplates: *error_response_template
-          .*type.*NotFound.*:
-            statusCode: "404"
-            responseTemplates: *error_response_template
-          (.*type.*InternalServerError.*)|(.+):
-            statusCode: "500"
-            responseTemplates: *error_response_template
+        requestTemplates:
+          application/json: |
+            #set($allParams = $input.params())
+            {
+              "claims" : {
+                "email" : "$context.authorizer.claims['email']",
+                "groups" : "$context.authorizer.claims['cognito:groups']"
+              },
+              "params" : {
+                "name" : "$input.params('name')"
+              },
+              "body-json" : $input.json('$')
+            }
         passthroughBehavior: "when_no_match"
         httpMethod: "POST"
         contentHandling: "CONVERT_TO_TEXT"
@@ -422,11 +471,52 @@ securityDefinitions:
     x-amazon-apigateway-authorizer:
         type: cognito_user_pools
         providerARNs:
-            - 'arn:aws:cognito-idp:eu-west-1:789073296014:userpool/eu-west-1_MkM8NwiuN'
+            - Fn:GettAtt: [ UserPool, Arn ]
 definitions:
   Empty:
     type: "object"
     title: "Empty Schema"
+  CreateAppRequest:
+    type: object
+    properties:
+      name:
+        type: string
+      tasks:
+        type: int
+      health_check_path:
+        type: string
+      image:
+        type: string
+    required:
+      - name
+      - tasks
+      - health_check_path
+  CreatePipelineRequest:
+    type: object
+    properties:
+      name:
+        type: string
+      app_name:
+        type: string
+      app_dev:
+        type: string
+      app_test:
+        type: string
+      github_repo:
+        type: string
+      github_branch:
+        type: string
+      github_token:
+        type: string
+      github_user:
+        type: string
+    required:
+      - name
+      - app_name
+      - github_repo
+      - github_branch
+      - github_token
+      - github_user
 x-amazon-apigateway-binary-media-types:
 - "application/octet-stream"
 - "application/x-tar"

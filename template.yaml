@@ -1,16 +1,18 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 Description: >
-    This SAM template creates the management API for the container platform.
+    'This SAM template creates the management API for the container platform.
     Last Modified: July 17th 2018
-    Author: Karl Wallbom <wallbomk@amazon.com
+    Author: Karl Wallbom <wallbomk@amazon.com'
 
 Parameters:
 
-  CUPArn:
-    Description: ARN to the Cognito User Pool to use
+  # Email address for Cognito Admin user
+  CognitoAdminEmail:
     Type: String
-    Default: "arn:aws:cognito-idp:eu-west-1:789073296014:userpool/eu-west-1_MkM8NwiuN"
+    Default: wallbomk@amazon.com
+    AllowedPattern: '^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$'
+    Description: E-mail address of the Cognito admin
 
   PlatformBucket:
     Description: S3 Bucket to get the product templates from
@@ -43,6 +45,161 @@ Globals:
 
 Resources:
 
+  #
+  # Cognito and IAM
+  #
+  # Creates a user pool in cognito to auth against
+  UserPool:
+    Type: 'AWS::Cognito::UserPool'
+    Properties:
+      UserPoolName: !Sub ${PlatformPrefix}_users
+      AutoVerifiedAttributes:
+        - email
+      MfaConfiguration: 'OFF'
+      EmailVerificationSubject: !Ref AWS::StackName
+
+  # Creates a needed group in Cognito for Admin access
+  UserPoolGroup:
+    Type: "AWS::Cognito::UserPoolGroup"
+    Properties:
+      Description: 'User pool group for Admin access'
+      GroupName: !Sub ${PlatformPrefix}_admin_group
+      Precedence: 0
+      UserPoolId: !Ref UserPool
+
+  # Creates a User Pool Client to be used by the identity pool
+  UserPoolClient:
+    Type: 'AWS::Cognito::UserPoolClient'
+    Properties:
+      ClientName: !Sub ${PlatformPrefix}-client
+      GenerateSecret: false
+      UserPoolId: !Ref UserPool
+
+  # Creates a federated Identity pool
+  IdentityPool:
+    Type: 'AWS::Cognito::IdentityPool'
+    Properties:
+      IdentityPoolName: !Sub ${PlatformPrefix}_idp
+      AllowUnauthenticatedIdentities: true
+      CognitoIdentityProviders:
+        - ClientId: !Ref UserPoolClient
+          ProviderName: !GetAtt UserPool.ProviderName
+
+  # Create a role for unauthorized access to AWS resources. Very limited access.
+  # Only allows users in the previously created Identity Pool
+  CognitoUnAuthorizedRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: 'Allow'
+            Principal:
+              Federated: 'cognito-identity.amazonaws.com'
+            Action:
+              - 'sts:AssumeRoleWithWebIdentity'
+            Condition:
+              StringEquals:
+                'cognito-identity.amazonaws.com:aud': !Ref IdentityPool
+              'ForAnyValue:StringLike':
+                'cognito-identity.amazonaws.com:amr': unauthenticated
+      Policies:
+        - PolicyName: 'CognitoUnauthorizedPolicy'
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: 'Allow'
+                Action:
+                  - 'mobileanalytics:PutEvents'
+                  - 'cognito-sync:BulkPublish'
+                  - 'cognito-sync:DescribeIdentityPoolUsage'
+                  - 'cognito-sync:GetBulkPublishDetails'
+                  - 'cognito-sync:GetCognitoEvents'
+                  - 'cognito-sync:GetIdentityPoolConfiguration'
+                  - 'cognito-sync:ListIdentityPoolUsage'
+                  - 'cognito-sync:SetCognitoEvents'
+                  - 'congito-sync:SetIdentityPoolConfiguration'
+                Resource: !Sub 'arn:aws:cognito-identity:${AWS::Region}:${AWS::AccountId}:identitypool/${IdentityPool}'
+
+  # Create a role for authorized access to AWS resources.
+  # Only allows users in the previously created Identity Pool
+  CognitoAuthorizedRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: 'Allow'
+            Principal:
+              Federated: 'cognito-identity.amazonaws.com'
+            Action:
+              - 'sts:AssumeRoleWithWebIdentity'
+            Condition:
+              StringEquals:
+                'cognito-identity.amazonaws.com:aud': !Ref IdentityPool
+              'ForAnyValue:StringLike':
+                'cognito-identity.amazonaws.com:amr': authenticated
+      Policies:
+        - PolicyName: 'CognitoAuthorizedPolicy'
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: 'Allow'
+                Action:
+                  - 'mobileanalytics:PutEvents'
+                  - 'cognito-sync:BulkPublish'
+                  - 'cognito-sync:DescribeIdentityPoolUsage'
+                  - 'cognito-sync:GetBulkPublishDetails'
+                  - 'cognito-sync:GetCognitoEvents'
+                  - 'cognito-sync:GetIdentityPoolConfiguration'
+                  - 'cognito-sync:ListIdentityPoolUsage'
+                  - 'cognito-sync:SetCognitoEvents'
+                  - 'congito-sync:SetIdentityPoolConfiguration'
+                  - 'cognito-identity:DeleteIdentityPool'
+                  - 'cognito-identity:DescribeIdentityPool'
+                  - 'cognito-identity:GetIdentityPoolRoles'
+                  - 'cognito-identity:GetOpenIdTokenForDeveloperIdentity'
+                  - 'cognito-identity:ListIdentities'
+                  - 'cognito-identity:LookupDeveloperIdentity'
+                  - 'cognito-identity:MergeDeveloperIdentities'
+                  - 'cognito-identity:UnlikeDeveloperIdentity'
+                  - 'cognito-identity:UpdateIdentityPool'
+                Resource: !Sub 'arn:aws:cognito-identity:${AWS::Region}:${AWS::AccountId}:identitypool/${IdentityPool}'
+
+  CognitoESAccessRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonESCognitoAccess
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: 'Allow'
+            Principal:
+              Service: 'es.amazonaws.com'
+            Action:
+              - 'sts:AssumeRole'
+
+  # Assigns the roles to the Identity Pool
+  IdentityPoolRoleMapping:
+    Type: 'AWS::Cognito::IdentityPoolRoleAttachment'
+    Properties:
+      IdentityPoolId: !Ref IdentityPool
+      Roles:
+        authenticated: !GetAtt CognitoAuthorizedRole.Arn
+        unauthenticated: !GetAtt CognitoUnAuthorizedRole.Arn
+
+  AdminUser:
+    Type: 'AWS::Cognito::UserPoolUser'
+    Properties:
+      DesiredDeliveryMediums:
+        - 'EMAIL'
+      UserAttributes:
+        - Name: email
+          Value: !Ref CognitoAdminEmail
+      Username: !Ref CognitoAdminEmail
+      UserPoolId: !Ref UserPool
+  
   DeploymentRole:
     Type: AWS::IAM::Role
     Properties:
@@ -72,8 +229,13 @@ Resources:
   ApiGatewayApi:
     Type: AWS::Serverless::Api
     Properties:
-      StageName: dev
+      StageName: v1
       DefinitionBody:
+  # External swagger definition
+  #      Fn::Transform:
+  #        Name: AWS::Include
+  #        Parameters:
+  #          Location: s3://storage-kalleh/swagger/swagger.yaml
         swagger: "2.0"
         info:
           version: "1.0"
@@ -97,7 +259,7 @@ Resources:
               - CognitoUserPool: []
               x-amazon-apigateway-integration:
                 uri:
-                  !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ListApps.Arn}/invocations
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ListApps.Arn}/invocations
                 responses:
                   default:
                     statusCode: "200"
@@ -134,7 +296,7 @@ Resources:
               - CognitoUserPool: []
               x-amazon-apigateway-integration:
                 uri:
-                  !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${CreateApp.Arn}/invocations
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${CreateApp.Arn}/invocations
                 responses:
                   default:
                     statusCode: "200"
@@ -172,7 +334,7 @@ Resources:
               - CognitoUserPool: []
               x-amazon-apigateway-integration:
                 uri:
-                  !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DescribeApp.Arn}/invocations
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DescribeApp.Arn}/invocations
                 responses:
                   default:
                     statusCode: "200"
@@ -211,7 +373,7 @@ Resources:
               - CognitoUserPool: []
               x-amazon-apigateway-integration:
                 uri:
-                  !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DeleteApp.Arn}/invocations
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DeleteApp.Arn}/invocations
                 responses:
                   default:
                     statusCode: "200"
@@ -250,7 +412,7 @@ Resources:
               - CognitoUserPool: []
               x-amazon-apigateway-integration:
                 uri:
-                  !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UpdateApp.Arn}/invocations
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UpdateApp.Arn}/invocations
                 responses:
                   default:
                     statusCode: "200"
@@ -291,7 +453,7 @@ Resources:
               - CognitoUserPool: []
               x-amazon-apigateway-integration:
                 uri:
-                  !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DescribeEvents.Arn}/invocations
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DescribeEvents.Arn}/invocations
                 responses:
                   default:
                     statusCode: "200"
@@ -326,7 +488,7 @@ Resources:
               - CognitoUserPool: []
               x-amazon-apigateway-integration:
                 uri:
-                  !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ListPipelines.Arn}/invocations
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ListPipelines.Arn}/invocations
                 responses:
                   default:
                     statusCode: "200"
@@ -363,7 +525,7 @@ Resources:
               - CognitoUserPool: []
               x-amazon-apigateway-integration:
                 uri:
-                  !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${CreatePipeline.Arn}/invocations
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${CreatePipeline.Arn}/invocations
                 responses:
                   default:
                     statusCode: "200"
@@ -401,7 +563,7 @@ Resources:
               - CognitoUserPool: []
               x-amazon-apigateway-integration:
                 uri:
-                  !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DescribePipeline.Arn}/invocations
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DescribePipeline.Arn}/invocations
                 responses:
                   default:
                     statusCode: "200"
@@ -440,7 +602,7 @@ Resources:
               - CognitoUserPool: []
               x-amazon-apigateway-integration:
                 uri:
-                  !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${CreatePipeline.Arn}/invocations
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${CreatePipeline.Arn}/invocations
                 responses:
                   default:
                     statusCode: "200"
@@ -477,7 +639,7 @@ Resources:
               - CognitoUserPool: []
               x-amazon-apigateway-integration:
                 uri:
-                  !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DeletePipeline.Arn}/invocations
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DeletePipeline.Arn}/invocations
                 responses:
                   default:
                     statusCode: "200"
@@ -516,7 +678,233 @@ Resources:
               - CognitoUserPool: []
               x-amazon-apigateway-integration:
                 uri:
-                  !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UpdatePipeline.Arn}/invocations
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UpdatePipeline.Arn}/invocations
+                responses:
+                  default:
+                    statusCode: "200"
+                requestTemplates:
+                  application/json: |
+                    #set($allParams = $input.params())
+                    {
+                      "claims" : {
+                        "email" : "$context.authorizer.claims['email']",
+                        "groups" : "$context.authorizer.claims['cognito:groups']"
+                      },
+                      "params" : {
+                        "name" : "$input.params('name')"
+                      },
+                      "body-json" : $input.json('$')
+                    }
+                passthroughBehavior: "when_no_match"
+                httpMethod: "POST"
+                contentHandling: "CONVERT_TO_TEXT"
+                type: "aws"
+          /services:
+            get:
+              consumes:
+              - "application/json"
+              produces:
+              - "application/json"
+              responses:
+                '200':
+                  description: "200 response"
+                  schema:
+                    $ref: "#/definitions/Empty"
+              security:
+              - CognitoUserPool: []
+              x-amazon-apigateway-integration:
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ListServices.Arn}/invocations
+                responses:
+                  default:
+                    statusCode: "200"
+                requestTemplates:
+                  application/json: |
+                    #set($allParams = $input.params())
+                    {
+                      "claims" : {
+                        "email" : "$context.authorizer.claims['email']",
+                        "groups" : "$context.authorizer.claims['cognito:groups']"
+                      }
+                    }
+                passthroughBehavior: "when_no_match"
+                httpMethod: "POST"
+                contentHandling: "CONVERT_TO_TEXT"
+                type: "aws"
+            post:
+              consumes:
+              - "application/json"
+              produces:
+              - "application/json"
+              parameters:
+                - name: body
+                  in: body
+                  required: true
+                  schema:
+                    $ref: '#/definitions/CreateServiceRequest'
+              responses:
+                '200':
+                  description: "200 response"
+                  schema:
+                    $ref: "#/definitions/Empty"
+              security:
+              - CognitoUserPool: []
+              x-amazon-apigateway-integration:
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${CreateService.Arn}/invocations
+                responses:
+                  default:
+                    statusCode: "200"
+                requestTemplates:
+                  application/json: |
+                    #set($allParams = $input.params())
+                    {
+                      "claims" : {
+                        "email" : "$context.authorizer.claims['email']",
+                        "groups" : "$context.authorizer.claims['cognito:groups']"
+                      },
+                      "body-json" : $input.json('$')
+                    }
+                passthroughBehavior: "when_no_match"
+                httpMethod: "POST"
+                contentHandling: "CONVERT_TO_TEXT"
+                type: "aws"
+          /services/{name}:
+            get:
+              consumes:
+              - "application/json"
+              produces:
+              - "application/json"
+              parameters:
+              - name: "name"
+                in: "path"
+                required: true
+                type: "string"
+              responses:
+                '200':
+                  description: "200 response"
+                  schema:
+                    $ref: "#/definitions/Empty"
+              security:
+              - CognitoUserPool: []
+              x-amazon-apigateway-integration:
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DescribeService.Arn}/invocations
+                responses:
+                  default:
+                    statusCode: "200"
+                requestTemplates:
+                  application/json: |
+                    #set($allParams = $input.params())
+                    {
+                      "claims" : {
+                        "email" : "$context.authorizer.claims['email']",
+                        "groups" : "$context.authorizer.claims['cognito:groups']"
+                      },
+                      "params" : {
+                        "name" : "$input.params('name')"
+                      }
+                    }
+                passthroughBehavior: "when_no_match"
+                httpMethod: "POST"
+                contentHandling: "CONVERT_TO_TEXT"
+                type: "aws"
+            post:
+              consumes:
+              - "application/json"
+              produces:
+              - "application/json"
+              parameters:
+              - name: "name"
+                in: "path"
+                required: true
+                type: "string"
+              responses:
+                '200':
+                  description: "200 response"
+                  schema:
+                    $ref: "#/definitions/Empty"
+              security:
+              - CognitoUserPool: []
+              x-amazon-apigateway-integration:
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${CreateService.Arn}/invocations
+                responses:
+                  default:
+                    statusCode: "200"
+                requestTemplates:
+                  application/json: |
+                    #set($allParams = $input.params())
+                    {
+                      "claims" : {
+                        "email" : "$context.authorizer.claims['email']",
+                        "groups" : "$context.authorizer.claims['cognito:groups']"
+                      },
+                      "body-json" : $input.json('$')
+                    }
+                passthroughBehavior: "when_no_match"
+                httpMethod: "POST"
+                contentHandling: "CONVERT_TO_TEXT"
+                type: "aws"
+            delete:
+              consumes:
+              - "application/json"
+              produces:
+              - "application/json"
+              parameters:
+              - name: "name"
+                in: "path"
+                required: true
+                type: "string"
+              responses:
+                '200':
+                  description: "200 response"
+                  schema:
+                    $ref: "#/definitions/Empty"
+              security:
+              - CognitoUserPool: []
+              x-amazon-apigateway-integration:
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DeleteService.Arn}/invocations
+                responses:
+                  default:
+                    statusCode: "200"
+                requestTemplates:
+                  application/json: |
+                    #set($allParams = $input.params())
+                    {
+                      "claims" : {
+                        "email" : "$context.authorizer.claims['email']",
+                        "groups" : "$context.authorizer.claims['cognito:groups']"
+                      },
+                      "params" : {
+                        "name" : "$input.params('name')"
+                      }
+                    }
+                passthroughBehavior: "when_no_match"
+                httpMethod: "POST"
+                contentHandling: "CONVERT_TO_TEXT"
+                type: "aws"
+            patch:
+              consumes:
+              - "application/json"
+              produces:
+              - "application/json"
+              parameters:
+              - name: "name"
+                in: "path"
+                required: true
+                type: "string"
+              responses:
+                '200':
+                  description: "200 response"
+                  schema:
+                    $ref: "#/definitions/Empty"
+              security:
+              - CognitoUserPool: []
+              x-amazon-apigateway-integration:
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UpdateService.Arn}/invocations
                 responses:
                   default:
                     statusCode: "200"
@@ -546,7 +934,7 @@ Resources:
             x-amazon-apigateway-authorizer:
                 type: cognito_user_pools
                 providerARNs:
-                    - !Ref CUPArn
+                    - !GetAtt UserPool.Arn
         definitions:
           Empty:
             type: "object"
@@ -592,6 +980,17 @@ Resources:
               - github_branch
               - github_token
               - github_user
+          CreateServiceRequest:
+            type: object
+            properties:
+              name:
+                type: string
+              service_type:
+                type: string
+              image:
+                type: string
+            required:
+              - name
         x-amazon-apigateway-binary-media-types:
         - "application/octet-stream"
         - "application/x-tar"
@@ -722,6 +1121,29 @@ Resources:
               Resource:
                 - '*'
 
+# Events definition
+  DescribeEvents:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: events_name.get
+      CodeUri: src/
+      Tracing: "Active"
+      Events:
+        DescribeEvents:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGatewayApi
+            Path: /events/{name}
+            Method: get
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - 'cloudformation:DescribeStacks'
+                - 'cloudformation:DescribeStackEvents'
+              Resource:
+                - '*'
+  
   # Pipelines definition
   ListPipelines:
     Type: 'AWS::Serverless::Function'
@@ -833,25 +1255,127 @@ Resources:
               Resource:
                 - '*'
 
-# Events definition
-  DescribeEvents:
+# Services definition
+  ListServices:
     Type: 'AWS::Serverless::Function'
     Properties:
-      Handler: events_name.get
+      Handler: services.get
       CodeUri: src/
       Tracing: "Active"
       Events:
-        DescribeEvents:
+        ListServices:
           Type: Api
           Properties:
             RestApiId: !Ref ApiGatewayApi
-            Path: /events/{name}
+            Path: /services
             Method: get
       Policies:
         - Statement:
             - Effect: Allow
               Action:
                 - 'cloudformation:DescribeStacks'
-                - 'cloudformation:DescribeStackEvents'
               Resource:
                 - '*'
+
+  CreateService:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: services.post
+      CodeUri: src/
+      Tracing: "Active"
+      Events:
+        CreateService:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGatewayApi
+            Path: /services
+            Method: post
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - 'cloudformation:CreateStack'
+                - 'cloudformation:ListExports'
+                - 'iam:PassRole'
+              Resource:
+                - '*'
+
+  DescribeService:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: services_name.get
+      CodeUri: src/
+      Tracing: "Active"
+      Events:
+        DescribeService:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGatewayApi
+            Path: /services/{name}
+            Method: get
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - 'cloudformation:DescribeStacks'
+              Resource:
+                - '*'
+
+  DeleteService:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: services_name.delete
+      CodeUri: src/
+      Tracing: "Active"
+      Events:
+        DeleteService:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGatewayApi
+            Path: /services/{name}
+            Method: delete
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - 'cloudformation:DescribeStacks'
+                - 'cloudformation:DeleteStack'
+              Resource:
+                - '*'
+
+  UpdateService:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: services_name.patch
+      CodeUri: src/
+      Tracing: "Active"
+      Events:
+        UpdateService:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGatewayApi
+            Path: /services/{name}
+            Method: patch
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - 'cloudformation:DescribeStacks'
+                - 'cloudformation:UpdateStack'
+                - 'iam:PassRole'
+              Resource:
+                - '*'
+
+Outputs:
+
+    CognitoUserPoolID:
+      Description: Cognito User Pool ID to be used by clients
+      Value: !Ref UserPool
+
+    CognitoUserPoolClientID:
+      Description: Cognito User Pool Client ID to be used by clients
+      Value: !Ref UserPoolClient
+
+    CognitoIdentityPoolID:
+      Description: Cognito Identity Pool ID to be used by clients
+      Value: !Ref IdentityPool

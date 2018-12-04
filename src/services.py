@@ -23,31 +23,32 @@ CFN_CLIENT = boto3.client('cloudformation', region_name=util.PLATFORM_REGION)
 PLATFORM_BUCKET = os.environ['PLATFORM_BUCKET']
 
 """
-Apps Resource Definition
+Service Resource Definition
 
-    URI: /apps
+    URI: /services
     Methods:
-        GET - List all apps
-        POST - Create a new app
+        GET - List all services
+        POST - Create new service
+
 """
 
 
 def get(event, context):
-    """ Returns the apps belonging to the authenticated user.
-    It uses filter_stacks() to filter the CloudFormation stacks with type 'app'
+    """ Returns the services belonging to the authenticated user.
+    It uses filter_stacks() to filter the CloudFormation stacks with type 'service'
     and owner belonging to the same Cognito group as the user is logged in as.
 
     Args:
         None:
     Basic Usage:
-        >>> GET /apps
+        >>> GET /services
     Returns:
-        List: List of JSON objects containing app information
+        List: List of JSON objects containing service information
     """
     data = []
     stacks = []
-    
-    LOGGER.debug('Listing Apps:')
+
+    LOGGER.debug('Listing Services:')    
 
     # Get the user id for the request
     groups = event['claims']['groups']
@@ -57,11 +58,11 @@ def get(event, context):
         r = CFN_CLIENT.describe_stacks()
     except Exception as ex:
         logging.exception(ex)
-        raise Exception('Failed to list apps')
+        raise Exception('Failed to list services.')
 
     # Filter stacks based on owner and retrieve wanted keys
     keys = ['StackName', 'Parameters', 'CreationTime', 'LastUpdatedTime']
-    stacks = util.filter_stacks(r['Stacks'], keys, groups, 'app')
+    stacks = util.filter_stacks(r['Stacks'], keys, groups, 'service')
 
     try:
         for stack in stacks:
@@ -72,30 +73,34 @@ def get(event, context):
                     'name': name,
                     'created_at': stack['CreationTime'],
                     'updated_at': stack['LastUpdatedTime'],
-                    'tasks': params['DesiredCount']
+                    'service_dev': params['ServiceDev'],
+                    'service_test': params['ServiceTest'],
+                    'service': params['ServiceProd']
                 })
     except Exception as e:
         raise Exception(e)
-    else:
-        return util.respond(None, data)
+
+    return util.respond(None, data)
 
 
 def post(event, context):
-    """ Creates a new app belonging to the authenticated user.
+    """ Creates a new service belonging to the authenticated user.
+    Pre-requisites: User must create a new OAuth token on his GitHub-account
+    that allows repo access to the requested repository for the service
+    to be able to pull source.
 
     Args:
-        None:
+        name (string): Name of the service (CloudFormation Stack)
     Basic Usage:
-        >>> POST /apps
+        >>> POST /service
         >>> Payload Example:
-            {
-                "name": "my-app",
-                "tasks": "1",
-                "health_check_path": "/health",
-                "image": "nginx:latest"             [Optional]
-            }
+            [{
+                "service_name": "my-service",
+                "service_type": "s3|sqs",           [Optional]
+                "service_version": "0.1|latest"     [Optional]
+            }]
     Returns:
-        List: List of JSON objects containing app information
+        List: List of JSON objects containing service information
     """
     params = {}
     tags = {}
@@ -107,40 +112,33 @@ def post(event, context):
     payload = json.loads(event['body-json'][0])
 
     stack_name = util.addprefix(payload['name'])
-    LOGGER.debug('Creating App: ' + stack_name)
+    LOGGER.debug('Creating Service: ' + stack_name)
 
-    if 'app_type' in payload:
-        app_type = payload['app_type']
+    if 'service_type' in payload:
+        service_type = payload['service_type']
     else:
-        app_type = 'shared-lb'
-    if 'app_version' in payload:
-        app_version = payload['app_version']
+        service_type = 's3'
+    if 'service_version' in payload:
+        service_version = payload['service_version']
     else:
-        app_version = 'latest'
+        service_version = 'latest'
     
-    exports = util.get_cfn_exports()
-
-    params['DesiredCount'] = payload['tasks']
-    params['Priority'] = str(util.iterate_rule_priority(exports['LoadBalancerListener']))
-    params['Listener'] = exports['LoadBalancerListener']
-    params['HealthCheckPath'] = payload['health_check_path']
-    params['DockerImage'] = payload['image']
-    params['GroupName'] = groups
+    params['ServiceProd'] = util.addprefix(payload['service_name'])
     params = util.dict_to_kv(params, 'ParameterKey', 'ParameterValue')
 
-    tags[util.PLATFORM_TAGS['TYPE']] = 'app'
-    tags[util.PLATFORM_TAGS['SUBTYPE']] = app_type
-    tags[util.PLATFORM_TAGS['VERSION']] = app_version
+    tags[util.PLATFORM_TAGS['TYPE']] = 'service'
+    tags[util.PLATFORM_TAGS['SUBTYPE']] = service_type
+    tags[util.PLATFORM_TAGS['VERSION']] = service_version
     tags[util.PLATFORM_TAGS['GROUPS']] = groups
     tags[util.PLATFORM_TAGS['REGION']] = util.PLATFORM_REGION
     tags[util.PLATFORM_TAGS['OWNER']] = user
     tags = util.dict_to_kv(tags, 'Key', 'Value')
-
+    
     template_url = 'https://s3-eu-west-1.amazonaws.com/' + \
         PLATFORM_BUCKET + \
-        '/cfn/apps/app-' + \
-        app_type + '-' + \
-        app_version
+        '/cfn/services/service-' + \
+        service_type + '-' + \
+        service_version
     
     try:
         stack = CFN_CLIENT.create_stack(
@@ -156,12 +154,11 @@ def post(event, context):
         )
     except ClientError as e:
         if e.response['Error']['Code'] == 'AlreadyExistsException':
-            return util.respond('An application with that name already exists.')
+            raise Exception('A service with that name already exists.')
         else:
-            logging.exception(e)
-            return util.respond('Unexpected error: %s' % e)
+            print("Unexpected error: %s" % e)
     except Exception as ex:
         logging.exception(ex)
-        return util.respond('Internal server error.')
-    else:
-        return util.respond(None, stack)
+        raise Exception('Internal server error.')
+
+    return util.respond(None, stack)

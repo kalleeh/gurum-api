@@ -64,19 +64,19 @@ def get(event, context):
     except Exception as ex:
         logging.exception(ex)
         raise Exception('Error while filtering stacks.')
+    else:
+        if 'Outputs' in apps[0]:
+            outputs = util.kv_to_dict(apps[0]['Outputs'], 'OutputKey', 'OutputValue')
+            data['endpoint'] = outputs['Endpoint']
+            if 'Repository' in outputs:
+                data['repository'] = outputs['Repository']
 
-    if 'Outputs' in apps[0]:
-        outputs = util.kv_to_dict(apps[0]['Outputs'], 'OutputKey', 'OutputValue')
-        data['endpoint'] = outputs['Endpoint']
-        if 'Repository' in outputs:
-            data['repository'] = outputs['Repository']
+        data['name'] = util.remprefix(apps[0]['StackName'])
+        data['description'] = apps[0]['Description']
+        data['status'] = apps[0]['StackStatus']
+        data['tags'] = util.kv_to_dict(apps[0]['Tags'], 'Key', 'Value')
 
-    data['name'] = util.remprefix(apps[0]['StackName'])
-    data['description'] = apps[0]['Description']
-    data['status'] = apps[0]['StackStatus']
-    data['tags'] = util.kv_to_dict(apps[0]['Tags'], 'Key', 'Value')
-
-    return util.respond(None, data)
+        return util.respond(None, data)
 
 
 def patch(event, context):
@@ -99,6 +99,7 @@ def patch(event, context):
     params = {}
     tags = {}
     stack = {}
+    err = ''
 
     # Get the user id for the request
     user = event['claims']['email']
@@ -130,6 +131,12 @@ def patch(event, context):
     params.append(
         {
             "ParameterKey": 'Listener',
+            "UsePreviousValue": True
+        }
+    )
+    params.append(
+        {
+            "ParameterKey": 'GroupName',
             "UsePreviousValue": True
         }
     )
@@ -174,12 +181,14 @@ def patch(event, context):
             Tags=tags
         )
     except ValidationError as e:
-        raise Exception('No updates are to be performed. {}'.format(e))
+        setattr(err, 'message', 'No updates are to be performed. {}'.format(e))
+        return util.respond(err)
     except Exception as ex:
         logging.exception(ex)
-        raise
-
-    return util.respond(None, stack)
+        setattr(err, 'message', 'Internal Server Error.')
+        return util.respond(err)
+    else:
+        return util.respond(None, stack)
 
 
 def delete(event, context):
@@ -212,6 +221,5 @@ def delete(event, context):
             raise Exception('No such item.')
     except Exception as ex:
         logging.exception(ex)
-        raise
-
-    return util.respond(None, stack)
+    else:
+        return util.respond(None, stack)
