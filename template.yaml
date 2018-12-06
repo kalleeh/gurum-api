@@ -987,10 +987,14 @@ Resources:
                 type: string
               service_type:
                 type: string
-              image:
+              service_bindings:
+                type: string
+              service_version:
                 type: string
             required:
               - name
+              - service_type
+              - service_bindings
         x-amazon-apigateway-binary-media-types:
         - "application/octet-stream"
         - "application/x-tar"

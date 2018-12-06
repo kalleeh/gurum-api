@@ -111,24 +111,24 @@ def patch(event, context):
     if not util.validate_auth(stack_name, groups):
         raise Exception('You do not have permission to modify this resource.')
     
-    if 'service_dev' in payload:
-        params['ServiceDev'] = util.addprefix(payload['service_dev'])
-    if 'service_test' in payload:
-        params['ServiceTest'] = util.addprefix(payload['service_test'])
-    if 'service_name' in payload:
-        params['ServiceProd'] = util.addprefix(payload['service_name'])
-    if 'github_repo' in payload:
-        params['GitHubRepo'] = payload['github_repo']
-    if 'github_branch' in payload:
-        params['GitHubBranch'] = payload['github_branch']
-    if 'github_token' in payload:
-        params['GitHubToken'] = payload['github_token']
-    if 'github_user' in payload:
-        params['GitHubUser'] = payload['github_user']
+    if 'service_type' in payload:
+        service_type = payload['service_type']
+    else:
+        service_type = 's3'
+    if 'service_bindings' in payload:
+        binding_list = ['arn:aws:iam::789073296014:role/platform-role-' + b for b in payload['service_bindings'].split(',')]
+        service_bindings = ','.join(map(str, binding_list))
+    if 'service_version' in payload:
+        service_version = payload['service_version']
+    else:
+        service_version = 'latest'
+    
+    params['ServiceBindings'] = service_bindings
     params = util.dict_to_kv(params, 'ParameterKey', 'ParameterValue')
 
     tags[util.PLATFORM_TAGS['TYPE']] = 'service'
-    tags[util.PLATFORM_TAGS['VERSION']] = '0.2'
+    tags[util.PLATFORM_TAGS['SUBTYPE']] = service_type
+    tags[util.PLATFORM_TAGS['VERSION']] = service_version
     tags[util.PLATFORM_TAGS['GROUPS']] = groups
     tags[util.PLATFORM_TAGS['REGION']] = util.PLATFORM_REGION
     tags[util.PLATFORM_TAGS['OWNER']] = user

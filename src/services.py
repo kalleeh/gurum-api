@@ -73,9 +73,7 @@ def get(event, context):
                     'name': name,
                     'created_at': stack['CreationTime'],
                     'updated_at': stack['LastUpdatedTime'],
-                    'service_dev': params['ServiceDev'],
-                    'service_test': params['ServiceTest'],
-                    'service': params['ServiceProd']
+                    'service_bindings': params['ServiceBindings']
                 })
     except Exception as e:
         raise Exception(e)
@@ -96,7 +94,8 @@ def post(event, context):
         >>> Payload Example:
             [{
                 "service_name": "my-service",
-                "service_type": "s3|sqs",           [Optional]
+                "service_type": "s3|sqs",
+                "service_bindings": "app1,app2",
                 "service_version": "0.1|latest"     [Optional]
             }]
     Returns:
@@ -118,12 +117,15 @@ def post(event, context):
         service_type = payload['service_type']
     else:
         service_type = 's3'
+    if 'service_bindings' in payload:
+        binding_list = ['arn:aws:iam::789073296014:role/platform-role-' + b for b in payload['service_bindings'].split(',')]
+        service_bindings = ','.join(map(str, binding_list))
     if 'service_version' in payload:
         service_version = payload['service_version']
     else:
         service_version = 'latest'
     
-    params['ServiceProd'] = util.addprefix(payload['service_name'])
+    params['ServiceBindings'] = service_bindings
     params = util.dict_to_kv(params, 'ParameterKey', 'ParameterValue')
 
     tags[util.PLATFORM_TAGS['TYPE']] = 'service'
@@ -138,8 +140,9 @@ def post(event, context):
         PLATFORM_BUCKET + \
         '/cfn/services/service-' + \
         service_type + '-' + \
-        service_version
-    
+        service_version + '.yaml'
+    LOGGER.debug('Template URL: ' + template_url)
+
     try:
         stack = CFN_CLIENT.create_stack(
             StackName=stack_name,

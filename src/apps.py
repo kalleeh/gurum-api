@@ -140,8 +140,9 @@ def post(event, context):
         PLATFORM_BUCKET + \
         '/cfn/apps/app-' + \
         app_type + '-' + \
-        app_version
-    
+        app_version + '.yaml'
+    LOGGER.debug('Template URL: ' + template_url)
+
     try:
         stack = CFN_CLIENT.create_stack(
             StackName=stack_name,
