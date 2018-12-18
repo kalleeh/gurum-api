@@ -114,56 +114,20 @@ def patch(event, context):
     # Validate authorization
     if not util.validate_auth(stack_name, groups):
         raise Exception('You do not have permission to modify this resource.')
-
-    if 'tasks' in payload:
-        params['DesiredCount'] = payload['tasks']
-    if 'health_check_path' in payload:
-        params['HealthCheckPath'] = payload['health_check_path']
-    if 'image' in payload:
-        params['DockerImage'] = payload['image']
+    
+    # mark parameters that should be re-used in CloudFormation and modify depending on paylod.
+    reuse_params = ['Priority','Listener','GroupName']
+    if 'tasks' in payload:              params['DesiredCount'] = payload['tasks'] 
+    else:                               reuse_params.append('DesiredCount')
+    if 'health_check_path' in payload:  params['HealthCheckPath'] = payload['health_check_path']
+    else:                               reuse_params.append('HealthCheckPath')
+    if 'image' in payload:              params['DockerImage'] = payload['image']
+    else:                               reuse_params.append('DockerImage')
     params = util.dict_to_kv(params, 'ParameterKey', 'ParameterValue')
-    params.append(
-        {
-            "ParameterKey": 'Priority',
-            "UsePreviousValue": True
-        }
-    )
-    params.append(
-        {
-            "ParameterKey": 'Listener',
-            "UsePreviousValue": True
-        }
-    )
-    params.append(
-        {
-            "ParameterKey": 'GroupName',
-            "UsePreviousValue": True
-        }
-    )
-    if not 'tasks' in payload:
-        params.append(
-            {
-                "ParameterKey": 'DesiredCount',
-                "UsePreviousValue": True
-            }
-        )
-    if not 'health_check_path' in payload:
-        params.append(
-            {
-                "ParameterKey": 'HealthCheckPath',
-                "UsePreviousValue": True
-            }
-        )
-    if not 'image' in payload:
-        params.append(
-            {
-                "ParameterKey": 'DockerImage',
-                "UsePreviousValue": True
-            }
-        )
+    params = params + util.reuse_vals(reuse_params)
+    print(params)
 
     tags[util.PLATFORM_TAGS['TYPE']] = 'app'
-    tags[util.PLATFORM_TAGS['VERSION']] = '0.2'
     tags[util.PLATFORM_TAGS['GROUPS']] = groups
     tags[util.PLATFORM_TAGS['REGION']] = util.PLATFORM_REGION
     tags[util.PLATFORM_TAGS['OWNER']] = user
@@ -181,12 +145,11 @@ def patch(event, context):
             Tags=tags
         )
     except ValidationError as e:
-        setattr(err, 'message', 'No updates are to be performed. {}'.format(e))
-        return util.respond(err)
+        logging.exception(e)
+        #return util.respond(e)
     except Exception as ex:
         logging.exception(ex)
-        setattr(err, 'message', 'Internal Server Error.')
-        return util.respond(err)
+        #return util.respond(ex)
     else:
         return util.respond(None, stack)
 

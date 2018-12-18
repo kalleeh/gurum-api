@@ -26,7 +26,7 @@ CFN_CLIENT = boto3.client('cloudformation', region_name=PLATFORM_REGION)
 
 def respond(err, res=None):
     return {
-        'body': err.message if err else json.dumps(res, default=datetime_serialize),
+        'body': err if err else json.dumps(res, default=datetime_serialize),
         'statusCode': '400' if err else '200',
         'headers': {
             'Content-Type': 'application/json',
@@ -280,6 +280,44 @@ def kv_to_dict(my_list, key_name, value_name):
         my_dict[item[key_name]] = item[value_name]
 
     return my_dict
+
+
+def reuse_vals(key_names, key_type='param'):
+    """
+    Used for keys that are required to be passed to CloudFormation but you don't want to update.
+    Takes the key type (param|tag) and appends the key name and sets key value to 'UsePreviousValue'.
+
+    Args:
+        key_name (list): List of key names to re-use (case-sensitive)
+        key_type (param|tag): Defines the format for key name. Defaults to 'param'.
+    Basic Usage:
+        >>> params = util.reuse_vals(params, ['Listener','Priority'])
+    Returns:
+        my_list (list): List representing AWS exitinsg keypairs with the new one appended.
+        {
+            "ParameterKey": 'ExistingKey',
+            "ParameterValue": 'ExistingValue'
+        },
+        {
+            "ParameterKey": 'Listener',
+            "UsePreviousValue": True
+        },
+        {
+            "ParameterKey": 'Priority',
+            "UsePreviousValue": True
+        }
+    """
+    my_list = []
+    
+    for key_name in key_names:
+        my_list.append(
+            {
+                "ParameterKey": key_name,
+                "UsePreviousValue": True
+            }
+        )
+
+    return my_list
 
 
 def boto_exception(err):
