@@ -58,7 +58,7 @@ def get(event, context):
         r = CFN_CLIENT.describe_stacks()
     except Exception as ex:
         logging.exception(ex)
-        raise Exception('Failed to list pipelines.')
+        util.respond('Failed to list pipelines.')
 
     # Filter stacks based on owner and retrieve wanted keys
     keys = ['StackName', 'Parameters', 'CreationTime', 'LastUpdatedTime']
@@ -78,7 +78,7 @@ def get(event, context):
                     'app': params['ServiceProd']
                 })
     except Exception as e:
-        raise Exception(e)
+        util.respond(e)
 
     return util.respond(None, data)
 
@@ -150,11 +150,11 @@ def post(event, context):
         )
     except ClientError as e:
         if e.response['Error']['Code'] == 'AlreadyExistsException':
-            raise Exception('A pipeline with that name already exists.')
+            util.respond('A pipeline with that name already exists.')
         else:
             print("Unexpected error: %s" % e)
     except Exception as ex:
         logging.exception(ex)
-        raise Exception('Internal server error.')
+        util.respond('Internal server error.')
 
     return util.respond(None, stack)

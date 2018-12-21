@@ -55,7 +55,7 @@ def get(event, context):
         r = CFN_CLIENT.describe_stacks(StackName=stack_name)
     except Exception as ex:
         logging.exception(ex)
-        raise
+        return util.respond('No such application.')
 
     # Filter stacks based on owner and retrieve wanted keys
     keys = ['StackName', 'Description', 'StackStatus', 'Tags', 'Outputs']
@@ -63,7 +63,8 @@ def get(event, context):
         apps = util.filter_stacks(r['Stacks'], keys, groups, 'app')
     except Exception as ex:
         logging.exception(ex)
-        raise Exception('Error while filtering stacks.')
+
+        return util.respond('You don\'t have permission to access this resource.')
     else:
         if 'Outputs' in apps[0]:
             outputs = util.kv_to_dict(apps[0]['Outputs'], 'OutputKey', 'OutputValue')
@@ -99,7 +100,6 @@ def patch(event, context):
     params = {}
     tags = {}
     stack = {}
-    err = ''
 
     # Get the user id for the request
     user = event['claims']['email']
@@ -113,7 +113,7 @@ def patch(event, context):
 
     # Validate authorization
     if not util.validate_auth(stack_name, groups):
-        raise Exception('You do not have permission to modify this resource.')
+        util.respond('You do not have permission to access this resource.')
     
     # mark parameters that should be re-used in CloudFormation and modify depending on paylod.
     reuse_params = ['Priority','Listener','GroupName']
@@ -146,10 +146,10 @@ def patch(event, context):
         )
     except ValidationError as e:
         logging.exception(e)
-        #return util.respond(e)
+        return util.respond(e)
     except Exception as ex:
         logging.exception(ex)
-        #return util.respond(ex)
+        return util.respond(ex)
     else:
         return util.respond(None, stack)
 
@@ -174,15 +174,16 @@ def delete(event, context):
 
     # Validate authorization
     if not util.validate_auth(stack_name, groups):
-        raise Exception('You do not have permission to modify this resource.')
+        util.respond('You do not have permission to access this resource.')
     
     try:
-        stack = CFN_CLIENT.delete_stack(StackName=stack_name)
+        CFN_CLIENT.delete_stack(StackName=stack_name)
     except ValidationError as e:
         error_msg = util.boto_exception(e)
         if error_msg.endswidth('does not exist'):
-            raise Exception('No such item.')
+            util.respond('No such item.')
     except Exception as ex:
         logging.exception(ex)
+        util.respond(ex)
     else:
-        return util.respond(None, stack)
+        return util.respond(None, 'Successfully deleted the app.')

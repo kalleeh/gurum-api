@@ -57,7 +57,7 @@ def get(event, context):
         r = CFN_CLIENT.describe_stacks()
     except Exception as ex:
         logging.exception(ex)
-        raise Exception('Failed to list apps')
+        util.respond('Failed to list apps')
 
     # Filter stacks based on owner and retrieve wanted keys
     keys = ['StackName', 'Parameters', 'CreationTime', 'LastUpdatedTime']
@@ -75,7 +75,7 @@ def get(event, context):
                     'tasks': params['DesiredCount']
                 })
     except Exception as e:
-        raise Exception(e)
+        util.respond(e)
     else:
         return util.respond(None, data)
 

@@ -98,8 +98,9 @@ def validate_auth(stack_name, groups):
     try:
         r = CFN_CLIENT.describe_stacks(StackName=stack_name)
     except Exception as ex:
+        LOGGER.debug('Stack {} does not exist.'.format(stack_name))
+        respond('No such object.')
         logging.exception(ex)
-        raise('No such object.')
     
     # Loop through stacks
     for stack in r['Stacks']:
