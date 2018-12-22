@@ -24,3 +24,4 @@ artifacts:
   type: zip
   files:
     - template-export.yaml
+    - template-configuration.json
