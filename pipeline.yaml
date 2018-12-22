@@ -142,7 +142,7 @@ Resources:
                         RoleArn: !GetAtt CloudFormationExecutionRole.Arn
                         StackName: gureume-api-Beta
                         ChangeSetName: gureume-api-ChangeSet-Beta
-                        TemplatePath: BuildArtifactAsZip::packaged.yaml
+                        TemplatePath: BuildArtifactAsZip::template-deploy.yaml
                         Capabilities: CAPABILITY_IAM
                       InputArtifacts:
                         - Name: BuildArtifactAsZip
@@ -174,7 +174,7 @@ Resources:
                         RoleArn: !GetAtt CloudFormationExecutionRole.Arn
                         StackName: gureume-api-Gamma
                         ChangeSetName: gureume-api-ChangeSet-Gamma
-                        TemplatePath: BuildArtifactAsZip::packaged.yaml
+                        TemplatePath: BuildArtifactAsZip::template-deploy.yaml
                         Capabilities: CAPABILITY_IAM
                       InputArtifacts:
                         - Name: BuildArtifactAsZip
@@ -213,7 +213,7 @@ Resources:
                         RoleArn: !GetAtt CloudFormationExecutionRole.Arn
                         StackName: gureume-api-Prod
                         ChangeSetName: gureume-api-ChangeSet-Prod
-                        TemplatePath: BuildArtifactAsZip::packaged.yaml
+                        TemplatePath: BuildArtifactAsZip::template-deploy.yaml
                         Capabilities: CAPABILITY_IAM
                       InputArtifacts:
                         - Name: BuildArtifactAsZip
