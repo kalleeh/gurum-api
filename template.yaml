@@ -2,7 +2,6 @@
 AWSTemplateFormatVersion: 2010-09-09
 Transform:
 - AWS::Serverless-2016-10-31
-- AWS::CodeStar
 Description: >
     'This SAM template creates the management API for the container platform.
     Last Modified: July 17th 2018
@@ -31,19 +30,6 @@ Parameters:
     Description: String to use as prefix for platform resources
     Type: String
     Default: "gureume"
-  
-  ProjectId:
-    Type: String
-    Description: CodeStar projectId used to associate new resources to team members
-  
-  CodeDeployRole:
-    Type: String
-    Description: IAM role to allow AWS CodeDeploy to manage deployment of AWS Lambda functions
-  
-  Stage:
-    Type: String
-    Description: The name for a project pipeline stage, such as Staging or Prod, for which resources are provisioned and deployed.
-    Default: ''
 
 Globals:
   Function:
@@ -56,11 +42,6 @@ Globals:
         PLATFORM_PREFIX: !Sub "${PlatformPrefix}-"
         PLATFORM_BUCKET: !Ref PlatformBucket
         PLATFORM_DEPLOYMENT_ROLE: !GetAtt DeploymentRole.Arn
-    AutoPublishAlias: live
-    DeploymentPreference:
-      Enabled: true
-      Type: Canary10Percent5Minutes
-      Role: !Ref CodeDeployRole
 
   Api:
     EndpointConfiguration: REGIONAL
