@@ -178,12 +178,12 @@ def delete(event, context):
     
     try:
         CFN_CLIENT.delete_stack(StackName=stack_name)
-    except ValidationError as e:
-        error_msg = util.boto_exception(e)
-        if error_msg.endswidth('does not exist'):
-            util.respond('No such item.')
+    except ClientError as e:
+        if e.response['Error']['Code'] == "NoSuchEntity":
+            # no need to delete a thing that doesn't exist
+            return util.respond(None, 'App does not exist, deletion succeeded')
     except Exception as ex:
         logging.exception(ex)
-        util.respond(ex)
+        return util.respond(ex)
     else:
         return util.respond(None, 'Successfully deleted the app.')
