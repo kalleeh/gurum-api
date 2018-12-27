@@ -94,10 +94,10 @@ Update the bucket policy to something similar,
 - AWS CLI already configured with Administrator access
   - Alternatively, you can use a [Cloudformation Service Role with Admin access](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-iam-servicerole.html)
 
-## Pipeline creation
+## Modify default pipeline settings
 
-<details>
-<summary>If you don't use Python or don't want to trigger the Pipeline from the `master` branch click here...</summary>
+If you don't use Python or don't want to trigger the Pipeline from the `master` branch you need to take additional steps.
+
 Before we create this 3-environment Pipeline through Cloudformation you may want to change a couple of things to fit your environment/runtime:
 
 - **CodeBuild** uses a `Python` build image by default and if you're not using `Python` as a runtime you can change that
@@ -141,7 +141,7 @@ Before we create this 3-environment Pipeline through Cloudformation you may want
                 RunOrder: 1
 ```
 
-</details>
+## Deploy the pipeline in your account
 
 Run the following AWS CLI command to create your first pipeline for your SAM based Serverless App:
 

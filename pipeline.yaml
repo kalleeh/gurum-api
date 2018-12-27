@@ -161,38 +161,6 @@ Resources:
                       OutputArtifacts:
                         - Name: gureume-apiBetaChangeSet
                       RunOrder: 2
-                - Name: Gamma
-                  Actions:
-                    - Name: CreateChangeSet
-                      ActionTypeId:
-                        Category: Deploy
-                        Owner: AWS
-                        Provider: CloudFormation
-                        Version: "1"
-                      Configuration:
-                        ActionMode: CHANGE_SET_REPLACE
-                        RoleArn: !GetAtt CloudFormationExecutionRole.Arn
-                        StackName: gureume-api-Gamma
-                        ChangeSetName: gureume-api-ChangeSet-Gamma
-                        TemplatePath: BuildArtifactAsZip::template-deploy.yaml
-                        Capabilities: CAPABILITY_IAM
-                      InputArtifacts:
-                        - Name: BuildArtifactAsZip
-                      RunOrder: 1
-                    - Name: ExecuteChangeSet
-                      ActionTypeId:
-                        Category: Deploy
-                        Owner: AWS
-                        Provider: CloudFormation
-                        Version: "1"
-                      Configuration:
-                        ActionMode: CHANGE_SET_EXECUTE
-                        RoleArn: !GetAtt CloudFormationExecutionRole.Arn
-                        StackName: gureume-api-Gamma
-                        ChangeSetName: gureume-api-ChangeSet-Gamma
-                      OutputArtifacts:
-                        - Name: gureume-apiGammaChangeSet
-                      RunOrder: 2
                 - Name: Prod
                   Actions:
                     - Name: DeploymentApproval
