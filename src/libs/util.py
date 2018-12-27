@@ -26,8 +26,8 @@ CFN_CLIENT = boto3.client('cloudformation', region_name=PLATFORM_REGION)
 
 def respond(err, res=None):
     return {
-        'body': err if err else json.dumps(res, default=datetime_serialize),
-        'statusCode': '400' if err else '200',
+        'body': res if err else json.dumps(res, default=datetime_serialize),
+        'statusCode': err if err else '200',
         'headers': {
             'Content-Type': 'application/json',
         },

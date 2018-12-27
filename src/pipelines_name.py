@@ -53,7 +53,7 @@ def get(event, context):
         r = CFN_CLIENT.describe_stacks(StackName=name)
     except Exception as ex:
         logging.exception(ex)
-        util.respond('Internal server error.')
+        util.respond(500, 'Internal server error.')
 
     # Filter stacks based on owner and retrieve wanted keys
     keys = ['StackName', 'Description', 'StackStatus', 'Tags', 'Outputs']
@@ -61,7 +61,7 @@ def get(event, context):
         pipelines = util.filter_stacks(r['Stacks'], keys, groups, 'pipeline')
     except Exception as ex:
         logging.exception(ex)
-        util.respond('Error while filtering stacks.')
+        util.respond(500, 'Error while filtering stacks.')
     
     if 'Outputs' in pipelines[0]:
         data['outputs'] = util.kv_to_dict(pipelines[0]['Outputs'], 'OutputKey', 'OutputValue')
@@ -109,7 +109,7 @@ def patch(event, context):
 
     # Validate authorization
     if not util.validate_auth(stack_name, groups):
-        util.respond('You do not have permission to access this resource.')
+        util.respond(403, 'You do not have permission to access this resource.')
     
     if 'app_dev' in payload:
         params['ServiceDev'] = util.addprefix(payload['app_dev'])
@@ -147,12 +147,12 @@ def patch(event, context):
         )
     except ClientError as e:
         if e.response['Error']['Code'] == 'AlreadyExistsException':
-            util.respond('A pipeline with that name already exists.')
+            util.respond(400, 'A pipeline with that name already exists.')
         else:
             print("Unexpected error: %s" % e)
     except Exception as ex:
         logging.exception(ex)
-        util.respond('Internal server error.')
+        util.respond(500, 'Internal server error.')
 
     return util.respond(None, stack)
 
@@ -176,7 +176,7 @@ def delete(event, context):
 
     # Validate authorization
     if not util.validate_auth(stack_name, groups):
-        util.respond('You do not have permission to access this resource.')
+        util.respond(403, 'You do not have permission to access this resource.')
     
     try:
         CFN_CLIENT.delete_stack(StackName=stack_name)

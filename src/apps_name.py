@@ -55,7 +55,7 @@ def get(event, context):
         r = CFN_CLIENT.describe_stacks(StackName=stack_name)
     except Exception as ex:
         logging.exception(ex)
-        return util.respond('No such application.')
+        return util.respond(404, 'No such application.')
 
     # Filter stacks based on owner and retrieve wanted keys
     keys = ['StackName', 'Description', 'StackStatus', 'Tags', 'Outputs']
@@ -64,7 +64,7 @@ def get(event, context):
     except Exception as ex:
         logging.exception(ex)
 
-        return util.respond('You don\'t have permission to access this resource.')
+        return util.respond(403, 'You don\'t have permission to access this resource.')
     else:
         if 'Outputs' in apps[0]:
             outputs = util.kv_to_dict(apps[0]['Outputs'], 'OutputKey', 'OutputValue')
@@ -113,7 +113,7 @@ def patch(event, context):
 
     # Validate authorization
     if not util.validate_auth(stack_name, groups):
-        util.respond('You do not have permission to access this resource.')
+        util.respond(403, 'You do not have permission to access this resource.')
     
     # mark parameters that should be re-used in CloudFormation and modify depending on paylod.
     reuse_params = ['Priority','Listener','GroupName']
@@ -174,7 +174,7 @@ def delete(event, context):
 
     # Validate authorization
     if not util.validate_auth(stack_name, groups):
-        util.respond('You do not have permission to access this resource.')
+        util.respond(403, 'You do not have permission to access this resource.')
     
     try:
         CFN_CLIENT.delete_stack(StackName=stack_name)

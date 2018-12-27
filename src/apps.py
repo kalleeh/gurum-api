@@ -57,7 +57,7 @@ def get(event, context):
         r = CFN_CLIENT.describe_stacks()
     except Exception as ex:
         logging.exception(ex)
-        util.respond('Failed to list apps')
+        util.respond(500, 'Failed to list apps')
 
     # Filter stacks based on owner and retrieve wanted keys
     keys = ['StackName', 'Parameters', 'CreationTime', 'LastUpdatedTime']
@@ -157,12 +157,12 @@ def post(event, context):
         )
     except ClientError as e:
         if e.response['Error']['Code'] == 'AlreadyExistsException':
-            return util.respond('An application with that name already exists.')
+            return util.respond(400, 'An application with that name already exists.')
         else:
             logging.exception(e)
-            return util.respond('Unexpected error: %s' % e)
+            return util.respond(400, 'Unexpected error: %s' % e)
     except Exception as ex:
         logging.exception(ex)
-        return util.respond('Internal server error.')
+        return util.respond(500, 'Internal server error.')
     else:
         return util.respond(None, stack)

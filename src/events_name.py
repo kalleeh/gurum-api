@@ -49,7 +49,7 @@ def get(event, context):
     
     # Validate authorization
     if not util.validate_auth(name, groups):
-        return util.respond('You do not have permission to access this resource.')
+        return util.respond(403, 'You do not have permission to access this resource.')
     
     try:
         # List Events for Stack
@@ -75,6 +75,6 @@ def get(event, context):
                     })
     except Exception as ex:
         logging.exception(ex)
-        return util.respond('Failed to list events.')
+        return util.respond(500, 'Failed to list events.')
 
     return util.respond(None, data)
