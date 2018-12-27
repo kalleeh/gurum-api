@@ -404,7 +404,7 @@ Resources:
       Type: AWS::Lambda::Function
       Condition: ChimeWebhookSet
       Properties:
-        Runtime: python2.7
+        Runtime: python3.6
         Handler: index.lambda_handler
         MemorySize: 128
         Role: !GetAtt LambdaExecutionRole.Arn
