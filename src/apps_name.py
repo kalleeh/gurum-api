@@ -134,6 +134,11 @@ def patch(event, context):
             RoleARN=util.PLATFORM_DEPLOYMENT_ROLE,
             Tags=tags
         )
+    except ClientError as e:
+        if e.response['Error']['Code'] == 'ValidationError' and 'does not exist' in e.response['Error']['Message']:
+            return util.respond(None, 'App does not exist')
+        if e.response['Error']['Code'] == 'ValidationError' and 'ROLLBACK_COMPLETE' in e.response['Error']['Message']:
+            return util.respond(None, 'App is in inconsistent state. Please re-create it.')
     except ValidationError as e:
         logging.exception(e)
         util.respond(400, 'Invalid input')
