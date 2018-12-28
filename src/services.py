@@ -75,8 +75,9 @@ def get(event, context):
                     'updated_at': stack['LastUpdatedTime'],
                     'service_bindings': params['ServiceBindings']
                 })
-    except Exception as e:
-        util.respond(e)
+    except Exception as ex:
+        logging.exception(ex)
+        util.respond(500, 'Unexpected error')
 
     return util.respond(None, data)
 

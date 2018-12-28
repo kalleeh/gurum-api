@@ -51,7 +51,7 @@ def filter_stacks(stacks, keys, groups, stack_type='any'):
     Returns:
         List: List of dicts representing AWS Stacks and information
         [
-        {
+            {
                 'StackName': 'mystack',
                 'StackStatus': 'status'
             }
@@ -82,7 +82,7 @@ def filter_stacks(stacks, keys, groups, stack_type='any'):
     return data
 
 
-def validate_auth(stack_name, groups):
+def validate_auth(stack_name, groups, stack_type=None):
     """ Describes a stack validating they are in the platform
     and belongs to the user performing the request.
     Args:
@@ -96,38 +96,40 @@ def validate_auth(stack_name, groups):
     """
 
     try:
-        r = CFN_CLIENT.describe_stacks(StackName=stack_name)
+        resp = CFN_CLIENT.describe_stacks(StackName=stack_name)
     except Exception as ex:
-        LOGGER.debug('Stack {} does not exist.'.format(stack_name))
-        respond('No such object.')
         logging.exception(ex)
-    
-    # Loop through stacks
-    for stack in r['Stacks']:
-        stack_name = remprefix(stack['StackName'])
-        stack_tags = kv_to_dict(stack['Tags'], 'Key', 'Value')
+        return respond(500, 'Internal server error.')
+    else:
+        # Loop through stacks
+        for stack in resp['Stacks']:
+            stack_name = remprefix(stack['StackName'])
+            stack_tags = kv_to_dict(stack['Tags'], 'Key', 'Value')
 
-        # Check if the stack is part of the platform
-        if (PLATFORM_TAGS['TYPE'] in stack_tags):
-            # Check if stack belongs to group by comparing groups tag to the cognito group in claim
-            if stack_tags[PLATFORM_TAGS['GROUPS']] == groups:
-                LOGGER.debug('Authorization Successful: Stack {} owned by: {}'.format(stack_name, groups))
-                return True
+            # Check if the stack is part of the platform
+            if (PLATFORM_TAGS['TYPE'] in stack_tags):
+                if stack_type and stack_type != PLATFORM_TAGS['TYPE']:
+                    LOGGER.debug('{} is not of the right type {}'.format(stack_name, PLATFORM_TAGS['TYPE']))
+                    return False
+                # Check if stack belongs to group by comparing groups tag to the cognito group in claim
+                if stack_tags[PLATFORM_TAGS['GROUPS']] == groups:
+                    LOGGER.debug('Authorization Successful: Stack {} owned by: {}'.format(stack_name, groups))
+                    return True
+                else:
+                    LOGGER.debug('{} does not belong to group: {}'.format(stack_name, groups))
+                    return False
             else:
-                LOGGER.debug('{} does not belong to group: {}'.format(stack_name, groups))
-                raise('Permission denied.')
-        else:
-            LOGGER.debug('Stack {} does not have a platform type.'.format(stack_name))
-            raise('No such object.')
+                LOGGER.debug('Stack {} does not have a platform type.'.format(stack_name))
+                return False
 
-    return False
+        return False
 
 
 def get_cfn_exports():
     """ Gets the CloudFormation Exports in the region and returns a flat dict of key:value pairs
     Args:
     Basic Usage:
-        >>> r = get_cfn_exports()
+        >>> resp = get_cfn_exports()
     Returns:
         Dict: Dict of key:value pairs representing AWS output
         {
@@ -155,7 +157,7 @@ def iterate_rule_priority(listener_arn):
     Args:
         listener_arn (string): String of the ARN to the ALB Listener
     Basic Usage:
-        >>> r = iterate_rule_priority(listener_arn)
+        >>> resp = iterate_rule_priority(listener_arn)
     Returns:
         Number: Number of the next available rule priority number
         Default: 1

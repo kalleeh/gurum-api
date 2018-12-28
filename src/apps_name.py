@@ -39,7 +39,6 @@ def get(event, context):
     Returns:
         List: List of JSON object containing app information
     """
-    apps = []
     data = {}
 
     LOGGER.debug('Describing Stack:')
@@ -50,32 +49,24 @@ def get(event, context):
 
     stack_name = util.addprefix(name)
 
+    # Validate authorization
+    if not util.validate_auth(stack_name, groups, 'app'):
+        util.respond(403, 'You do not have permission to access this resource.')
+    
     # List CloudFormation Stacks
     try:
-        r = CFN_CLIENT.describe_stacks(StackName=stack_name)
+        resp = CFN_CLIENT.describe_stacks(StackName=stack_name)
     except Exception as ex:
         logging.exception(ex)
-        return util.respond(404, 'No such application.')
-
-    # Filter stacks based on owner and retrieve wanted keys
-    keys = ['StackName', 'Description', 'StackStatus', 'Tags', 'Outputs']
-    try:
-        apps = util.filter_stacks(r['Stacks'], keys, groups, 'app')
-    except Exception as ex:
-        logging.exception(ex)
-
-        return util.respond(403, 'You don\'t have permission to access this resource.')
+        return util.respond(500, 'Internal server error.')
     else:
-        if 'Outputs' in apps[0]:
-            outputs = util.kv_to_dict(apps[0]['Outputs'], 'OutputKey', 'OutputValue')
-            data['endpoint'] = outputs['Endpoint']
-            if 'Repository' in outputs:
-                data['repository'] = outputs['Repository']
-
-        data['name'] = util.remprefix(apps[0]['StackName'])
-        data['description'] = apps[0]['Description']
-        data['status'] = apps[0]['StackStatus']
-        data['tags'] = util.kv_to_dict(apps[0]['Tags'], 'Key', 'Value')
+        stack = resp['Stacks'][0]
+        if 'Outputs' in stack:
+            data['outputs'] = util.kv_to_dict(stack['Outputs'], 'OutputKey', 'OutputValue')
+        data['name'] = util.remprefix(stack['StackName'])
+        data['description'] = stack['Description']
+        data['status'] = stack['StackStatus']
+        data['tags'] = util.kv_to_dict(stack['Tags'], 'Key', 'Value')
 
         return util.respond(None, data)
 
@@ -125,7 +116,6 @@ def patch(event, context):
     else:                               reuse_params.append('DockerImage')
     params = util.dict_to_kv(params, 'ParameterKey', 'ParameterValue')
     params = params + util.reuse_vals(reuse_params)
-    print(params)
 
     tags[util.PLATFORM_TAGS['TYPE']] = 'app'
     tags[util.PLATFORM_TAGS['GROUPS']] = groups
@@ -146,10 +136,10 @@ def patch(event, context):
         )
     except ValidationError as e:
         logging.exception(e)
-        return util.respond(e)
+        util.respond(400, 'Invalid input')
     except Exception as ex:
         logging.exception(ex)
-        return util.respond(ex)
+        util.respond(500, 'Unexpected error')
     else:
         return util.respond(None, stack)
 
@@ -179,11 +169,13 @@ def delete(event, context):
     try:
         CFN_CLIENT.delete_stack(StackName=stack_name)
     except ClientError as e:
-        if e.response['Error']['Code'] == "NoSuchEntity":
-            # no need to delete a thing that doesn't exist
-            return util.respond(None, 'App does not exist, deletion succeeded')
+        if e.response['Error']['Code'] == 'ValidationError' and 'does not exist' in e.response['Error']['Message']:
+            return util.respond(None, 'App does not exist')
+    except ValidationError as e:
+        logging.exception(e)
+        util.respond(400, 'Invalid input')
     except Exception as ex:
         logging.exception(ex)
-        return util.respond(ex)
+        util.respond(500, 'Internal server error')
     else:
-        return util.respond(None, 'Successfully deleted the app.')
+        return util.respond(None, 'Successfully deleted the app')

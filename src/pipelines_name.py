@@ -39,7 +39,6 @@ def get(event, context):
     Returns:
         List: List of JSON object containing pipeline information
     """
-    pipelines = []
     data = {}
 
     LOGGER.debug('Describing Stack:')
@@ -48,29 +47,28 @@ def get(event, context):
     groups = event['claims']['groups']
     name = event['params']['name']
 
+    stack_name = util.addprefix(name)
+
+    # Validate authorization
+    if not util.validate_auth(stack_name, groups, 'pipeline'):
+        util.respond(403, 'You do not have permission to access this resource.')
+    
     # List CloudFormation Stacks
     try:
-        r = CFN_CLIENT.describe_stacks(StackName=name)
+        resp = CFN_CLIENT.describe_stacks(StackName=stack_name)
     except Exception as ex:
         logging.exception(ex)
-        util.respond(500, 'Internal server error.')
+        return util.respond(500, 'Internal server error.')
+    else:
+        stack = resp['Stacks'][0]
+        if 'Outputs' in stack:
+            data['outputs'] = util.kv_to_dict(stack['Outputs'], 'OutputKey', 'OutputValue')
+        data['name'] = util.remprefix(stack['StackName'])
+        data['description'] = stack['Description']
+        data['status'] = stack['StackStatus']
+        data['tags'] = util.kv_to_dict(stack['Tags'], 'Key', 'Value')
 
-    # Filter stacks based on owner and retrieve wanted keys
-    keys = ['StackName', 'Description', 'StackStatus', 'Tags', 'Outputs']
-    try:
-        pipelines = util.filter_stacks(r['Stacks'], keys, groups, 'pipeline')
-    except Exception as ex:
-        logging.exception(ex)
-        util.respond(500, 'Error while filtering stacks.')
-    
-    if 'Outputs' in pipelines[0]:
-        data['outputs'] = util.kv_to_dict(pipelines[0]['Outputs'], 'OutputKey', 'OutputValue')
-    data['name'] = util.remprefix(pipelines[0]['StackName'])
-    data['description'] = pipelines[0]['Description']
-    data['status'] = pipelines[0]['StackStatus']
-    data['tags'] = util.kv_to_dict(pipelines[0]['Tags'], 'Key', 'Value')
-
-    return util.respond(None, data)
+        return util.respond(None, data)
 
 
 def patch(event, context):
@@ -181,11 +179,13 @@ def delete(event, context):
     try:
         CFN_CLIENT.delete_stack(StackName=stack_name)
     except ClientError as e:
-        if e.response['Error']['Code'] == "NoSuchEntity":
-            # no need to delete a thing that doesn't exist
-            return util.respond(None, 'Pipeline does not exist, deletion succeeded')
+        if e.response['Error']['Code'] == 'ValidationError' and 'does not exist' in e.response['Error']['Message']:
+            return util.respond(None, 'Pipeline does not exist')
+    except ValidationError as e:
+        logging.exception(e)
+        util.respond(400, 'Invalid input')
     except Exception as ex:
         logging.exception(ex)
-        return util.respond(ex)
+        util.respond(500, 'Internal server error')
     else:
-        return util.respond(None, 'Successfully deleted the pipeline.')
+        return util.respond(None, 'Successfully deleted the pipeline')

@@ -74,8 +74,9 @@ def get(event, context):
                     'updated_at': stack['LastUpdatedTime'],
                     'tasks': params['DesiredCount']
                 })
-    except Exception as e:
-        util.respond(e)
+    except Exception as ex:
+        logging.exception(ex)
+        util.respond(500, 'Unexpected error')
     else:
         return util.respond(None, data)
 

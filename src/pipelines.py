@@ -77,8 +77,9 @@ def get(event, context):
                     'app_test': params['ServiceTest'],
                     'app': params['ServiceProd']
                 })
-    except Exception as e:
-        util.respond(e)
+    except Exception as ex:
+        logging.exception(ex)
+        util.respond(500, 'Unexpected error')
 
     return util.respond(None, data)
 
