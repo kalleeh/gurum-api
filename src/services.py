@@ -118,15 +118,15 @@ def post(event, context):
         service_type = payload['service_type']
     else:
         service_type = 's3'
-    if 'service_bindings' in payload:
-        binding_list = ['arn:aws:iam::789073296014:role/platform-role-' + b for b in payload['service_bindings'].split(',')]
-        service_bindings = ','.join(map(str, binding_list))
+    #if 'service_bindings' in payload:
+    #    binding_list = ['arn:aws:iam::789073296014:role/platform-role-' + b for b in payload['service_bindings'].split(',')]
+    #    service_bindings = ','.join(map(str, binding_list))
     if 'service_version' in payload:
         service_version = payload['service_version']
     else:
         service_version = 'latest'
     
-    params['ServiceBindings'] = service_bindings
+    params['ServiceBindings'] = payload['service_bindings']
     params = util.dict_to_kv(params, 'ParameterKey', 'ParameterValue')
 
     tags[util.PLATFORM_TAGS['TYPE']] = 'service'
