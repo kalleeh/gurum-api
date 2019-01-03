@@ -119,6 +119,15 @@ def post(event, context):
     stack_name = util.addprefix(payload['name'])
     LOGGER.debug('Creating Pipeline: ' + stack_name)
 
+    if 'pipeline_type' in payload:
+        pipeline_type = payload['pipeline_type']
+    else:
+        pipeline_type = 'github'
+    if 'pipeline_version' in payload:
+        pipeline_version = payload['pipeline_version']
+    else:
+        pipeline_version = 'latest'
+    
     if 'app_dev' in payload:
         params['ServiceDev'] = util.addprefix(payload['app_dev'])
     if 'app_test' in payload:
@@ -137,10 +146,18 @@ def post(event, context):
     tags[util.PLATFORM_TAGS['OWNER']] = user
     tags = util.dict_to_kv(tags, 'Key', 'Value')
 
+    template_url = 'https://s3-{}.amazonaws.com/{}/cfn/pipelines/pipeline-{}-{}.yaml'.format(
+        util.PLATFORM_REGION,
+        PLATFORM_BUCKET,
+        pipeline_type,
+        pipeline_version
+    )
+    LOGGER.debug('Template URL: ' + template_url)
+
     try:
         stack = CFN_CLIENT.create_stack(
             StackName=stack_name,
-            TemplateURL='https://s3-eu-west-1.amazonaws.com/' + PLATFORM_BUCKET + '/cfn/app/pipeline.yaml',
+            TemplateURL=template_url,
             TimeoutInMinutes=15,
             Parameters=params,
             Capabilities=[
@@ -151,11 +168,12 @@ def post(event, context):
         )
     except ClientError as e:
         if e.response['Error']['Code'] == 'AlreadyExistsException':
-            util.respond(400, 'A pipeline with that name already exists.')
+            return util.respond(400, 'A pipeline with that name already exists.')
         else:
-            print("Unexpected error: %s" % e)
+            logging.exception(e)
+            return util.respond(400, 'Unexpected error: %s' % e)
     except Exception as ex:
         logging.exception(ex)
-        util.respond(500, 'Internal server error.')
-
-    return util.respond(None, stack)
+        return util.respond(500, 'Internal server error.')
+    else:
+        return util.respond(None, stack)

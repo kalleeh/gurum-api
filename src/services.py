@@ -134,11 +134,12 @@ def post(event, context):
     tags[util.PLATFORM_TAGS['OWNER']] = user
     tags = util.dict_to_kv(tags, 'Key', 'Value')
     
-    template_url = 'https://s3-eu-west-1.amazonaws.com/' + \
-        PLATFORM_BUCKET + \
-        '/cfn/services/service-' + \
-        service_type + '-' + \
-        service_version + '.yaml'
+    template_url = 'https://s3-{}.amazonaws.com/{}/cfn/services/service-{}-{}.yaml'.format(
+        util.PLATFORM_REGION,
+        PLATFORM_BUCKET,
+        service_type,
+        service_version
+    )
     LOGGER.debug('Template URL: ' + template_url)
 
     try:
@@ -155,11 +156,12 @@ def post(event, context):
         )
     except ClientError as e:
         if e.response['Error']['Code'] == 'AlreadyExistsException':
-            util.respond(400, 'A service with that name already exists.')
+            return util.respond(400, 'A service with that name already exists.')
         else:
-            print("Unexpected error: %s" % e)
+            logging.exception(e)
+            return util.respond(400, 'Unexpected error: %s' % e)
     except Exception as ex:
         logging.exception(ex)
-        util.respond(500, 'Internal server error.')
-
-    return util.respond(None, stack)
+        return util.respond(500, 'Internal server error.')
+    else:
+        return util.respond(None, stack)

@@ -137,11 +137,12 @@ def post(event, context):
     tags[util.PLATFORM_TAGS['OWNER']] = user
     tags = util.dict_to_kv(tags, 'Key', 'Value')
 
-    template_url = 'https://s3-eu-west-1.amazonaws.com/' + \
-        PLATFORM_BUCKET + \
-        '/cfn/apps/app-' + \
-        app_type + '-' + \
-        app_version + '.yaml'
+    template_url = 'https://s3-{}.amazonaws.com/{}/cfn/apps/app-{}-{}.yaml'.format(
+        util.PLATFORM_REGION,
+        PLATFORM_BUCKET,
+        app_type,
+        app_version
+    )
     LOGGER.debug('Template URL: ' + template_url)
 
     try:
