@@ -66,6 +66,7 @@ def get(event, context):
         data['name'] = util.remprefix(stack['StackName'])
         data['description'] = stack['Description']
         data['status'] = stack['StackStatus']
+        data['params'] = util.kv_to_dict(stack['Parameters'], 'ParameterKey', 'ParameterValue')
         data['tags'] = util.kv_to_dict(stack['Tags'], 'Key', 'Value')
 
         return util.respond(None, data)
@@ -81,12 +82,7 @@ def patch(event, context):
         >>> Payload Example:
             [{
                 "service_name": "my-service",
-                "service_dev": "my-service-dev",    [Optional]
-                "service_test": "my-service-test",  [Optional]
-                "github_repo": "2048",
-                "github_branch": "master",
-                "github_token": "b248f1e7360fe21c33e12d4bca3feaweEXAMPLE",
-                "github_user": "mygithubuser"
+                "service_bindings": "myapp1"
             }]
     Returns:
         List: List of JSON objects containing service information
@@ -114,8 +110,7 @@ def patch(event, context):
     else:
         service_type = 's3'
     if 'service_bindings' in payload:
-        binding_list = ['arn:aws:iam::789073296014:role/platform-role-' + b for b in payload['service_bindings'].split(',')]
-        service_bindings = ','.join(map(str, binding_list))
+        service_bindings = payload['service_bindings']
     if 'service_version' in payload:
         service_version = payload['service_version']
     else:

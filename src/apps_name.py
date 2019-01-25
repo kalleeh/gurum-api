@@ -66,6 +66,7 @@ def get(event, context):
         data['name'] = util.remprefix(stack['StackName'])
         data['description'] = stack['Description']
         data['status'] = stack['StackStatus']
+        data['params'] = util.kv_to_dict(stack['Parameters'], 'ParameterKey', 'ParameterValue')
         data['tags'] = util.kv_to_dict(stack['Tags'], 'Key', 'Value')
 
         return util.respond(None, data)
