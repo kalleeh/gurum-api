@@ -23,7 +23,7 @@ LOGGER = configure_logger(__name__)
 
 
 def get(event, context):
-    """ Describes detailed information about an pipeline
+    """ Describes detailed information about a pipeline
 
     Args:
         name (string): Name of the pipeline (CloudFormation Stack)
@@ -51,17 +51,13 @@ def get(event, context):
     stack = stacks[0]
     
     outputs = tu.kv_to_dict(stack['Outputs'], 'OutputKey', 'OutputValue') if 'Outputs' in stack else []
-    params = tu.kv_to_dict(stack['Parameters'], 'ParameterKey', 'ParameterValue')
-    tags = tu.kv_to_dict(stack['Tags'], 'Key', 'Value')
 
     data['pipelines'].append(
         {
             'name': stack['StackName'],
             'description': stack['Description'],
             'status': stack['StackStatus'],
-            'outputs': outputs,
-            'params': params,
-            'tags': tags
+            'outputs': outputs
         })
     
     return tu.respond(None, data)

@@ -1068,7 +1068,7 @@ Resources:
         - "video/webm"
 
   ### Lambda Layers ###
-  LambdaLayerVersion:
+  DependenciesLayerVersion:
     Type: "AWS::Serverless::LayerVersion"
     Properties:
       ContentUri: "lambda_layers/dependencies"
@@ -1096,7 +1096,7 @@ Resources:
       CodeUri: src/apps
       MemorySize: 1024
       Layers:
-        - !Ref LambdaLayerVersion
+        - !Ref DependenciesLayerVersion
         - !Ref XRayLayerVersion
       Tracing: "Active"
       Events:
@@ -1121,7 +1121,7 @@ Resources:
       CodeUri: src/apps
       MemorySize: 1024
       Layers:
-        - !Ref LambdaLayerVersion
+        - !Ref DependenciesLayerVersion
         - !Ref XRayLayerVersion
       Tracing: "Active"
       Events:
@@ -1149,7 +1149,7 @@ Resources:
       CodeUri: src/apps/name
       MemorySize: 1024
       Layers:
-        - !Ref LambdaLayerVersion
+        - !Ref DependenciesLayerVersion
         - !Ref XRayLayerVersion
       Tracing: "Active"
       Events:
@@ -1174,7 +1174,7 @@ Resources:
       CodeUri: src/apps/name
       MemorySize: 1024
       Layers:
-        - !Ref LambdaLayerVersion
+        - !Ref DependenciesLayerVersion
         - !Ref XRayLayerVersion
       Tracing: "Active"
       Events:
@@ -1200,7 +1200,7 @@ Resources:
       CodeUri: src/apps/name
       MemorySize: 1024
       Layers:
-        - !Ref LambdaLayerVersion
+        - !Ref DependenciesLayerVersion
         - !Ref XRayLayerVersion
       Tracing: "Active"
       Events:
@@ -1230,7 +1230,7 @@ Resources:
       CodeUri: src/events
       MemorySize: 1024
       Layers:
-        - !Ref LambdaLayerVersion
+        - !Ref DependenciesLayerVersion
         - !Ref XRayLayerVersion
       Tracing: "Active"
       Events:
@@ -1257,7 +1257,7 @@ Resources:
       CodeUri: src/pipelines
       MemorySize: 1024
       Layers:
-        - !Ref LambdaLayerVersion
+        - !Ref DependenciesLayerVersion
         - !Ref XRayLayerVersion
       Tracing: "Active"
       Events:
@@ -1282,7 +1282,7 @@ Resources:
       CodeUri: src/pipelines
       MemorySize: 1024
       Layers:
-        - !Ref LambdaLayerVersion
+        - !Ref DependenciesLayerVersion
         - !Ref XRayLayerVersion
       Tracing: "Active"
       Events:
@@ -1309,7 +1309,7 @@ Resources:
       CodeUri: src/pipelines/name
       MemorySize: 1024
       Layers:
-        - !Ref LambdaLayerVersion
+        - !Ref DependenciesLayerVersion
         - !Ref XRayLayerVersion
       Tracing: "Active"
       Events:
@@ -1334,7 +1334,7 @@ Resources:
       CodeUri: src/pipelines/name
       MemorySize: 1024
       Layers:
-        - !Ref LambdaLayerVersion
+        - !Ref DependenciesLayerVersion
         - !Ref XRayLayerVersion
       Tracing: "Active"
       Events:
@@ -1360,7 +1360,7 @@ Resources:
       CodeUri: src/pipelines/name
       MemorySize: 1024
       Layers:
-        - !Ref LambdaLayerVersion
+        - !Ref DependenciesLayerVersion
         - !Ref XRayLayerVersion
       Tracing: "Active"
       Events:
@@ -1388,7 +1388,7 @@ Resources:
       CodeUri: src/pipelines/name/state
       MemorySize: 1024
       Layers:
-        - !Ref LambdaLayerVersion
+        - !Ref DependenciesLayerVersion
         - !Ref XRayLayerVersion
       Tracing: "Active"
       Events:
@@ -1396,12 +1396,13 @@ Resources:
           Type: Api
           Properties:
             RestApiId: !Ref ApiGatewayApi
-            Path: /pipelines/{name}
+            Path: /pipelines/{name}/state
             Method: get
       Policies:
         - Statement:
             - Effect: Allow
               Action:
+                - 'cloudformation:DescribeStacks'
                 - 'codepipeline:GetPipelineState'
               Resource:
                 - '*'
@@ -1414,7 +1415,7 @@ Resources:
       CodeUri: src/services
       MemorySize: 1024
       Layers:
-        - !Ref LambdaLayerVersion
+        - !Ref DependenciesLayerVersion
         - !Ref XRayLayerVersion
       Tracing: "Active"
       Events:
@@ -1439,7 +1440,7 @@ Resources:
       CodeUri: src/services
       MemorySize: 1024
       Layers:
-        - !Ref LambdaLayerVersion
+        - !Ref DependenciesLayerVersion
         - !Ref XRayLayerVersion
       Tracing: "Active"
       Events:
@@ -1466,7 +1467,7 @@ Resources:
       CodeUri: src/services/name
       MemorySize: 1024
       Layers:
-        - !Ref LambdaLayerVersion
+        - !Ref DependenciesLayerVersion
         - !Ref XRayLayerVersion
       Tracing: "Active"
       Events:
@@ -1491,7 +1492,7 @@ Resources:
       CodeUri: src/services/name
       MemorySize: 1024
       Layers:
-        - !Ref LambdaLayerVersion
+        - !Ref DependenciesLayerVersion
         - !Ref XRayLayerVersion
       Tracing: "Active"
       Events:
@@ -1517,7 +1518,7 @@ Resources:
       CodeUri: src/services/name
       MemorySize: 1024
       Layers:
-        - !Ref LambdaLayerVersion
+        - !Ref DependenciesLayerVersion
         - !Ref XRayLayerVersion
       Tracing: "Active"
       Events:

@@ -10,7 +10,7 @@ Amazon Web Services, Inc. or Amazon Web Services EMEA SARL or both.
 """
 
 from logger import configure_logger
-from stackmanager import StackManager
+from pipelinemanager import PipelineManager
 
 import transform_utils as tu
 
@@ -30,30 +30,49 @@ def get(event, context):
     Basic Usage:
         >>> GET /pipelines/my-pipeline/state
     Returns:
-        List: List of JSON object containing pipeline information
+        Dict: Dict with list of JSON object containing pipeline information
+        {
+            'pipelines'
+            [
+                {
+                    'name': 'mystack',
+                    'description': 'status'
+                    ...
+                }
+            ]
+        }
     """
+    pm = PipelineManager(event)
+
     data = {}
-
-    LOGGER.debug('Describing Stack:')
-
-    # Get the user id for the request
-    name = event['params']['name']
-
-    stack_name = tu.add_prefix(name)
+    data['states'] = []
     
-    # List CloudFormation Stacks
-    try:
-        resp = sm.describe_stacks(StackName=stack_name)
-    except Exception as ex:
-        LOGGER.exception(ex)
-        return tu.respond(500, 'Internal server error.')
-    else:
-        stack = resp['Stacks'][0]
-        if 'Outputs' in stack:
-            data['outputs'] = tu.kv_to_dict(stack['Outputs'], 'OutputKey', 'OutputValue')
-        
-        pipeline_name = data['outputs']['PipelineName']
-        # Get Pipeline State
-        pipeline_state = CPI_CLIENT.get_pipeline_state(PipelineName=pipeline_name)
+    stacks = pm.describe_stack()
+    stack = stacks[0]
+    outputs = tu.kv_to_dict(stack['Outputs'], 'OutputKey', 'OutputValue') if 'Outputs' in stack else []
 
-        return tu.respond(None, pipeline_state)
+    states = pm.get_pipeline_state(outputs['PipelineName'])
+    
+    for state in states:
+        keys = ['actionName', 'latestExecution']
+        actions = pm.filter_keys(state['actionStates'], keys)
+        
+        for action in actions:
+            latest_execution = action['latestExecution']
+            status = latest_execution['status'] if 'status' in latest_execution else 'N/A'
+            percent_complete = latest_execution['percentComplete'] if 'percentComplete' in latest_execution else 'N/A'
+            last_status_change = latest_execution['lastStatusChange'] if 'lastStatusChange' in latest_execution else 'N/A'
+            error_details = latest_execution['errorDetails'] if 'errorDetails' in latest_execution else 'N/A'
+
+            data['states'].append(
+                {
+                    'stage_name': state['stageName'],
+                    'name': action['actionName'],
+                    'status': status,
+                    'percent_complete': percent_complete,
+                    'last_status_change': last_status_change,
+                    'error_details': error_details
+                }
+            )
+    
+    return tu.respond(None, data)
