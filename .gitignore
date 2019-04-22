@@ -73,4 +73,7 @@ venv.bak/
 
 # mkdocs documentation
 /site
+
+# Dependencies
 template-deploy.yaml
+lambda_layers/

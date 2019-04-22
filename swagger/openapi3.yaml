@@ -1,0 +1,669 @@
+openapi: "3.0.1"
+info:
+  title: "gureume-api"
+  version: "1.0"
+servers:
+- url: "https://api.gureu.me"
+paths:
+  /apps:
+    get:
+      responses:
+        200:
+          description: "200 response"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Empty"
+      security:
+      - CognitoUserPool: []
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ListApps.Arn}/invocations
+        responses:
+          default:
+            statusCode: "200"
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        requestTemplates:
+          application/json: |
+            #set($allParams = $input.params())
+            {
+              "claims" : {
+                "email" : "$context.authorizer.claims['email']",
+                "groups" : "$context.authorizer.claims['cognito:groups']",
+                "roles" : "admin"
+              }
+            }
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws"
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateAppRequest"
+        required: true
+      responses:
+        200:
+          description: "200 response"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Empty"
+      security:
+      - CognitoUserPool: []
+      x-amazon-apigateway-integration:
+        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:789073296014:function:gureume-api-CreateApp-1C0JTD9MC795H/invocations"
+        responses:
+          default:
+            statusCode: "200"
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        requestTemplates:
+          application/json: "#set($allParams = $input.params())\n{\n  \"claims\" :\
+            \ {\n    \"email\" : \"$context.authorizer.claims['email']\",\n    \"\
+            groups\" : \"$context.authorizer.claims['cognito:groups']\",\n    \"roles\"\
+            \ : \"admin\"\n  },\n  \"body-json\" : $input.json('$')\n}\n"
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws"
+  /apps/{name}:
+    get:
+      parameters:
+      - name: "name"
+        in: "path"
+        required: true
+        schema:
+          type: "string"
+      responses:
+        200:
+          description: "200 response"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Empty"
+      security:
+      - CognitoUserPool: []
+      x-amazon-apigateway-integration:
+        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:789073296014:function:gureume-api-DescribeApp-52BLLADY3H0W/invocations"
+        responses:
+          default:
+            statusCode: "200"
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        requestTemplates:
+          application/json: "#set($allParams = $input.params())\n{\n  \"claims\" :\
+            \ {\n    \"email\" : \"$context.authorizer.claims['email']\",\n    \"\
+            groups\" : \"$context.authorizer.claims['cognito:groups']\",\n    \"roles\"\
+            \ : \"admin\"\n  },\n  \"params\" : {\n    \"name\" : \"$input.params('name')\"\
+            \n  }\n}\n"
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws"
+    delete:
+      parameters:
+      - name: "name"
+        in: "path"
+        required: true
+        schema:
+          type: "string"
+      responses:
+        200:
+          description: "200 response"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Empty"
+      security:
+      - CognitoUserPool: []
+      x-amazon-apigateway-integration:
+        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:789073296014:function:gureume-api-DeleteApp-1R14EMWNX831S/invocations"
+        responses:
+          default:
+            statusCode: "200"
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        requestTemplates:
+          application/json: "#set($allParams = $input.params())\n{\n  \"claims\" :\
+            \ {\n    \"email\" : \"$context.authorizer.claims['email']\",\n    \"\
+            groups\" : \"$context.authorizer.claims['cognito:groups']\",\n    \"roles\"\
+            \ : \"admin\"\n  },\n  \"params\" : {\n    \"name\" : \"$input.params('name')\"\
+            \n  }\n}\n"
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws"
+    patch:
+      parameters:
+      - name: "name"
+        in: "path"
+        required: true
+        schema:
+          type: "string"
+      responses:
+        200:
+          description: "200 response"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Empty"
+      security:
+      - CognitoUserPool: []
+      x-amazon-apigateway-integration:
+        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:789073296014:function:gureume-api-UpdateApp-BXIXDDUZDCUX/invocations"
+        responses:
+          default:
+            statusCode: "200"
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        requestTemplates:
+          application/json: "#set($allParams = $input.params())\n{\n  \"claims\" :\
+            \ {\n    \"email\" : \"$context.authorizer.claims['email']\",\n    \"\
+            groups\" : \"$context.authorizer.claims['cognito:groups']\",\n    \"roles\"\
+            \ : \"admin\"\n  },\n  \"params\" : {\n    \"name\" : \"$input.params('name')\"\
+            \n  },\n  \"body-json\" : $input.json('$')\n}\n"
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws"
+  /pipelines/{name}:
+    get:
+      parameters:
+      - name: "name"
+        in: "path"
+        required: true
+        schema:
+          type: "string"
+      responses:
+        200:
+          description: "200 response"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Empty"
+      security:
+      - CognitoUserPool: []
+      x-amazon-apigateway-integration:
+        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:789073296014:function:gureume-api-DescribePipeline-2KZMLEK70PFK/invocations"
+        responses:
+          default:
+            statusCode: "200"
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        requestTemplates:
+          application/json: "#set($allParams = $input.params())\n{\n  \"claims\" :\
+            \ {\n    \"email\" : \"$context.authorizer.claims['email']\",\n    \"\
+            groups\" : \"$context.authorizer.claims['cognito:groups']\",\n    \"roles\"\
+            \ : \"admin\"\n  },\n  \"params\" : {\n    \"name\" : \"$input.params('name')\"\
+            \n  }\n}\n"
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws"
+    post:
+      parameters:
+      - name: "name"
+        in: "path"
+        required: true
+        schema:
+          type: "string"
+      responses:
+        200:
+          description: "200 response"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Empty"
+      security:
+      - CognitoUserPool: []
+      x-amazon-apigateway-integration:
+        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:789073296014:function:gureume-api-CreatePipeline-1UL2C5QVHHSW0/invocations"
+        responses:
+          default:
+            statusCode: "200"
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        requestTemplates:
+          application/json: "#set($allParams = $input.params())\n{\n  \"claims\" :\
+            \ {\n    \"email\" : \"$context.authorizer.claims['email']\",\n    \"\
+            groups\" : \"$context.authorizer.claims['cognito:groups']\",\n    \"roles\"\
+            \ : \"admin\"\n  },\n  \"body-json\" : $input.json('$')\n}\n"
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws"
+    delete:
+      parameters:
+      - name: "name"
+        in: "path"
+        required: true
+        schema:
+          type: "string"
+      responses:
+        200:
+          description: "200 response"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Empty"
+      security:
+      - CognitoUserPool: []
+      x-amazon-apigateway-integration:
+        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:789073296014:function:gureume-api-DeletePipeline-99K50PCKV5SW/invocations"
+        responses:
+          default:
+            statusCode: "200"
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        requestTemplates:
+          application/json: "#set($allParams = $input.params())\n{\n  \"claims\" :\
+            \ {\n    \"email\" : \"$context.authorizer.claims['email']\",\n    \"\
+            groups\" : \"$context.authorizer.claims['cognito:groups']\",\n    \"roles\"\
+            \ : \"admin\"\n  },\n  \"params\" : {\n    \"name\" : \"$input.params('name')\"\
+            \n  }\n}\n"
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws"
+    patch:
+      parameters:
+      - name: "name"
+        in: "path"
+        required: true
+        schema:
+          type: "string"
+      responses:
+        200:
+          description: "200 response"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Empty"
+      security:
+      - CognitoUserPool: []
+      x-amazon-apigateway-integration:
+        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:789073296014:function:gureume-api-UpdatePipeline-3DQSV93K1JK5/invocations"
+        responses:
+          default:
+            statusCode: "200"
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        requestTemplates:
+          application/json: "#set($allParams = $input.params())\n{\n  \"claims\" :\
+            \ {\n    \"email\" : \"$context.authorizer.claims['email']\",\n    \"\
+            groups\" : \"$context.authorizer.claims['cognito:groups']\",\n    \"roles\"\
+            \ : \"admin\"\n  },\n  \"params\" : {\n    \"name\" : \"$input.params('name')\"\
+            \n  },\n  \"body-json\" : $input.json('$')\n}\n"
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws"
+  /services:
+    get:
+      responses:
+        200:
+          description: "200 response"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Empty"
+      security:
+      - CognitoUserPool: []
+      x-amazon-apigateway-integration:
+        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:789073296014:function:gureume-api-ListServices-1Q1W0RU7R4NOJ/invocations"
+        responses:
+          default:
+            statusCode: "200"
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        requestTemplates:
+          application/json: "#set($allParams = $input.params())\n{\n  \"claims\" :\
+            \ {\n    \"email\" : \"$context.authorizer.claims['email']\",\n    \"\
+            groups\" : \"$context.authorizer.claims['cognito:groups']\",\n    \"roles\"\
+            \ : \"admin\"\n  }\n}\n"
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws"
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateServiceRequest"
+        required: true
+      responses:
+        200:
+          description: "200 response"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Empty"
+      security:
+      - CognitoUserPool: []
+      x-amazon-apigateway-integration:
+        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:789073296014:function:gureume-api-CreateService-1159ZRP7NZROQ/invocations"
+        responses:
+          default:
+            statusCode: "200"
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        requestTemplates:
+          application/json: "#set($allParams = $input.params())\n{\n  \"claims\" :\
+            \ {\n    \"email\" : \"$context.authorizer.claims['email']\",\n    \"\
+            groups\" : \"$context.authorizer.claims['cognito:groups']\",\n    \"roles\"\
+            \ : \"admin\"\n  },\n  \"body-json\" : $input.json('$')\n}\n"
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws"
+  /services/{name}:
+    get:
+      parameters:
+      - name: "name"
+        in: "path"
+        required: true
+        schema:
+          type: "string"
+      responses:
+        200:
+          description: "200 response"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Empty"
+      security:
+      - CognitoUserPool: []
+      x-amazon-apigateway-integration:
+        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:789073296014:function:gureume-api-DescribeService-JWYVDOKOPZKP/invocations"
+        responses:
+          default:
+            statusCode: "200"
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        requestTemplates:
+          application/json: "#set($allParams = $input.params())\n{\n  \"claims\" :\
+            \ {\n    \"email\" : \"$context.authorizer.claims['email']\",\n    \"\
+            groups\" : \"$context.authorizer.claims['cognito:groups']\",\n    \"roles\"\
+            \ : \"admin\"\n  },\n  \"params\" : {\n    \"name\" : \"$input.params('name')\"\
+            \n  }\n}\n"
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws"
+    post:
+      parameters:
+      - name: "name"
+        in: "path"
+        required: true
+        schema:
+          type: "string"
+      responses:
+        200:
+          description: "200 response"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Empty"
+      security:
+      - CognitoUserPool: []
+      x-amazon-apigateway-integration:
+        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:789073296014:function:gureume-api-CreateService-1159ZRP7NZROQ/invocations"
+        responses:
+          default:
+            statusCode: "200"
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        requestTemplates:
+          application/json: "#set($allParams = $input.params())\n{\n  \"claims\" :\
+            \ {\n    \"email\" : \"$context.authorizer.claims['email']\",\n    \"\
+            groups\" : \"$context.authorizer.claims['cognito:groups']\",\n    \"roles\"\
+            \ : \"admin\"\n  },\n  \"body-json\" : $input.json('$')\n}\n"
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws"
+    delete:
+      parameters:
+      - name: "name"
+        in: "path"
+        required: true
+        schema:
+          type: "string"
+      responses:
+        200:
+          description: "200 response"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Empty"
+      security:
+      - CognitoUserPool: []
+      x-amazon-apigateway-integration:
+        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:789073296014:function:gureume-api-DeleteService-XK5SOLK461CW/invocations"
+        responses:
+          default:
+            statusCode: "200"
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        requestTemplates:
+          application/json: "#set($allParams = $input.params())\n{\n  \"claims\" :\
+            \ {\n    \"email\" : \"$context.authorizer.claims['email']\",\n    \"\
+            groups\" : \"$context.authorizer.claims['cognito:groups']\",\n    \"roles\"\
+            \ : \"admin\"\n  },\n  \"params\" : {\n    \"name\" : \"$input.params('name')\"\
+            \n  }\n}\n"
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws"
+    patch:
+      parameters:
+      - name: "name"
+        in: "path"
+        required: true
+        schema:
+          type: "string"
+      responses:
+        200:
+          description: "200 response"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Empty"
+      security:
+      - CognitoUserPool: []
+      x-amazon-apigateway-integration:
+        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:789073296014:function:gureume-api-UpdateService-ORV8V16FOMP3/invocations"
+        responses:
+          default:
+            statusCode: "200"
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        requestTemplates:
+          application/json: "#set($allParams = $input.params())\n{\n  \"claims\" :\
+            \ {\n    \"email\" : \"$context.authorizer.claims['email']\",\n    \"\
+            groups\" : \"$context.authorizer.claims['cognito:groups']\",\n    \"roles\"\
+            \ : \"admin\"\n  },\n  \"params\" : {\n    \"name\" : \"$input.params('name')\"\
+            \n  },\n  \"body-json\" : $input.json('$')\n}\n"
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws"
+  /pipelines:
+    get:
+      responses:
+        200:
+          description: "200 response"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Empty"
+      security:
+      - CognitoUserPool: []
+      x-amazon-apigateway-integration:
+        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:789073296014:function:gureume-api-ListPipelines-BS64Y4DP1RT3/invocations"
+        responses:
+          default:
+            statusCode: "200"
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        requestTemplates:
+          application/json: "#set($allParams = $input.params())\n{\n  \"claims\" :\
+            \ {\n    \"email\" : \"$context.authorizer.claims['email']\",\n    \"\
+            groups\" : \"$context.authorizer.claims['cognito:groups']\",\n    \"roles\"\
+            \ : \"admin\"\n  }\n}\n"
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws"
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePipelineRequest"
+        required: true
+      responses:
+        200:
+          description: "200 response"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Empty"
+      security:
+      - CognitoUserPool: []
+      x-amazon-apigateway-integration:
+        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:789073296014:function:gureume-api-CreatePipeline-1UL2C5QVHHSW0/invocations"
+        responses:
+          default:
+            statusCode: "200"
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        requestTemplates:
+          application/json: "#set($allParams = $input.params())\n{\n  \"claims\" :\
+            \ {\n    \"email\" : \"$context.authorizer.claims['email']\",\n    \"\
+            groups\" : \"$context.authorizer.claims['cognito:groups']\",\n    \"roles\"\
+            \ : \"admin\"\n  },\n  \"body-json\" : $input.json('$')\n}\n"
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws"
+  /pipelines/{name}/state:
+    get:
+      parameters:
+      - name: "name"
+        in: "path"
+        required: true
+        schema:
+          type: "string"
+      responses:
+        200:
+          description: "200 response"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Empty"
+      security:
+      - CognitoUserPool: []
+      x-amazon-apigateway-integration:
+        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:789073296014:function:gureume-api-DescribePipelineState-16P5Y1J4IU4RX/invocations"
+        responses:
+          default:
+            statusCode: "200"
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        requestTemplates:
+          application/json: "#set($allParams = $input.params())\n{\n  \"claims\" :\
+            \ {\n    \"email\" : \"$context.authorizer.claims['email']\",\n    \"\
+            groups\" : \"$context.authorizer.claims['cognito:groups']\",\n    \"roles\"\
+            \ : \"admin\"\n  },\n  \"params\" : {\n    \"name\" : \"$input.params('name')\"\
+            \n  }\n}\n"
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws"
+  /events/{name}:
+    get:
+      parameters:
+      - name: "name"
+        in: "path"
+        required: true
+        schema:
+          type: "string"
+      responses:
+        200:
+          description: "200 response"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Empty"
+      security:
+      - CognitoUserPool: []
+      x-amazon-apigateway-integration:
+        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:789073296014:function:gureume-api-DescribeEvents-24QJLPT43L1S/invocations"
+        responses:
+          default:
+            statusCode: "200"
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        requestTemplates:
+          application/json: "#set($allParams = $input.params())\n{\n  \"claims\" :\
+            \ {\n    \"email\" : \"$context.authorizer.claims['email']\",\n    \"\
+            groups\" : \"$context.authorizer.claims['cognito:groups']\",\n    \"roles\"\
+            \ : \"admin\"\n  },\n  \"params\" : {\n    \"name\" : \"$input.params('name')\"\
+            \n  }\n}\n"
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws"
+components:
+  schemas:
+    CreatePipelineRequest:
+      required:
+      - "app_name"
+      - "github_branch"
+      - "github_repo"
+      - "github_token"
+      - "github_user"
+      - "name"
+      type: "object"
+      properties:
+        app_name:
+          type: "string"
+        github_user:
+          type: "string"
+        app_dev:
+          type: "string"
+        github_token:
+          type: "string"
+        name:
+          type: "string"
+        github_branch:
+          type: "string"
+        app_test:
+          type: "string"
+        github_repo:
+          type: "string"
+    Empty:
+      title: "Empty Schema"
+      type: "object"
+    CreateServiceRequest:
+      required:
+      - "name"
+      - "service_bindings"
+      - "service_type"
+      type: "object"
+      properties:
+        service_type:
+          type: "string"
+        name:
+          type: "string"
+        service_version:
+          type: "string"
+        service_bindings:
+          type: "string"
+    CreateAppRequest:
+      required:
+      - "health_check_path"
+      - "name"
+      type: "object"
+      properties:
+        image:
+          type: "string"
+        name:
+          type: "string"
+        health_check_path:
+          type: "string"
+  securitySchemes:
+    CognitoUserPool:
+      type: "apiKey"
+      name: "Authorization"
+      in: "header"
+      x-amazon-apigateway-authtype: "cognito_user_pools"
+      x-amazon-apigateway-authorizer:
+        providerARNs:
+        - "arn:aws:cognito-idp:eu-west-1:789073296014:userpool/eu-west-1_ZaPgOl6cJ"
+        type: "cognito_user_pools"
+x-amazon-apigateway-binary-media-types:
+- "application/octet-stream"
+- "application/x-tar"
+- "application/zip"
+- "audio/basic"
+- "audio/ogg"
+- "audio/mp4"
+- "audio/mpeg"
+- "audio/wav"
+- "audio/webm"
+- "image/png"
+- "image/jpg"
+- "image/jpeg"
+- "image/gif"
+- "video/ogg"
+- "video/mpeg"
+- "video/webm"

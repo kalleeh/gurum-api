@@ -33,7 +33,7 @@ Parameters:
 
 Globals:
   Function:
-    Runtime: python3.6
+    Runtime: python3.7
     Timeout: 180
     Handler: index.handler
     Environment:
@@ -217,14 +217,6 @@ Resources:
                 - "cloudformation.amazonaws.com"
             Action: 
               - "sts:AssumeRole"
-          - 
-            Effect: "Allow"
-            Principal: 
-              AWS: 
-                - !GetAtt CreateAppRole.Arn
-                - !GetAtt CreatePipelineRole.Arn
-            Action: 
-              - "sts:AssumeRole"
       ManagedPolicyArns:
       - arn:aws:iam::aws:policy/PowerUserAccess
       - arn:aws:iam::aws:policy/IAMFullAccess
@@ -272,7 +264,8 @@ Resources:
                     {
                       "claims" : {
                         "email" : "$context.authorizer.claims['email']",
-                        "groups" : "$context.authorizer.claims['cognito:groups']"
+                        "groups" : "$context.authorizer.claims['cognito:groups']",
+                        "roles" : "admin"
                       }
                     }
                 passthroughBehavior: "when_no_match"
@@ -309,7 +302,8 @@ Resources:
                     {
                       "claims" : {
                         "email" : "$context.authorizer.claims['email']",
-                        "groups" : "$context.authorizer.claims['cognito:groups']"
+                        "groups" : "$context.authorizer.claims['cognito:groups']",
+                        "roles" : "admin"
                       },
                       "body-json" : $input.json('$')
                     }
@@ -347,7 +341,8 @@ Resources:
                     {
                       "claims" : {
                         "email" : "$context.authorizer.claims['email']",
-                        "groups" : "$context.authorizer.claims['cognito:groups']"
+                        "groups" : "$context.authorizer.claims['cognito:groups']",
+                        "roles" : "admin"
                       },
                       "params" : {
                         "name" : "$input.params('name')"
@@ -386,7 +381,8 @@ Resources:
                     {
                       "claims" : {
                         "email" : "$context.authorizer.claims['email']",
-                        "groups" : "$context.authorizer.claims['cognito:groups']"
+                        "groups" : "$context.authorizer.claims['cognito:groups']",
+                        "roles" : "admin"
                       },
                       "params" : {
                         "name" : "$input.params('name')"
@@ -425,7 +421,8 @@ Resources:
                     {
                       "claims" : {
                         "email" : "$context.authorizer.claims['email']",
-                        "groups" : "$context.authorizer.claims['cognito:groups']"
+                        "groups" : "$context.authorizer.claims['cognito:groups']",
+                        "roles" : "admin"
                       },
                       "params" : {
                         "name" : "$input.params('name')"
@@ -466,7 +463,8 @@ Resources:
                     {
                       "claims" : {
                         "email" : "$context.authorizer.claims['email']",
-                        "groups" : "$context.authorizer.claims['cognito:groups']"
+                        "groups" : "$context.authorizer.claims['cognito:groups']",
+                        "roles" : "admin"
                       },
                       "params" : {
                         "name" : "$input.params('name')"
@@ -501,7 +499,8 @@ Resources:
                     {
                       "claims" : {
                         "email" : "$context.authorizer.claims['email']",
-                        "groups" : "$context.authorizer.claims['cognito:groups']"
+                        "groups" : "$context.authorizer.claims['cognito:groups']",
+                        "roles" : "admin"
                       }
                     }
                 passthroughBehavior: "when_no_match"
@@ -538,7 +537,8 @@ Resources:
                     {
                       "claims" : {
                         "email" : "$context.authorizer.claims['email']",
-                        "groups" : "$context.authorizer.claims['cognito:groups']"
+                        "groups" : "$context.authorizer.claims['cognito:groups']",
+                        "roles" : "admin"
                       },
                       "body-json" : $input.json('$')
                     }
@@ -576,7 +576,8 @@ Resources:
                     {
                       "claims" : {
                         "email" : "$context.authorizer.claims['email']",
-                        "groups" : "$context.authorizer.claims['cognito:groups']"
+                        "groups" : "$context.authorizer.claims['cognito:groups']",
+                        "roles" : "admin"
                       },
                       "params" : {
                         "name" : "$input.params('name')"
@@ -615,7 +616,8 @@ Resources:
                     {
                       "claims" : {
                         "email" : "$context.authorizer.claims['email']",
-                        "groups" : "$context.authorizer.claims['cognito:groups']"
+                        "groups" : "$context.authorizer.claims['cognito:groups']",
+                        "roles" : "admin"
                       },
                       "body-json" : $input.json('$')
                     }
@@ -652,7 +654,8 @@ Resources:
                     {
                       "claims" : {
                         "email" : "$context.authorizer.claims['email']",
-                        "groups" : "$context.authorizer.claims['cognito:groups']"
+                        "groups" : "$context.authorizer.claims['cognito:groups']",
+                        "roles" : "admin"
                       },
                       "params" : {
                         "name" : "$input.params('name')"
@@ -691,12 +694,54 @@ Resources:
                     {
                       "claims" : {
                         "email" : "$context.authorizer.claims['email']",
-                        "groups" : "$context.authorizer.claims['cognito:groups']"
+                        "groups" : "$context.authorizer.claims['cognito:groups']",
+                        "roles" : "admin"
                       },
                       "params" : {
                         "name" : "$input.params('name')"
                       },
                       "body-json" : $input.json('$')
+                    }
+                passthroughBehavior: "when_no_match"
+                httpMethod: "POST"
+                contentHandling: "CONVERT_TO_TEXT"
+                type: "aws"
+          /pipelines/{name}/state:
+            get:
+              consumes:
+              - "application/json"
+              produces:
+              - "application/json"
+              parameters:
+              - name: "name"
+                in: "path"
+                required: true
+                type: "string"
+              responses:
+                '200':
+                  description: "200 response"
+                  schema:
+                    $ref: "#/definitions/Empty"
+              security:
+              - CognitoUserPool: []
+              x-amazon-apigateway-integration:
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DescribePipelineState.Arn}/invocations
+                responses:
+                  default:
+                    statusCode: "200"
+                requestTemplates:
+                  application/json: |
+                    #set($allParams = $input.params())
+                    {
+                      "claims" : {
+                        "email" : "$context.authorizer.claims['email']",
+                        "groups" : "$context.authorizer.claims['cognito:groups']",
+                        "roles" : "admin"
+                      },
+                      "params" : {
+                        "name" : "$input.params('name')"
+                      }
                     }
                 passthroughBehavior: "when_no_match"
                 httpMethod: "POST"
@@ -727,7 +772,8 @@ Resources:
                     {
                       "claims" : {
                         "email" : "$context.authorizer.claims['email']",
-                        "groups" : "$context.authorizer.claims['cognito:groups']"
+                        "groups" : "$context.authorizer.claims['cognito:groups']",
+                        "roles" : "admin"
                       }
                     }
                 passthroughBehavior: "when_no_match"
@@ -764,7 +810,8 @@ Resources:
                     {
                       "claims" : {
                         "email" : "$context.authorizer.claims['email']",
-                        "groups" : "$context.authorizer.claims['cognito:groups']"
+                        "groups" : "$context.authorizer.claims['cognito:groups']",
+                        "roles" : "admin"
                       },
                       "body-json" : $input.json('$')
                     }
@@ -802,7 +849,8 @@ Resources:
                     {
                       "claims" : {
                         "email" : "$context.authorizer.claims['email']",
-                        "groups" : "$context.authorizer.claims['cognito:groups']"
+                        "groups" : "$context.authorizer.claims['cognito:groups']",
+                        "roles" : "admin"
                       },
                       "params" : {
                         "name" : "$input.params('name')"
@@ -841,7 +889,8 @@ Resources:
                     {
                       "claims" : {
                         "email" : "$context.authorizer.claims['email']",
-                        "groups" : "$context.authorizer.claims['cognito:groups']"
+                        "groups" : "$context.authorizer.claims['cognito:groups']",
+                        "roles" : "admin"
                       },
                       "body-json" : $input.json('$')
                     }
@@ -878,7 +927,8 @@ Resources:
                     {
                       "claims" : {
                         "email" : "$context.authorizer.claims['email']",
-                        "groups" : "$context.authorizer.claims['cognito:groups']"
+                        "groups" : "$context.authorizer.claims['cognito:groups']",
+                        "roles" : "admin"
                       },
                       "params" : {
                         "name" : "$input.params('name')"
@@ -917,7 +967,8 @@ Resources:
                     {
                       "claims" : {
                         "email" : "$context.authorizer.claims['email']",
-                        "groups" : "$context.authorizer.claims['cognito:groups']"
+                        "groups" : "$context.authorizer.claims['cognito:groups']",
+                        "roles" : "admin"
                       },
                       "params" : {
                         "name" : "$input.params('name')"
@@ -1016,12 +1067,37 @@ Resources:
         - "video/mpeg"
         - "video/webm"
 
+  ### Lambda Layers ###
+  LambdaLayerVersion:
+    Type: "AWS::Serverless::LayerVersion"
+    Properties:
+      ContentUri: "lambda_layers/dependencies"
+      CompatibleRuntimes: 
+        - python3.6
+        - python3.7
+      Description: "Shared libraries across functions"
+      LayerName: shared_layer
+  
+  XRayLayerVersion:
+    Type: "AWS::Serverless::LayerVersion"
+    Properties:
+      ContentUri: "lambda_layers/aws-xray-sdk"
+      CompatibleRuntimes: 
+        - python3.6
+        - python3.7
+      Description: "AWS X-Ray SDK for Python"
+      LayerName: xray_python_layer
+
   # Apps definition
   ListApps:
     Type: 'AWS::Serverless::Function'
     Properties:
-      Handler: apps.get
-      CodeUri: src/
+      Handler: list_apps.get
+      CodeUri: src/apps
+      MemorySize: 1024
+      Layers:
+        - !Ref LambdaLayerVersion
+        - !Ref XRayLayerVersion
       Tracing: "Active"
       Events:
         ListApps:
@@ -1041,8 +1117,12 @@ Resources:
   CreateApp:
     Type: 'AWS::Serverless::Function'
     Properties:
-      Handler: apps.post
-      CodeUri: src/
+      Handler: create_app.post
+      CodeUri: src/apps
+      MemorySize: 1024
+      Layers:
+        - !Ref LambdaLayerVersion
+        - !Ref XRayLayerVersion
       Tracing: "Active"
       Events:
         CreateApp:
@@ -1065,8 +1145,12 @@ Resources:
   DescribeApp:
     Type: 'AWS::Serverless::Function'
     Properties:
-      Handler: apps_name.get
-      CodeUri: src/
+      Handler: describe_app.get
+      CodeUri: src/apps/name
+      MemorySize: 1024
+      Layers:
+        - !Ref LambdaLayerVersion
+        - !Ref XRayLayerVersion
       Tracing: "Active"
       Events:
         DescribeApp:
@@ -1086,8 +1170,12 @@ Resources:
   DeleteApp:
     Type: 'AWS::Serverless::Function'
     Properties:
-      Handler: apps_name.delete
-      CodeUri: src/
+      Handler: delete_app.delete
+      CodeUri: src/apps/name
+      MemorySize: 1024
+      Layers:
+        - !Ref LambdaLayerVersion
+        - !Ref XRayLayerVersion
       Tracing: "Active"
       Events:
         DeleteApp:
@@ -1108,8 +1196,12 @@ Resources:
   UpdateApp:
     Type: 'AWS::Serverless::Function'
     Properties:
-      Handler: apps_name.patch
-      CodeUri: src/
+      Handler: update_app.patch
+      CodeUri: src/apps/name
+      MemorySize: 1024
+      Layers:
+        - !Ref LambdaLayerVersion
+        - !Ref XRayLayerVersion
       Tracing: "Active"
       Events:
         UpdateApp:
@@ -1124,6 +1216,8 @@ Resources:
               Action:
                 - 'cloudformation:DescribeStacks'
                 - 'cloudformation:UpdateStack'
+                - 'cloudformation:ListExports'
+                - 'elasticloadbalancing:DescribeRules'
                 - 'iam:PassRole'
               Resource:
                 - '*'
@@ -1132,8 +1226,12 @@ Resources:
   DescribeEvents:
     Type: 'AWS::Serverless::Function'
     Properties:
-      Handler: events_name.get
-      CodeUri: src/
+      Handler: list_events.get
+      CodeUri: src/events
+      MemorySize: 1024
+      Layers:
+        - !Ref LambdaLayerVersion
+        - !Ref XRayLayerVersion
       Tracing: "Active"
       Events:
         DescribeEvents:
@@ -1155,8 +1253,12 @@ Resources:
   ListPipelines:
     Type: 'AWS::Serverless::Function'
     Properties:
-      Handler: pipelines.get
-      CodeUri: src/
+      Handler: list_pipelines.get
+      CodeUri: src/pipelines
+      MemorySize: 1024
+      Layers:
+        - !Ref LambdaLayerVersion
+        - !Ref XRayLayerVersion
       Tracing: "Active"
       Events:
         ListPipelines:
@@ -1176,8 +1278,12 @@ Resources:
   CreatePipeline:
     Type: 'AWS::Serverless::Function'
     Properties:
-      Handler: pipelines.post
-      CodeUri: src/
+      Handler: create_pipeline.post
+      CodeUri: src/pipelines
+      MemorySize: 1024
+      Layers:
+        - !Ref LambdaLayerVersion
+        - !Ref XRayLayerVersion
       Tracing: "Active"
       Events:
         CreatePipeline:
@@ -1199,8 +1305,12 @@ Resources:
   DescribePipeline:
     Type: 'AWS::Serverless::Function'
     Properties:
-      Handler: pipelines_name.get
-      CodeUri: src/
+      Handler: describe_pipeline.get
+      CodeUri: src/pipelines/name
+      MemorySize: 1024
+      Layers:
+        - !Ref LambdaLayerVersion
+        - !Ref XRayLayerVersion
       Tracing: "Active"
       Events:
         DescribePipeline:
@@ -1220,8 +1330,12 @@ Resources:
   DeletePipeline:
     Type: 'AWS::Serverless::Function'
     Properties:
-      Handler: pipelines_name.delete
-      CodeUri: src/
+      Handler: delete_pipeline.delete
+      CodeUri: src/pipelines/name
+      MemorySize: 1024
+      Layers:
+        - !Ref LambdaLayerVersion
+        - !Ref XRayLayerVersion
       Tracing: "Active"
       Events:
         DeletePipeline:
@@ -1242,8 +1356,12 @@ Resources:
   UpdatePipeline:
     Type: 'AWS::Serverless::Function'
     Properties:
-      Handler: pipelines_name.patch
-      CodeUri: src/
+      Handler: update_pipeline.patch
+      CodeUri: src/pipelines/name
+      MemorySize: 1024
+      Layers:
+        - !Ref LambdaLayerVersion
+        - !Ref XRayLayerVersion
       Tracing: "Active"
       Events:
         UpdatePipeline:
@@ -1258,16 +1376,46 @@ Resources:
               Action:
                 - 'cloudformation:DescribeStacks'
                 - 'cloudformation:UpdateStack'
+                - 'cloudformation:ListExports'
                 - 'iam:PassRole'
               Resource:
                 - '*'
 
-# Services definition
+  DescribePipelineState:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: describe_pipeline_state.get
+      CodeUri: src/pipelines/name/state
+      MemorySize: 1024
+      Layers:
+        - !Ref LambdaLayerVersion
+        - !Ref XRayLayerVersion
+      Tracing: "Active"
+      Events:
+        DescribePipeline:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGatewayApi
+            Path: /pipelines/{name}
+            Method: get
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - 'codepipeline:GetPipelineState'
+              Resource:
+                - '*'
+  
+  # Services definition
   ListServices:
     Type: 'AWS::Serverless::Function'
     Properties:
-      Handler: services.get
-      CodeUri: src/
+      Handler: list_services.get
+      CodeUri: src/services
+      MemorySize: 1024
+      Layers:
+        - !Ref LambdaLayerVersion
+        - !Ref XRayLayerVersion
       Tracing: "Active"
       Events:
         ListServices:
@@ -1287,8 +1435,12 @@ Resources:
   CreateService:
     Type: 'AWS::Serverless::Function'
     Properties:
-      Handler: services.post
-      CodeUri: src/
+      Handler: create_service.post
+      CodeUri: src/services
+      MemorySize: 1024
+      Layers:
+        - !Ref LambdaLayerVersion
+        - !Ref XRayLayerVersion
       Tracing: "Active"
       Events:
         CreateService:
@@ -1310,8 +1462,12 @@ Resources:
   DescribeService:
     Type: 'AWS::Serverless::Function'
     Properties:
-      Handler: services_name.get
-      CodeUri: src/
+      Handler: describe_service.get
+      CodeUri: src/services/name
+      MemorySize: 1024
+      Layers:
+        - !Ref LambdaLayerVersion
+        - !Ref XRayLayerVersion
       Tracing: "Active"
       Events:
         DescribeService:
@@ -1331,8 +1487,12 @@ Resources:
   DeleteService:
     Type: 'AWS::Serverless::Function'
     Properties:
-      Handler: services_name.delete
-      CodeUri: src/
+      Handler: delete_service.delete
+      CodeUri: src/services/name
+      MemorySize: 1024
+      Layers:
+        - !Ref LambdaLayerVersion
+        - !Ref XRayLayerVersion
       Tracing: "Active"
       Events:
         DeleteService:
@@ -1353,8 +1513,12 @@ Resources:
   UpdateService:
     Type: 'AWS::Serverless::Function'
     Properties:
-      Handler: services_name.patch
-      CodeUri: src/
+      Handler: update_service.patch
+      CodeUri: src/services/name
+      MemorySize: 1024
+      Layers:
+        - !Ref LambdaLayerVersion
+        - !Ref XRayLayerVersion
       Tracing: "Active"
       Events:
         UpdateService:
