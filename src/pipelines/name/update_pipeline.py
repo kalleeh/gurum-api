@@ -39,7 +39,8 @@ def patch(event, context):
                 "github_repo": "2048",
                 "github_branch": "master",
                 "github_token": "b248f1e7360fe21c33e12d4bca3feaweEXAMPLE",
-                "github_user": "mygithubuser"
+                "github_user": "mygithubuser",
+                "upgrade_version": "False"  [Optional] Forces platform version upgrade
             }]
     Returns:
         List: List of JSON objects containing app information

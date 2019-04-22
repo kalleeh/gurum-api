@@ -37,6 +37,7 @@ def patch(event, context):
                 "tasks": "2",
                 "health_check_path": "/health",
                 "image": "nginx:latest"     [Optional]
+                "upgrade_version": "False"  [Optional] Forces platform version upgrade
             }]
     Returns:
         List: List of JSON objects containing app information

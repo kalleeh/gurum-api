@@ -74,12 +74,16 @@ Update the bucket policy to something similar,
             "Effect": "Allow",
             "Principal": {
                 "AWS": [
-                    "arn:aws:iam::ACCOUNT_ID:role/gureume-api-CreatePipelineRole-19IKJ4QRFEF4J",
-                    "arn:aws:iam::ACCOUNT_ID:role/gureume-api-CreateAppRole-WH212SG7TQVR"
+                    "arn:aws:iam::[ACCOUNT_ID]:role/gureume-api-CreateServiceRole-1MIEWAEXAMPLE",
+                    "arn:aws:iam::[ACCOUNT_ID]:role/gureume-api-CreatePipelineRole-19IKJ4QEXAMPLE",
+                    "arn:aws:iam::[ACCOUNT_ID]:role/gureume-api-CreateAppRole-WH782EXAMPLE",
+                    "arn:aws:iam::[ACCOUNT_ID]:role/gureume-api-UpdateAppRole-M6P8CEXAMPLE",
+                    "arn:aws:iam::[ACCOUNT_ID]:role/gureume-api-UpdatePipelineRole-1Q61BEXAMPLE",
+                    "arn:aws:iam::[ACCOUNT_ID]:role/gureume-api-UpdateServiceRole-PQFE2EXAMPLE"
                 ]
             },
             "Action": "s3:GetObject",
-            "Resource": "arn:aws:s3:::STORAGE_BUCKET/cfn/app/*"
+            "Resource": "arn:aws:s3:::[STORAGE_BUCKET]/cfn/app/*"
         }
     ]
 }

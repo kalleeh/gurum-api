@@ -34,7 +34,8 @@ def patch(event, context):
         >>> Payload Example:
             [{
                 "service_name": "my-service",
-                "service_bindings": "myapp1"
+                "service_bindings": "myapp1",
+                "upgrade_version": "False"  [Optional] Forces platform version upgrade
             }]
     Returns:
         List: List of JSON objects containing service information
