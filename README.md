@@ -21,8 +21,8 @@ The templates below are included in this repository and reference architecture:
 
 | Template | Description |
 | --- | --- |
-| [lambda_layers/dependencies/](lambda_layers/dependencies/) | Shared Python libraries deployed as a Lambda Layer |
-| [src/](src/) | This is the master template - deploy it to CloudFormation and it includes all of the others automatically. |
+| [lambda_layers/dependencies/](lambda_layers/dependencies/) | Shared Python libraries deployed as a Lambda Layer. |
+| [src/](src/) | Source code for Lambda functions corresponding to API actions. |
 | [template.yaml](template.yaml) | This is the master template - deploy it to CloudFormation and it includes all of the others automatically. |
 
 ## Deployment Instructions
