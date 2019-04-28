@@ -9,11 +9,11 @@ This repository and templates deploy the management API. To modify or deploy the
 
 ### Architecture Overview
 
-![architecture-overview](images/architecture-overview.png)
+![architecture-overview](img/architecture-overview.png)
 
 ### API Overview
 
-![api-overview](images/api-overview.png)
+![api-overview](img/api-overview.png)
 
 ## Template details
 
