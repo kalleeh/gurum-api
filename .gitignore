@@ -76,4 +76,4 @@ venv.bak/
 
 # Dependencies
 template-deploy.yaml
-lambda_layers/
+lambda_layers/aws-xray-sdk

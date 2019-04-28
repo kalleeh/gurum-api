@@ -30,21 +30,10 @@ The ECS instances should also appear in the Managed Instances section of the EC2
 
 #### Cognito User Pool
 
-You'll need a Cognito User Pool to manage the identities that will authenticate through your API. [ECS Service Discovery](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/service-discovery.html#create-service-discovery)
+The base template automatically creates a Cognito User Pool to manage the identities that will authenticate through your API.
+You can modify the template to use an already existing Cognito User Pool if you like.
 
-1. Create a new service discovery namespace for our cluster
-
-    ``` bash
-    aws servicediscovery create-private-dns-namespace --name PLATFORM_NAME --vpc vpc-abcd1234 --region us-east-1
-    ```
-
-2. Using the OperationId from the previous output, verify that the private namespace was created successfully.
-
-    ``` bash
-    aws servicediscovery get-operation --operation-id h2qe3s6dxftvvt7riu6lfy2f6c3jlhf4-je6chs2e
-    ```
-
-#### Configure the template to use the Cognito User Pool
+##### Configure the template to use an existing Cognito User Pool
 
 You can adjust the Cognito User Pool ID used in this section of the [template.yaml](template.yaml) template:
 
@@ -61,9 +50,25 @@ securityDefinitions:
             - 'arn:aws:cognito-idp:REGION:ACCOUNT_ID:userpool/eu-west-1_MkMfew8eN'
 ```
 
+#### Service Discovery
+
+[ECS Service Discovery](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/service-discovery.html#create-service-discovery)
+
+1. Create a new service discovery namespace for our cluster
+
+    ``` bash
+    aws servicediscovery create-private-dns-namespace --name PLATFORM_NAME --vpc vpc-abcd1234 --region us-east-1
+    ```
+
+2. Using the OperationId from the previous output, verify that the private namespace was created successfully.
+
+    ``` bash
+    aws servicediscovery get-operation --operation-id h2qe3s6dxftvvt7riu6lfy2f6c3jlhf4-je6chs2e
+    ```
+
 #### S3 Bucket for the Product templates
 
-The CreateApp and CreatePipeline lambda requires permissions to read the templates from an S3-bucket in order to provision applications and pipelines. The templates that the functions need access to is already synchronized as part of the platform deployment however you need to add the necessary permissions for these functions to get the templates to deploy.
+Several of the lambda functions requires permissions to read the templates from an S3-bucket in order to provision applications and pipelines. The templates that the functions need access to is already synchronized as part of the platform deployment however you need to add the necessary permissions for these functions to get the templates to deploy.
 Update the bucket policy to something similar,
 
 ```json
