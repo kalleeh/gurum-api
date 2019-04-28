@@ -7,10 +7,7 @@ This reference architecture provides a set of YAML templates for deploying the G
 ![architecture-overview](images/architecture-overview.png)
 
 The architecture consists of two parts, the supporting platform and the management API.
-
-This repository consists of a set of nested templates to deploy the supporting platform:
-
-- A tiered [VPC](http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_Introduction.html) with public and private subnets, spanning an AWS region.
+This repository and templates deploy the management API. To modify or deploy the platform, please see the gureume-platform repository.
 
 ## Template details
 
@@ -20,20 +17,16 @@ The templates below are included in this repository and reference architecture:
 | --- | --- |
 | [template.yaml](template.yaml) | This is the master template - deploy it to CloudFormation and it includes all of the others automatically. |
 
-After the CloudFormation templates have been deployed, the [stack outputs](http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/outputs-section-structure.html) contain a
-
-The ECS instances should also appear in the Managed Instances section of the EC2 console.
-
 ## Deployment Instructions
 
 ### Prerequisites
 
-#### Cognito User Pool
+### Cognito User Pool
 
 The base template automatically creates a Cognito User Pool to manage the identities that will authenticate through your API.
 You can modify the template to use an already existing Cognito User Pool if you like.
 
-##### Configure the template to use an existing Cognito User Pool
+#### Configure the template to use an existing Cognito User Pool [Optional]
 
 You can adjust the Cognito User Pool ID used in this section of the [template.yaml](template.yaml) template:
 
@@ -50,23 +43,7 @@ securityDefinitions:
             - 'arn:aws:cognito-idp:REGION:ACCOUNT_ID:userpool/eu-west-1_MkMfew8eN'
 ```
 
-#### Service Discovery
-
-[ECS Service Discovery](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/service-discovery.html#create-service-discovery)
-
-1. Create a new service discovery namespace for our cluster
-
-    ``` bash
-    aws servicediscovery create-private-dns-namespace --name PLATFORM_NAME --vpc vpc-abcd1234 --region us-east-1
-    ```
-
-2. Using the OperationId from the previous output, verify that the private namespace was created successfully.
-
-    ``` bash
-    aws servicediscovery get-operation --operation-id h2qe3s6dxftvvt7riu6lfy2f6c3jlhf4-je6chs2e
-    ```
-
-#### S3 Bucket for the Product templates
+### S3 Bucket for the Product templates
 
 Several of the lambda functions requires permissions to read the templates from an S3-bucket in order to provision applications and pipelines. The templates that the functions need access to is already synchronized as part of the platform deployment however you need to add the necessary permissions for these functions to get the templates to deploy.
 Update the bucket policy to something similar,
@@ -94,16 +71,25 @@ Update the bucket policy to something similar,
 }
 ```
 
-## Pipeline Deployment
+### Manual Deployment
+
+You can use the included bash script to quickly deploy the API in your account. Modify the properties in the deploy.sh and then run the following commands.
+
+```bash
+chmod +x deploy.sh
+./deploy.sh
+```
+
+### Pipeline Deployment
 
 ![Pipeline Sample Image](img/pipeline-sample.png)
 
-## Requirements
+#### Requirements
 
 - AWS CLI already configured with Administrator access
   - Alternatively, you can use a [Cloudformation Service Role with Admin access](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-iam-servicerole.html)
 
-## Modify default pipeline settings
+#### Modify default pipeline settings
 
 If you don't use Python or don't want to trigger the Pipeline from the `master` branch you need to take additional steps.
 
@@ -150,7 +136,7 @@ Before we create this 3-environment Pipeline through Cloudformation you may want
                 RunOrder: 1
 ```
 
-## Deploy the pipeline in your account
+#### Deploy the pipeline in your account
 
 Run the following AWS CLI command to create your first pipeline for your SAM based Serverless App:
 
@@ -169,7 +155,7 @@ aws cloudformation describe-stacks \
     --query 'Stacks[].Outputs'
 ```
 
-## Release through the newly built Pipeline
+#### Release through the newly built Pipeline
 
 Although CodePipeline will orchestrate this 3-environment CI/CD pipeline we need to learn how to integrate our toolchain to fit the following sections:
 
