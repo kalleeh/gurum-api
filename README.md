@@ -4,10 +4,16 @@ This reference architecture provides a set of YAML templates for deploying the G
 
 ## Overview
 
-![architecture-overview](images/architecture-overview.png)
-
 The architecture consists of two parts, the supporting platform and the management API.
 This repository and templates deploy the management API. To modify or deploy the platform, please see the gureume-platform repository.
+
+### Architecture Overview
+
+![architecture-overview](images/architecture-overview.png)
+
+### API Overview
+
+![api-overview](images/api-overview.png)
 
 ## Template details
 
@@ -15,11 +21,19 @@ The templates below are included in this repository and reference architecture:
 
 | Template | Description |
 | --- | --- |
+| [lambda_layers/dependencies/] | Shared Python libraries deployed as a Lambda Layer |
+| [src/](template.yaml) | This is the master template - deploy it to CloudFormation and it includes all of the others automatically. |
 | [template.yaml](template.yaml) | This is the master template - deploy it to CloudFormation and it includes all of the others automatically. |
 
 ## Deployment Instructions
 
 ### Prerequisites
+
+This repository does not include a shared lambda layer with the [AWS X-Ray SDK](https://github.com/aws/aws-xray-sdk-python). You can either disable the use of AWS X-Ray in the source code or follow below instructions to create a [Lambda Deployment Package](https://docs.aws.amazon.com/lambda/latest/dg/lambda-python-how-to-create-deployment-package.html) that is referenced in the template.yaml and automatically attached as a [AWS Lambda Layer](https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html) to the required lambda functions.
+
+```bash
+[project_root] pip install aws-xray-sdk --target lambda_layers/aws-xray-sdk/python
+```
 
 ### Cognito User Pool
 
