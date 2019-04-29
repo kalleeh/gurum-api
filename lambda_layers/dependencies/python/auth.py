@@ -49,7 +49,7 @@ class Auth:
     """
 
     def __init__(self, event, required_permission, stack_type='any'):
-        self._groups, self._roles = config.get_user_context(event)
+        self._user, self._groups, self._roles = config.get_user_context(event)
         self.required_permission = required_permission
         self.stack_type = stack_type
 

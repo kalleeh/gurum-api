@@ -9,14 +9,12 @@ or other written agreement between Customer and either
 Amazon Web Services, Inc. or Amazon Web Services EMEA SARL or both.
 """
 
-import os
 import datetime
-import logging
-import boto3
 import json
 
-LOGGER = logging.getLogger()
-LOGGER.setLevel(logging.INFO)
+from logger import configure_logger
+
+LOGGER = configure_logger(__name__)
 
 
 def respond(err, res=None):

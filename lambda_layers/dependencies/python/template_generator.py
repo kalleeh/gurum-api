@@ -12,7 +12,6 @@ Amazon Web Services, Inc. or Amazon Web Services EMEA SARL or both.
 """Template Generator module
 """
 
-import boto3
 from logger import configure_logger
 
 LOGGER = configure_logger(__name__)
