@@ -58,5 +58,4 @@ def get(event, context):
                 'message': event['ResourceStatusReason']
             })
     
-    print(data)
     return tu.respond(None, data)
