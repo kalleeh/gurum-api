@@ -710,7 +710,7 @@ Resources:
                 httpMethod: "POST"
                 contentHandling: "CONVERT_TO_TEXT"
                 type: "aws"
-          /pipelines/{name}/state:
+          /pipelines/{name}/states:
             get:
               consumes:
               - "application/json"
@@ -746,6 +746,47 @@ Resources:
                       "params" : {
                         "name" : "$input.params('name')"
                       }
+                    }
+                passthroughBehavior: "when_no_match"
+                httpMethod: "POST"
+                contentHandling: "CONVERT_TO_TEXT"
+                type: "aws"
+            put:
+              consumes:
+              - "application/json"
+              produces:
+              - "application/json"
+              parameters:
+              - name: "name"
+                in: "path"
+                required: true
+                type: "string"
+              responses:
+                '200':
+                  description: "200 response"
+                  schema:
+                    $ref: '#/definitions/Empty'
+              security:
+              - CognitoUserPool: []
+              x-amazon-apigateway-integration:
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${PutPipelineState.Arn}/invocations
+                responses:
+                  default:
+                    statusCode: "200"
+                requestTemplates:
+                  application/json: |
+                    #set($allParams = $input.params())
+                    {
+                      "claims" : {
+                        "email" : "$context.authorizer.claims['email']",
+                        "groups" : "$context.authorizer.claims['cognito:groups']",
+                        "roles" : "admin"
+                      },
+                      "params" : {
+                        "name" : "$input.params('name')"
+                      },
+                      "body-json" : $input.json('$')
                     }
                 passthroughBehavior: "when_no_match"
                 httpMethod: "POST"
@@ -1038,6 +1079,19 @@ Resources:
               - github_branch
               - github_token
               - github_user
+          PutPipelineStateRequest:
+            type: object
+            properties:
+              name:
+                type: string
+              summary:
+                type: string
+              status:
+                type: string
+            required:
+              - name
+              - summary
+              - status
           CreateServiceRequest:
             type: object
             properties:
@@ -1389,7 +1443,7 @@ Resources:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: describe_pipeline_state.get
-      CodeUri: src/pipelines/name/state
+      CodeUri: src/pipelines/name/states
       MemorySize: 1024
       Layers:
         - !Ref DependenciesLayerVersion
@@ -1400,7 +1454,7 @@ Resources:
           Type: Api
           Properties:
             RestApiId: !Ref ApiGatewayApi
-            Path: /pipelines/{name}/state
+            Path: /pipelines/{name}/states
             Method: get
       Policies:
         - Statement:
@@ -1408,6 +1462,33 @@ Resources:
               Action:
                 - 'cloudformation:DescribeStacks'
                 - 'codepipeline:GetPipelineState'
+              Resource:
+                - '*'
+  
+  PutPipelineState:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: put_pipeline_state.put
+      CodeUri: src/pipelines/name/states
+      MemorySize: 1024
+      Layers:
+        - !Ref DependenciesLayerVersion
+        - !Ref XRayLayerVersion
+      Tracing: "Active"
+      Events:
+        DescribePipeline:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGatewayApi
+            Path: /pipelines/{name}/states
+            Method: put
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - 'cloudformation:DescribeStacks'
+                - 'codepipeline:GetPipelineState'
+                - 'codepipeline:PutApprovalResult'
               Resource:
                 - '*'
   

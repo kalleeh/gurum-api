@@ -75,6 +75,42 @@ class PipelineManager(StackManager):
         return states
     
 
+    def put_approval_result(self, pipeline_name, stage_name, action_name, summary, status, token):
+        """ Returns information about the state of a pipeline,
+        including the stages and actions.
+
+        Args:
+        Basic Usage:
+            >>> put_approval_result()
+        Returns:
+            Dict: Dict representing approval datetime.
+            {
+                'approvedAt': datetime(2015, 1, 1)
+            }
+        """
+        LOGGER.debug('Approving deploy for {}'.format(pipeline_name))
+
+        result = {}
+        result['summary'] = summary
+        result['status'] = status
+
+        print(result)
+        
+        try:
+            states = self.codepipeline.put_approval_result(
+                pipelineName = pipeline_name,
+                stageName = stage_name,
+                actionName = action_name,
+                result = result,
+                token = token
+                )
+        except Exception as ex:
+            LOGGER.exception(ex)
+            tu.respond(500, 'Failed to register approval result.')
+        
+        return states
+    
+
     def _generate_params(self, payload):
         """ Dynamically generates a CloudFormation compatible
         dict with the params passed in from a request payload.

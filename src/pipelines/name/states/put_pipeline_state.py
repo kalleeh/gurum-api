@@ -8,6 +8,7 @@ AWS Customer Agreement available at http://aws.amazon.com/agreement
 or other written agreement between Customer and either
 Amazon Web Services, Inc. or Amazon Web Services EMEA SARL or both.
 """
+import json
 
 from logger import configure_logger
 from pipelinemanager import PipelineManager
@@ -22,13 +23,13 @@ patch_all()
 LOGGER = configure_logger(__name__)
 
 
-def get(event, context):
+def put(event, context):
     """ Describes detailed information about a pipeline
-
+    
     Args:
-        name (string): Name of the pipeline (CloudFormation Stack)
+        summary (string): Short description of the reason for status change.
     Basic Usage:
-        >>> GET /pipelines/my-pipeline/state
+        >>> PUT /pipelines/my-pipeline/states
     Returns:
         Dict: Dict with list of JSON object containing pipeline information
         {
@@ -46,6 +47,8 @@ def get(event, context):
 
     data = {}
     data['states'] = []
+
+    payload = json.loads(event['body-json'][0])
     
     stacks = pm.describe_stack()
     stack = stacks[0]
@@ -62,17 +65,30 @@ def get(event, context):
             status = latest_execution['status'] if 'status' in latest_execution else 'N/A'
             percent_complete = latest_execution['percentComplete'] if 'percentComplete' in latest_execution else 'N/A'
             last_status_change = latest_execution['lastStatusChange'] if 'lastStatusChange' in latest_execution else 'N/A'
-            error_details = latest_execution['errorDetails'] if 'errorDetails' in latest_execution else 'N/A'
 
-            data['states'].append(
-                {
-                    'stage_name': state['stageName'],
-                    'name': action['actionName'],
-                    'status': status,
-                    'percent_complete': percent_complete,
-                    'last_status_change': last_status_change,
-                    'error_details': error_details
-                }
-            )
+            if state['stageName'] == 'ApprovalStage' and action['actionName'] == 'Approval':
+                token = latest_execution['token']
+                summary = payload['summary']
+                status = payload['status']
+
+                approval_result = pm.put_approval_result(
+                    pipeline_name = outputs['PipelineName'],
+                    stage_name = state['stageName'],
+                    action_name = action['actionName'],
+                    summary = summary,
+                    status = status,
+                    token = token
+                    )
+                
+                data['states'].append(
+                    {
+                        'stage_name': state['stageName'],
+                        'name': action['actionName'],
+                        'status': status,
+                        'percent_complete': percent_complete,
+                        'last_status_change': last_status_change,
+                        'error_details': approval_result
+                    }
+                )
     
     return tu.respond(None, data)
