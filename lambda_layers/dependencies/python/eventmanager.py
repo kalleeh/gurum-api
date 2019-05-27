@@ -74,6 +74,6 @@ class EventManager(StackManager):
                 events.append(event)
         except Exception as ex:
             LOGGER.exception(ex)
-            return tu.respond(500, 'Failed to list events.')
+            return None
 
         return events

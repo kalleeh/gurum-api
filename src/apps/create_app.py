@@ -9,6 +9,7 @@ or other written agreement between Customer and either
 Amazon Web Services, Inc. or Amazon Web Services EMEA SARL or both.
 """
 
+from exceptions import AlreadyExists
 import json
 
 from logger import configure_logger
@@ -58,11 +59,16 @@ def post(event, context):
     if not 'version' in payload:
         payload['version'] = 'latest'
     
-    resp = app.create_stack(
-        name,
-        payload
-    )
+    try:
+        resp = app.create_stack(
+            name,
+            payload
+        )
+    except AlreadyExists:
+        return tu.respond(500, 'An app with that name already exists.')
+    except Exception as ex:
+        return tu.respond(500, 'Unknown Error: {}'.format(ex))
+    else:
+        data['apps'] = resp
 
-    data['apps'] = resp
-
-    return tu.respond(None, data)
+        return tu.respond(None, data)

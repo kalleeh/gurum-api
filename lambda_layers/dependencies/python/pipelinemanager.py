@@ -68,7 +68,7 @@ class PipelineManager(StackManager):
             states = self.codepipeline.get_pipeline_state(name=pipeline_name)
         except Exception as ex:
             LOGGER.exception(ex)
-            tu.respond(500, 'Failed to fetch list of states.')
+            return None
         
         states = states['stageStates']
         
@@ -106,7 +106,7 @@ class PipelineManager(StackManager):
                 )
         except Exception as ex:
             LOGGER.exception(ex)
-            tu.respond(500, 'Failed to register approval result.')
+            raise 
         
         return states
     

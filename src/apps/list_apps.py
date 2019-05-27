@@ -50,17 +50,21 @@ def get(event, context):
     data['apps'] = []
     
     keys = ['StackName', 'Parameters', 'CreationTime', 'LastUpdatedTime']
-    stacks = app.list_stacks(keys)
-    
-    for stack in stacks:
-        name = tu.remove_prefix(stack['StackName'])
-        params = tu.kv_to_dict(stack['Parameters'], 'ParameterKey', 'ParameterValue')
-        data['apps'].append(
-            {
-                'name': name,
-                'created_at': stack['CreationTime'],
-                'updated_at': stack['LastUpdatedTime'],
-                'tasks': params['DesiredCount']
-            })
-    
-    return tu.respond(None, data)
+
+    try:
+        stacks = app.list_stacks(keys)
+    except Exception as ex:
+        return tu.respond(500, 'Unknown Error: {}'.format(ex))
+    else:
+        for stack in stacks:
+            name = tu.remove_prefix(stack['StackName'])
+            params = tu.kv_to_dict(stack['Parameters'], 'ParameterKey', 'ParameterValue')
+            data['apps'].append(
+                {
+                    'name': name,
+                    'created_at': stack['CreationTime'],
+                    'updated_at': stack['LastUpdatedTime'],
+                    'tasks': params['DesiredCount']
+                })
+        
+        return tu.respond(None, data)

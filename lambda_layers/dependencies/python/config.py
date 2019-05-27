@@ -44,7 +44,7 @@ def get_user_context(event):
     user = event['claims']['email']
     groups = event['claims']['groups']
     roles = event['claims']['roles'].split(',')
-
+    
     return user, groups, roles
 
 

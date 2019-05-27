@@ -98,7 +98,7 @@ class AppManager(StackManager):
             )['Rules']
         except Exception as ex:
             LOGGER.exception(ex)
-            raise('Internal server error.')
+            raise
 
         rules = [rule for rule in rules if rule['Priority'].isdigit()]
 

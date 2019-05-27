@@ -47,21 +47,25 @@ def get(event, context):
     data = {}
     data['apps'] = []
     
-    stacks = app.describe_stack()
-    stack = stacks[0]
-    
-    outputs = tu.kv_to_dict(stack['Outputs'], 'OutputKey', 'OutputValue') if 'Outputs' in stack else []
-    params = tu.kv_to_dict(stack['Parameters'], 'ParameterKey', 'ParameterValue')
-    tags = tu.kv_to_dict(stack['Tags'], 'Key', 'Value')
+    try:
+        stacks = app.describe_stack()
+    except Exception as ex:
+        return tu.respond(500, 'Unknown Error: {}'.format(ex))
+    else:
+        stack = stacks[0]
+        
+        outputs = tu.kv_to_dict(stack['Outputs'], 'OutputKey', 'OutputValue') if 'Outputs' in stack else []
+        params = tu.kv_to_dict(stack['Parameters'], 'ParameterKey', 'ParameterValue')
+        tags = tu.kv_to_dict(stack['Tags'], 'Key', 'Value')
 
-    data['apps'].append(
-        {
-            'name': stack['StackName'],
-            'description': stack['Description'],
-            'status': stack['StackStatus'],
-            'outputs': outputs,
-            'params': params,
-            'tags': tags
-        })
-    
-    return tu.respond(None, data)
+        data['apps'].append(
+            {
+                'name': stack['StackName'],
+                'description': stack['Description'],
+                'status': stack['StackStatus'],
+                'outputs': outputs,
+                'params': params,
+                'tags': tags
+            })
+        
+        return tu.respond(None, data)

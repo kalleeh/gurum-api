@@ -47,17 +47,21 @@ def get(event, context):
     data = {}
     data['pipelines'] = []
     
-    stacks = pm.describe_stack()
-    stack = stacks[0]
-    
-    outputs = tu.kv_to_dict(stack['Outputs'], 'OutputKey', 'OutputValue') if 'Outputs' in stack else []
+    try:
+        stacks = pm.describe_stack()
+    except Exception as ex:
+        return tu.respond(500, 'Unknown Error: {}'.format(ex))
+    else:
+        stack = stacks[0]
+        
+        outputs = tu.kv_to_dict(stack['Outputs'], 'OutputKey', 'OutputValue') if 'Outputs' in stack else []
 
-    data['pipelines'].append(
-        {
-            'name': stack['StackName'],
-            'description': stack['Description'],
-            'status': stack['StackStatus'],
-            'outputs': outputs
-        })
-    
-    return tu.respond(None, data)
+        data['pipelines'].append(
+            {
+                'name': stack['StackName'],
+                'description': stack['Description'],
+                'status': stack['StackStatus'],
+                'outputs': outputs
+            })
+        
+        return tu.respond(None, data)

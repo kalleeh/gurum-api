@@ -40,19 +40,23 @@ def get(event, context):
     data['pipelines'] = []
     
     keys = ['StackName', 'Parameters', 'CreationTime', 'LastUpdatedTime']
-    stacks = pm.list_stacks(keys)
-    
-    for stack in stacks:
-        name = tu.remove_prefix(stack['StackName'])
-        params = tu.kv_to_dict(stack['Parameters'], 'ParameterKey', 'ParameterValue')
-        data['pipelines'].append(
-            {
-                'name': name,
-                'created_at': stack['CreationTime'],
-                'updated_at': stack['LastUpdatedTime'],
-                'app_dev': params['ServiceDev'],
-                'app_test': params['ServiceTest'],
-                'app': params['ServiceProd']
-            })
 
-    return tu.respond(None, data)
+    try:
+        stacks = pm.list_stacks(keys)
+    except Exception as ex:
+        return tu.respond(500, 'Unknown Error: {}'.format(ex))
+    else:
+        for stack in stacks:
+            name = tu.remove_prefix(stack['StackName'])
+            params = tu.kv_to_dict(stack['Parameters'], 'ParameterKey', 'ParameterValue')
+            data['pipelines'].append(
+                {
+                    'name': name,
+                    'created_at': stack['CreationTime'],
+                    'updated_at': stack['LastUpdatedTime'],
+                    'app_dev': params['ServiceDev'],
+                    'app_test': params['ServiceTest'],
+                    'app': params['ServiceProd']
+                })
+
+        return tu.respond(None, data)

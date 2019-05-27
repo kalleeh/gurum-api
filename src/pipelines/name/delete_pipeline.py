@@ -37,7 +37,6 @@ def delete(event, context):
     try:
         pm.delete_stack()
     except Exception as ex:
-        LOGGER.exception(ex)
-        tu.respond(500, 'Internal server error')
+        return tu.respond(500, 'Unknown Error: {}'.format(ex))
     else:
         return tu.respond(None, 'Successfully deleted the pipeline.')

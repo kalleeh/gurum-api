@@ -61,11 +61,14 @@ def post(event, context):
     if not 'version' in payload:
         payload['version'] = 'latest'
     
-    resp = sm.create_stack(
-        name,
-        payload
-    )
+    try:
+        resp = sm.create_stack(
+            name,
+            payload
+        )
+    except Exception as ex:
+        return tu.respond(500, 'Unknown Error: {}'.format(ex))
+    else:
+        data['services'] = resp
 
-    data['services'] = resp
-
-    return tu.respond(None, data)
+        return tu.respond(None, data)

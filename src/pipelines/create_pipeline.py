@@ -64,11 +64,14 @@ def post(event, context):
     if not 'version' in payload:
         payload['version'] = 'latest'
     
-    resp = pm.create_stack(
-        name,
-        payload
-    )
+    try:
+        resp = pm.create_stack(
+            name,
+            payload
+        )
+    except Exception as ex:
+        return tu.respond(500, 'Unknown Error: {}'.format(ex))
+    else:
+        data['pipelines'] = resp
 
-    data['pipelines'] = resp
-
-    return tu.respond(None, data)
+        return tu.respond(None, data)

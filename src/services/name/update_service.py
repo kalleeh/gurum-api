@@ -57,10 +57,13 @@ def patch(event, context):
         if not sm.has_permissions(binding):
             return tu.respond(400, '{} doesn\'t exist or not enough permissions'.format(binding))
     
-    resp = sm.update_stack(
-        payload
-    )
+    try:
+        resp = sm.update_stack(
+            payload
+        )
+    except Exception as ex:
+        return tu.respond(500, 'Unknown Error: {}'.format(ex))
+    else:
+        data['services'] = resp
 
-    data['services'] = resp
-
-    return tu.respond(None, data)
+        return tu.respond(None, data)

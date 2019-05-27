@@ -45,7 +45,7 @@ def get(event, context):
     em = EventManager(event)
     data = {}
     data['events'] = []
-
+    
     for event in em.get_stack_events():
         if not 'ResourceStatusReason' in event:
             event['ResourceStatusReason'] = ""

@@ -59,14 +59,14 @@ class Auth:
         permissions to perform the requested action.
         """
         if not self.required_permission in self._get_permissions_from_roles():
-            return tu.respond(403, 'Permission denied.')
+            raise PermissionError('Permission denied.', 403)
         
         """
         Secondly validate that the tags on the stack
         matches the users groups and that it's a part of the platform.
         """
         if not self._tags_are_valid(tags, self.stack_type):
-            return tu.respond(403, 'Permission denied.')
+            raise PermissionError('Permission denied.', 403)
 
     def _tags_are_valid(self, tags, stack_type):
         stack_tags = tu.kv_to_dict(tags, 'Key', 'Value')
@@ -102,6 +102,6 @@ class Auth:
                     LOGGER.debug('Adding {} from role: {}'.format(permission, role))
                     permissions.append(permission)
         except Exception:
-            return tu.respond(403, 'Permission denied. Invalid role or role does not grant any permissions.')
+            raise PermissionError('Permission denied. Invalid role or role does not grant any permissions.', 403)
         
         return permissions

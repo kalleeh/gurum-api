@@ -37,19 +37,23 @@ def get(event, context):
     data = {}
     data['services'] = []
     
-    stacks = sm.describe_stack()
-    stack = stacks[0]
-    
-    outputs = tu.kv_to_dict(stack['Outputs'], 'OutputKey', 'OutputValue') if 'Outputs' in stack else []
-    params = tu.kv_to_dict(stack['Parameters'], 'ParameterKey', 'ParameterValue')
+    try:
+        stacks = sm.describe_stack()
+    except Exception as ex:
+        return tu.respond(500, 'Unknown Error: {}'.format(ex))
+    else:
+        stack = stacks[0]
+        
+        outputs = tu.kv_to_dict(stack['Outputs'], 'OutputKey', 'OutputValue') if 'Outputs' in stack else []
+        params = tu.kv_to_dict(stack['Parameters'], 'ParameterKey', 'ParameterValue')
 
-    data['services'].append(
-        {
-            'name': stack['StackName'],
-            'description': stack['Description'],
-            'status': stack['StackStatus'],
-            'outputs': outputs,
-            'params': params
-        })
-    
-    return tu.respond(None, data)
+        data['services'].append(
+            {
+                'name': stack['StackName'],
+                'description': stack['Description'],
+                'status': stack['StackStatus'],
+                'outputs': outputs,
+                'params': params
+            })
+        
+        return tu.respond(None, data)

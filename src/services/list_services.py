@@ -40,17 +40,21 @@ def get(event, context):
     data['services'] = []
     
     keys = ['StackName', 'Parameters', 'CreationTime', 'LastUpdatedTime']
-    stacks = sm.list_stacks(keys)
     
-    for stack in stacks:
-        name = tu.remove_prefix(stack['StackName'])
-        params = tu.kv_to_dict(stack['Parameters'], 'ParameterKey', 'ParameterValue')
-        data['services'].append(
-            {
-                'name': name,
-                'created_at': stack['CreationTime'],
-                'updated_at': stack['LastUpdatedTime'],
-                'service_bindings': params['ServiceBindings']
-            })
+    try:
+        stacks = sm.list_stacks(keys)
+    except Exception as ex:
+        return tu.respond(500, 'Unknown Error: {}'.format(ex))
+    else:
+        for stack in stacks:
+            name = tu.remove_prefix(stack['StackName'])
+            params = tu.kv_to_dict(stack['Parameters'], 'ParameterKey', 'ParameterValue')
+            data['services'].append(
+                {
+                    'name': name,
+                    'created_at': stack['CreationTime'],
+                    'updated_at': stack['LastUpdatedTime'],
+                    'service_bindings': params['ServiceBindings']
+                })
 
-    return tu.respond(None, data)
+        return tu.respond(None, data)

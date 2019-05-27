@@ -57,10 +57,13 @@ def patch(event, context):
     if not 'version' in payload:
         payload['version'] = 'latest'
     
-    resp = app.update_stack(
-        payload
-    )
-
-    data['apps'] = resp
-
-    return tu.respond(None, data)
+    try:
+        resp = app.update_stack(
+            payload
+        )
+    except Exception as ex:
+        return tu.respond(500, 'Unknown Error: {}'.format(ex))
+    else:
+        data['apps'] = resp
+        
+        return tu.respond(None, data)

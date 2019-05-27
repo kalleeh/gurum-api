@@ -13,6 +13,7 @@ from abc import ABCMeta, abstractmethod
 
 import boto3
 from botocore.exceptions import ValidationError, ClientError
+from exceptions import AlreadyExists, InvalidInput, NoSuchObject, UnknownError
 
 from logger import configure_logger
 from paginator import paginator
@@ -68,7 +69,7 @@ class StackManager():
             stacks = self.client.describe_stacks()
         except Exception as ex:
             LOGGER.exception(ex)
-            tu.respond(500, 'Failed to fetch list of stacks.')
+            raise UnknownError from ex
         
         stacks = stacks['Stacks']
         stacks = self.filter_stacks(stacks)
@@ -110,17 +111,22 @@ class StackManager():
                 RoleARN=config.PLATFORM_DEPLOYMENT_ROLE,
                 Tags=tags
             )
-        except ClientError as e:
-            if e.response['Error']['Code'] == 'AlreadyExistsException':
-                return tu.respond(400, 'A stack with that name already exists.')
-            else:
-                LOGGER.exception(e)
-                return tu.respond(400, 'Unexpected error: %s' % e)
+        except self.client.exceptions.AlreadyExistsException as ex:
+            LOGGER.exception(ex)
+            raise AlreadyExists from ex
+        except self.client.exceptions.InsufficientCapabilities as ex:
+            LOGGER.exception(ex)
+            LOGGER.debug('Error: The template contains resources with capabilities that weren\'t specified in the Capabilities parameter.')
+            raise UnknownError from ex
+        except self.client.exceptions.LimitExceeded as ex:
+            LOGGER.exception(ex)
+            LOGGER.debug('Error: The quota for the resource has already been reached.')
+            raise UnknownError from ex
         except Exception as ex:
             LOGGER.exception(ex)
-            return tu.respond(500, 'Internal server error.')
+            raise UnknownError from ex
         else:
-            return tu.respond(None, stack)
+            return stack
 
 
     def describe_stack(self):
@@ -149,7 +155,7 @@ class StackManager():
             stacks = self.client.describe_stacks(StackName=stack_name)
         except Exception as ex:
             LOGGER.exception(ex)
-            tu.respond(500, 'Failed to fetch list of stacks.')
+            raise UnknownError from ex
         
         stacks = stacks['Stacks']
         stacks = self.filter_stacks(stacks)
@@ -207,18 +213,19 @@ class StackManager():
             LOGGER.exception(e)
             if e.response['Error']['Code'] == 'ValidationError' and \
                 'does not exist' in e.response['Error']['Message']:
-                return tu.respond(None, 'Stack does not exist')
+                raise NoSuchObject from e
             if e.response['Error']['Code'] == 'ValidationError' and \
                 'ROLLBACK_COMPLETE' in e.response['Error']['Message']:
-                return tu.respond(None, 'Stack is in inconsistent state. Please re-create it.')
-        except ValidationError as e:
-            LOGGER.exception(e)
-            tu.respond(400, 'Invalid input.')
+                raise Exception('Stack is in inconsistent state. Please re-create it.')
+        except self.client.exceptions.InsufficientCapabilities as ex:
+            LOGGER.exception(ex)
+            LOGGER.debug('Error: The template contains resources with capabilities that weren\'t specified in the Capabilities parameter.')
+            raise UnknownError from ex
         except Exception as ex:
             LOGGER.exception(ex)
-            tu.respond(500, 'Unexpected error.')
+            raise UnknownError from ex
         else:
-            return tu.respond(None, stack)
+            return stack
 
 
     def delete_stack(self):
@@ -234,22 +241,23 @@ class StackManager():
         LOGGER.debug('Deleting stack: ' + stack_name)
 
         if not self.has_permissions(stack_name):
-            return tu.respond(403, 'No such object or not enough permissions.')
+            raise PermissionError('No such object or not enough permissions.')
         
         try:
             self.client.delete_stack(StackName=stack_name)
         except ClientError as e:
+            LOGGER.exception(e)
             if e.response['Error']['Code'] == 'ValidationError' and \
                 'does not exist' in e.response['Error']['Message']:
-                return tu.respond(None, 'Stack does not exist')
+                raise NoSuchObject from e
         except ValidationError as e:
             LOGGER.exception(e)
-            tu.respond(400, 'Invalid input.')
+            raise InvalidInput from e
         except Exception as ex:
             LOGGER.exception(ex)
-            tu.respond(500, 'Internal server error.')
+            raise UnknownError from ex
         else:
-            return tu.respond(None, 'Successfully deleted the stack.')
+            return True
 
 
     def filter_stacks(self, stacks):
@@ -299,7 +307,7 @@ class StackManager():
                 data.append(stack)
         except Exception as ex:
             LOGGER.exception(ex)
-            tu.respond(500, 'Unexpected error')
+            raise UnknownError from ex
         else:
             return data
     
@@ -338,10 +346,10 @@ class StackManager():
                 data.append(filtered_stack)
         except KeyError as ex:
             LOGGER.exception(ex)
-            tu.respond(500, 'KeyError: Key not found while filtering keys.')
+            raise
         except Exception as ex:
             LOGGER.exception(ex)
-            tu.respond(500, 'Unexpected error')
+            raise UnknownError from ex
         else:
             return data
         
@@ -356,12 +364,6 @@ class StackManager():
             >>> has_permissions('app')
         Returns:
             Bool: Boolean with the result of the permission check.
-            [
-                {
-                    'StackName': 'mystack',
-                    'StackStatus': 'status'
-                }
-            ]
         """
         LOGGER.debug('Validating permissions for: {}'.format(stack_name))
         
@@ -371,12 +373,12 @@ class StackManager():
             LOGGER.exception(e)
             if e.response['Error']['Code'] == 'ValidationError' and \
                 'does not exist' in e.response['Error']['Message']:
-                return False
+                raise NoSuchObject from e
             else:
-                return tu.respond(400, 'Unexpected error: %s' % e)
+                raise
         except Exception as ex:
             LOGGER.exception(ex)
-            tu.respond(500, 'Failed to fetch list of stacks.')
+            raise UnknownError from ex
         else:
             stack = stacks['Stacks'][0]
             stack_tags = tu.kv_to_dict(stack['Tags'], 'Key', 'Value')
@@ -436,7 +438,7 @@ class StackManager():
             cfn_exports = self.client.list_exports()
         except Exception as ex:
             LOGGER.exception(ex)
-            raise('Internal server error.')
+            raise UnknownError from ex
 
         exports = {}
         for export in cfn_exports['Exports']:

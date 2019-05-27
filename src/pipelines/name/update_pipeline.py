@@ -67,10 +67,13 @@ def patch(event, context):
     if 'app_test' in payload and not pm.has_permissions(payload['app_test']):
         return tu.respond(400, 'App (test) doesn\'t exist or not enough permissions')
     
-    resp = pm.update_stack(
-        payload
-    )
+    try:
+        resp = pm.update_stack(
+            payload
+        )
+    except Exception as ex:
+        return tu.respond(500, 'Unknown Error: {}'.format(ex))
+    else:
+        data['pipelines'] = resp
 
-    data['pipelines'] = resp
-
-    return tu.respond(None, data)
+        return tu.respond(None, data)
