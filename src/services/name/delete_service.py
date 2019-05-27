@@ -9,6 +9,8 @@ or other written agreement between Customer and either
 Amazon Web Services, Inc. or Amazon Web Services EMEA SARL or both.
 """
 
+from exceptions import NoSuchObject, PermissionDenied
+
 from logger import configure_logger
 from servicemanager import ServiceManager
 
@@ -39,7 +41,11 @@ def delete(event, context):
 
     try:
         sm.delete_stack()
+    except NoSuchObject:
+        return tu.respond(400, 'No such service.')
+    except PermissionDenied:
+        return tu.respond(401, 'Permission denied.')
     except Exception as ex:
         return tu.respond(500, 'Unknown Error: {}'.format(ex))
     else:
-        return tu.respond(None, 'Successfully deleted the pipeline.')
+        return tu.respond(None, 'Successfully deleted the service.')

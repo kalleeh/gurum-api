@@ -9,6 +9,8 @@ or other written agreement between Customer and either
 Amazon Web Services, Inc. or Amazon Web Services EMEA SARL or both.
 """
 
+from exceptions import NoSuchObject, PermissionDenied
+
 import json
 
 from logger import configure_logger
@@ -71,6 +73,10 @@ def patch(event, context):
         resp = pm.update_stack(
             payload
         )
+    except NoSuchObject:
+        return tu.respond(400, 'No such pipeline.')
+    except PermissionDenied:
+        return tu.respond(401, 'Permission denied.')
     except Exception as ex:
         return tu.respond(500, 'Unknown Error: {}'.format(ex))
     else:

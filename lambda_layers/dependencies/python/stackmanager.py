@@ -13,7 +13,7 @@ from abc import ABCMeta, abstractmethod
 
 import boto3
 from botocore.exceptions import ValidationError, ClientError
-from exceptions import AlreadyExists, InvalidInput, NoSuchObject, UnknownError
+from exceptions import AlreadyExists, InvalidInput, NoSuchObject, PermissionDenied, UnknownError
 
 from logger import configure_logger
 from paginator import paginator
@@ -241,7 +241,7 @@ class StackManager():
         LOGGER.debug('Deleting stack: ' + stack_name)
 
         if not self.has_permissions(stack_name):
-            raise PermissionError('No such object or not enough permissions.')
+            raise PermissionDenied
         
         try:
             self.client.delete_stack(StackName=stack_name)
@@ -250,6 +250,9 @@ class StackManager():
             if e.response['Error']['Code'] == 'ValidationError' and \
                 'does not exist' in e.response['Error']['Message']:
                 raise NoSuchObject from e
+        except PermissionDenied as e:
+            LOGGER.exception(e)
+            raise
         except ValidationError as e:
             LOGGER.exception(e)
             raise InvalidInput from e
@@ -373,12 +376,14 @@ class StackManager():
             LOGGER.exception(e)
             if e.response['Error']['Code'] == 'ValidationError' and \
                 'does not exist' in e.response['Error']['Message']:
-                raise NoSuchObject from e
-            else:
-                raise
+                return False
         except Exception as ex:
             LOGGER.exception(ex)
-            raise UnknownError from ex
+
+            """ Catch and log unhandled exceptions but just returns False.
+            This is desired if something goes wrong permissions should
+            still be denied. """
+            return False
         else:
             stack = stacks['Stacks'][0]
             stack_tags = tu.kv_to_dict(stack['Tags'], 'Key', 'Value')

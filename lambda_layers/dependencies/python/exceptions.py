@@ -15,6 +15,11 @@ class NoSuchObject(Error):
     object that doesn't exist."""
     pass
 
+class PermissionDenied(Error):
+    """Raised when an action is performed on a resource 
+    the principal doesn't have permissions to."""
+    pass
+
 class UnknownError(Error):
     """Raised for unhandled exceptions or errors
     that should be hidden from the client"""

@@ -9,6 +9,8 @@ or other written agreement between Customer and either
 Amazon Web Services, Inc. or Amazon Web Services EMEA SARL or both.
 """
 
+from exceptions import NoSuchObject, PermissionDenied
+
 import json
 
 from logger import configure_logger
@@ -55,12 +57,16 @@ def patch(event, context):
     bindings = payload['service_bindings'].split(',')
     for binding in bindings:
         if not sm.has_permissions(binding):
-            return tu.respond(400, '{} doesn\'t exist or not enough permissions'.format(binding))
+            return tu.respond(400, '{} doesn\'t exist or not enough permissions.'.format(binding))
     
     try:
         resp = sm.update_stack(
             payload
         )
+    except NoSuchObject:
+        return tu.respond(400, 'No such service.')
+    except PermissionDenied:
+        return tu.respond(401, 'Permission denied.')
     except Exception as ex:
         return tu.respond(500, 'Unknown Error: {}'.format(ex))
     else:
