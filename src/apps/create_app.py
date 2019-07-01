@@ -65,7 +65,7 @@ def post(event, context):
             payload
         )
     except AlreadyExists:
-        return tu.respond(500, 'An app with that name already exists.')
+        return tu.respond(400, 'An app with that name already exists.')
     except Exception as ex:
         return tu.respond(500, 'Unknown Error: {}'.format(ex))
     else:

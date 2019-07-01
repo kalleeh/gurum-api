@@ -24,10 +24,10 @@ LOGGER = configure_logger(__name__)
 
 
 def put(event, context):
-    """ Describes detailed information about a pipeline
+    """ Send an approval result to the approval stage of a pipeline.
     
     Args:
-        summary (string): Short description of the reason for status change.
+        summary (string): Short description of the reason for approval result.
     Basic Usage:
         >>> PUT /pipelines/my-pipeline/states
     Returns:
