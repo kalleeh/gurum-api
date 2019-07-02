@@ -21,19 +21,16 @@ Parameters:
   # Email address for Cognito Admin user
   CognitoAdminEmail:
     Type: String
-    Default: my-email@company.com
     AllowedPattern: '^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$'
     Description: E-mail address of the Cognito admin
 
   PlatformBucket:
     Description: S3 Bucket to get the product templates from
     Type: String
-    Default: "gureume-templates-bucket"
 
   PlatformRegion:
     Description: Region to deploy the platform resources in
     Type: String
-    Default: "eu-west-1"
 
   PlatformPrefix:
     Description: String to use as prefix for platform resources

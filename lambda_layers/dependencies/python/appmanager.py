@@ -71,6 +71,7 @@ class AppManager(StackManager):
 
         params['Priority'] = str(self._iterate_rule_priority(exports['LoadBalancerListener']))
         params['Listener'] = exports['LoadBalancerListener']
+        params['PlatformDomainName'] = exports['PlatformDomainName']
         params['GroupName'] = self._groups
         params = tu.dict_to_kv(params, 'ParameterKey', 'ParameterValue', clean=True)
         params = params + tu.reuse_vals(reuse_params)
