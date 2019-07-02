@@ -98,6 +98,10 @@ class StackManager():
             config.PLATFORM_BUCKET,
             self._stack_type,
             payload)
+        
+        LOGGER.debug('Generated Parameters: {}'.format(params))
+        LOGGER.debug('Generated Tags: {}'.format(tags))
+        LOGGER.debug('Using template: {}'.format(template_url))
 
         try:
             stack = self.client.create_stack(
