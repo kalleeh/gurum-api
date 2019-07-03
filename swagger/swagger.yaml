@@ -1,836 +1,890 @@
-
 swagger: "2.0"
-  info:
-    version: "1.0"
-    title: "gureume-api"
-  host: "api.gureu.me"
-  schemes:
-  - "https"
-  paths:
-    /apps:
-      get:
-        consumes:
-        - "application/json"
-        produces:
-        - "application/json"
+info:
+  version: "1.0"
+  title:
+    Fn::Sub: "${PlatformPrefix}-api"
+host: "api.gureu.me"
+schemes:
+- "https"
+paths:
+  /apps:
+    get:
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      responses:
+        '200':
+          description: "200 response"
+          schema:
+            $ref: "#/definitions/Empty"
+      security:
+      - CognitoUserPool: []
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ListApps.Arn}/invocations
         responses:
-          '200':
-            description: "200 response"
-            schema:
-              $ref: "#/definitions/Empty"
-        security:
-        - CognitoUserPool: []
-        x-amazon-apigateway-integration:
-          uri:
-            Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ListApps.Arn}/invocations
-          responses:
-            default:
-              statusCode: "200"
-          requestTemplates:
-            application/json: |
-              #set($allParams = $input.params())
-              {
-                "claims" : {
-                  "email" : "$context.authorizer.claims['email']",
-                  "groups" : "$context.authorizer.claims['cognito:groups']",
-                  "roles" : "admin"
-                }
+          default:
+            statusCode: "200"
+        requestTemplates:
+          application/json: |
+            #set($allParams = $input.params())
+            {
+              "claims" : {
+                "email" : "$context.authorizer.claims['email']",
+                "groups" : "$context.authorizer.claims['cognito:groups']",
+                "roles" : "admin"
               }
-          passthroughBehavior: "when_no_match"
-          httpMethod: "POST"
-          contentHandling: "CONVERT_TO_TEXT"
-          type: "aws"
-      post:
-        consumes:
-        - "application/json"
-        produces:
-        - "application/json"
-        parameters:
-          - name: body
-            in: body
-            required: true
-            schema:
-              $ref: '#/definitions/CreateAppRequest'
-        responses:
-          '200':
-            description: "200 response"
-            schema:
-              $ref: "#/definitions/Empty"
-        security:
-        - CognitoUserPool: []
-        x-amazon-apigateway-integration:
-          uri:
-            Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${CreateApp.Arn}/invocations
-          responses:
-            default:
-              statusCode: "200"
-          requestTemplates:
-            application/json: |
-              #set($allParams = $input.params())
-              {
-                "claims" : {
-                  "email" : "$context.authorizer.claims['email']",
-                  "groups" : "$context.authorizer.claims['cognito:groups']",
-                  "roles" : "admin"
-                },
-                "body-json" : $input.json('$')
-              }
-          passthroughBehavior: "when_no_match"
-          httpMethod: "POST"
-          contentHandling: "CONVERT_TO_TEXT"
-          type: "aws"
-    /apps/{name}:
-      get:
-        consumes:
-        - "application/json"
-        produces:
-        - "application/json"
-        parameters:
-        - name: "name"
-          in: "path"
+            }
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws"
+    post:
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+        - name: body
+          in: body
           required: true
-          type: "string"
+          schema:
+            $ref: '#/definitions/CreateAppRequest'
+      responses:
+        '200':
+          description: "200 response"
+          schema:
+            $ref: "#/definitions/Empty"
+      security:
+      - CognitoUserPool: []
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${CreateApp.Arn}/invocations
         responses:
-          '200':
-            description: "200 response"
-            schema:
-              $ref: "#/definitions/Empty"
-        security:
-        - CognitoUserPool: []
-        x-amazon-apigateway-integration:
-          uri:
-            Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DescribeApp.Arn}/invocations
-          responses:
-            default:
-              statusCode: "200"
-          requestTemplates:
-            application/json: |
-              #set($allParams = $input.params())
-              {
-                "claims" : {
-                  "email" : "$context.authorizer.claims['email']",
-                  "groups" : "$context.authorizer.claims['cognito:groups']",
-                  "roles" : "admin"
-                },
-                "params" : {
-                  "name" : "$input.params('name')"
-                }
+          default:
+            statusCode: "200"
+        requestTemplates:
+          application/json: |
+            #set($allParams = $input.params())
+            {
+              "claims" : {
+                "email" : "$context.authorizer.claims['email']",
+                "groups" : "$context.authorizer.claims['cognito:groups']",
+                "roles" : "admin"
+              },
+              "body-json" : $input.json('$')
+            }
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws"
+  /apps/{name}:
+    get:
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "name"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        '200':
+          description: "200 response"
+          schema:
+            $ref: "#/definitions/Empty"
+      security:
+      - CognitoUserPool: []
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DescribeApp.Arn}/invocations
+        responses:
+          default:
+            statusCode: "200"
+        requestTemplates:
+          application/json: |
+            #set($allParams = $input.params())
+            {
+              "claims" : {
+                "email" : "$context.authorizer.claims['email']",
+                "groups" : "$context.authorizer.claims['cognito:groups']",
+                "roles" : "admin"
+              },
+              "params" : {
+                "name" : "$input.params('name')"
               }
-          passthroughBehavior: "when_no_match"
-          httpMethod: "POST"
-          contentHandling: "CONVERT_TO_TEXT"
-          type: "aws"
-      delete:
-        consumes:
-        - "application/json"
-        produces:
-        - "application/json"
-        parameters:
-        - name: "name"
-          in: "path"
+            }
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws"
+    delete:
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "name"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        '200':
+          description: "200 response"
+          schema:
+            $ref: "#/definitions/Empty"
+      security:
+      - CognitoUserPool: []
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DeleteApp.Arn}/invocations
+        responses:
+          default:
+            statusCode: "200"
+        requestTemplates:
+          application/json: |
+            #set($allParams = $input.params())
+            {
+              "claims" : {
+                "email" : "$context.authorizer.claims['email']",
+                "groups" : "$context.authorizer.claims['cognito:groups']",
+                "roles" : "admin"
+              },
+              "params" : {
+                "name" : "$input.params('name')"
+              }
+            }
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws"
+    patch:
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "name"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        '200':
+          description: "200 response"
+          schema:
+            $ref: "#/definitions/Empty"
+      security:
+      - CognitoUserPool: []
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UpdateApp.Arn}/invocations
+        responses:
+          default:
+            statusCode: "200"
+        requestTemplates:
+          application/json: |
+            #set($allParams = $input.params())
+            {
+              "claims" : {
+                "email" : "$context.authorizer.claims['email']",
+                "groups" : "$context.authorizer.claims['cognito:groups']",
+                "roles" : "admin"
+              },
+              "params" : {
+                "name" : "$input.params('name')"
+              },
+              "body-json" : $input.json('$')
+            }
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws"
+  /events/{name}:
+    get:
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "name"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        '200':
+          description: "200 response"
+          schema:
+            $ref: "#/definitions/Empty"
+      security:
+      - CognitoUserPool: []
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DescribeEvents.Arn}/invocations
+        responses:
+          default:
+            statusCode: "200"
+        requestTemplates:
+          application/json: |
+            #set($allParams = $input.params())
+            {
+              "claims" : {
+                "email" : "$context.authorizer.claims['email']",
+                "groups" : "$context.authorizer.claims['cognito:groups']",
+                "roles" : "admin"
+              },
+              "params" : {
+                "name" : "$input.params('name')"
+              }
+            }
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws"
+  /pipelines:
+    get:
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      responses:
+        '200':
+          description: "200 response"
+          schema:
+            $ref: "#/definitions/Empty"
+      security:
+      - CognitoUserPool: []
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ListPipelines.Arn}/invocations
+        responses:
+          default:
+            statusCode: "200"
+        requestTemplates:
+          application/json: |
+            #set($allParams = $input.params())
+            {
+              "claims" : {
+                "email" : "$context.authorizer.claims['email']",
+                "groups" : "$context.authorizer.claims['cognito:groups']",
+                "roles" : "admin"
+              }
+            }
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws"
+    post:
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+        - name: body
+          in: body
           required: true
-          type: "string"
+          schema:
+            $ref: '#/definitions/CreatePipelineRequest'
+      responses:
+        '200':
+          description: "200 response"
+          schema:
+            $ref: "#/definitions/Empty"
+      security:
+      - CognitoUserPool: []
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${CreatePipeline.Arn}/invocations
         responses:
-          '200':
-            description: "200 response"
-            schema:
-              $ref: "#/definitions/Empty"
-        security:
-        - CognitoUserPool: []
-        x-amazon-apigateway-integration:
-          uri:
-            Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DeleteApp.Arn}/invocations
-          responses:
-            default:
-              statusCode: "200"
-          requestTemplates:
-            application/json: |
-              #set($allParams = $input.params())
-              {
-                "claims" : {
-                  "email" : "$context.authorizer.claims['email']",
-                  "groups" : "$context.authorizer.claims['cognito:groups']",
-                  "roles" : "admin"
-                },
-                "params" : {
-                  "name" : "$input.params('name')"
-                }
+          default:
+            statusCode: "200"
+        requestTemplates:
+          application/json: |
+            #set($allParams = $input.params())
+            {
+              "claims" : {
+                "email" : "$context.authorizer.claims['email']",
+                "groups" : "$context.authorizer.claims['cognito:groups']",
+                "roles" : "admin"
+              },
+              "body-json" : $input.json('$')
+            }
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws"
+  /pipelines/{name}:
+    get:
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "name"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        '200':
+          description: "200 response"
+          schema:
+            $ref: "#/definitions/Empty"
+      security:
+      - CognitoUserPool: []
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DescribePipeline.Arn}/invocations
+        responses:
+          default:
+            statusCode: "200"
+        requestTemplates:
+          application/json: |
+            #set($allParams = $input.params())
+            {
+              "claims" : {
+                "email" : "$context.authorizer.claims['email']",
+                "groups" : "$context.authorizer.claims['cognito:groups']",
+                "roles" : "admin"
+              },
+              "params" : {
+                "name" : "$input.params('name')"
               }
-          passthroughBehavior: "when_no_match"
-          httpMethod: "POST"
-          contentHandling: "CONVERT_TO_TEXT"
-          type: "aws"
-      patch:
-        consumes:
-        - "application/json"
-        produces:
-        - "application/json"
-        parameters:
-        - name: "name"
-          in: "path"
+            }
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws"
+    post:
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "name"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        '200':
+          description: "200 response"
+          schema:
+            $ref: "#/definitions/Empty"
+      security:
+      - CognitoUserPool: []
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${CreatePipeline.Arn}/invocations
+        responses:
+          default:
+            statusCode: "200"
+        requestTemplates:
+          application/json: |
+            #set($allParams = $input.params())
+            {
+              "claims" : {
+                "email" : "$context.authorizer.claims['email']",
+                "groups" : "$context.authorizer.claims['cognito:groups']",
+                "roles" : "admin"
+              },
+              "body-json" : $input.json('$')
+            }
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws"
+    delete:
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "name"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        '200':
+          description: "200 response"
+          schema:
+            $ref: "#/definitions/Empty"
+      security:
+      - CognitoUserPool: []
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DeletePipeline.Arn}/invocations
+        responses:
+          default:
+            statusCode: "200"
+        requestTemplates:
+          application/json: |
+            #set($allParams = $input.params())
+            {
+              "claims" : {
+                "email" : "$context.authorizer.claims['email']",
+                "groups" : "$context.authorizer.claims['cognito:groups']",
+                "roles" : "admin"
+              },
+              "params" : {
+                "name" : "$input.params('name')"
+              }
+            }
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws"
+    patch:
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "name"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        '200':
+          description: "200 response"
+          schema:
+            $ref: "#/definitions/Empty"
+      security:
+      - CognitoUserPool: []
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UpdatePipeline.Arn}/invocations
+        responses:
+          default:
+            statusCode: "200"
+        requestTemplates:
+          application/json: |
+            #set($allParams = $input.params())
+            {
+              "claims" : {
+                "email" : "$context.authorizer.claims['email']",
+                "groups" : "$context.authorizer.claims['cognito:groups']",
+                "roles" : "admin"
+              },
+              "params" : {
+                "name" : "$input.params('name')"
+              },
+              "body-json" : $input.json('$')
+            }
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws"
+  /pipelines/{name}/states:
+    get:
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "name"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        '200':
+          description: "200 response"
+          schema:
+            $ref: "#/definitions/Empty"
+      security:
+      - CognitoUserPool: []
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DescribePipelineState.Arn}/invocations
+        responses:
+          default:
+            statusCode: "200"
+        requestTemplates:
+          application/json: |
+            #set($allParams = $input.params())
+            {
+              "claims" : {
+                "email" : "$context.authorizer.claims['email']",
+                "groups" : "$context.authorizer.claims['cognito:groups']",
+                "roles" : "admin"
+              },
+              "params" : {
+                "name" : "$input.params('name')"
+              }
+            }
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws"
+    put:
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "name"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        '200':
+          description: "200 response"
+          schema:
+            $ref: '#/definitions/Empty'
+      security:
+      - CognitoUserPool: []
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${PutPipelineState.Arn}/invocations
+        responses:
+          default:
+            statusCode: "200"
+        requestTemplates:
+          application/json: |
+            #set($allParams = $input.params())
+            {
+              "claims" : {
+                "email" : "$context.authorizer.claims['email']",
+                "groups" : "$context.authorizer.claims['cognito:groups']",
+                "roles" : "admin"
+              },
+              "params" : {
+                "name" : "$input.params('name')"
+              },
+              "body-json" : $input.json('$')
+            }
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws"
+  /services:
+    get:
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      responses:
+        '200':
+          description: "200 response"
+          schema:
+            $ref: "#/definitions/Empty"
+      security:
+      - CognitoUserPool: []
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ListServices.Arn}/invocations
+        responses:
+          default:
+            statusCode: "200"
+        requestTemplates:
+          application/json: |
+            #set($allParams = $input.params())
+            {
+              "claims" : {
+                "email" : "$context.authorizer.claims['email']",
+                "groups" : "$context.authorizer.claims['cognito:groups']",
+                "roles" : "admin"
+              }
+            }
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws"
+    post:
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+        - name: body
+          in: body
           required: true
-          type: "string"
+          schema:
+            $ref: '#/definitions/CreateServiceRequest'
+      responses:
+        '200':
+          description: "200 response"
+          schema:
+            $ref: "#/definitions/Empty"
+      security:
+      - CognitoUserPool: []
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${CreateService.Arn}/invocations
         responses:
-          '200':
-            description: "200 response"
-            schema:
-              $ref: "#/definitions/Empty"
-        security:
-        - CognitoUserPool: []
-        x-amazon-apigateway-integration:
-          uri:
-            Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UpdateApp.Arn}/invocations
-          responses:
-            default:
-              statusCode: "200"
-          requestTemplates:
-            application/json: |
-              #set($allParams = $input.params())
-              {
-                "claims" : {
-                  "email" : "$context.authorizer.claims['email']",
-                  "groups" : "$context.authorizer.claims['cognito:groups']",
-                  "roles" : "admin"
-                },
-                "params" : {
-                  "name" : "$input.params('name')"
-                },
-                "body-json" : $input.json('$')
-              }
-          passthroughBehavior: "when_no_match"
-          httpMethod: "POST"
-          contentHandling: "CONVERT_TO_TEXT"
-          type: "aws"
-    /events/{name}:
-      get:
-        consumes:
-        - "application/json"
-        produces:
-        - "application/json"
-        parameters:
-        - name: "name"
-          in: "path"
-          required: true
-          type: "string"
+          default:
+            statusCode: "200"
+        requestTemplates:
+          application/json: |
+            #set($allParams = $input.params())
+            {
+              "claims" : {
+                "email" : "$context.authorizer.claims['email']",
+                "groups" : "$context.authorizer.claims['cognito:groups']",
+                "roles" : "admin"
+              },
+              "body-json" : $input.json('$')
+            }
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws"
+  /services/{name}:
+    get:
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "name"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        '200':
+          description: "200 response"
+          schema:
+            $ref: "#/definitions/Empty"
+      security:
+      - CognitoUserPool: []
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DescribeService.Arn}/invocations
         responses:
-          '200':
-            description: "200 response"
-            schema:
-              $ref: "#/definitions/Empty"
-        security:
-        - CognitoUserPool: []
-        x-amazon-apigateway-integration:
-          uri:
-            Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DescribeEvents.Arn}/invocations
-          responses:
-            default:
-              statusCode: "200"
-          requestTemplates:
-            application/json: |
-              #set($allParams = $input.params())
-              {
-                "claims" : {
-                  "email" : "$context.authorizer.claims['email']",
-                  "groups" : "$context.authorizer.claims['cognito:groups']",
-                  "roles" : "admin"
-                },
-                "params" : {
-                  "name" : "$input.params('name')"
-                }
+          default:
+            statusCode: "200"
+        requestTemplates:
+          application/json: |
+            #set($allParams = $input.params())
+            {
+              "claims" : {
+                "email" : "$context.authorizer.claims['email']",
+                "groups" : "$context.authorizer.claims['cognito:groups']",
+                "roles" : "admin"
+              },
+              "params" : {
+                "name" : "$input.params('name')"
               }
-          passthroughBehavior: "when_no_match"
-          httpMethod: "POST"
-          contentHandling: "CONVERT_TO_TEXT"
-          type: "aws"
-    /pipelines:
-      get:
-        consumes:
-        - "application/json"
-        produces:
-        - "application/json"
+            }
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws"
+    post:
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "name"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        '200':
+          description: "200 response"
+          schema:
+            $ref: "#/definitions/Empty"
+      security:
+      - CognitoUserPool: []
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${CreateService.Arn}/invocations
         responses:
-          '200':
-            description: "200 response"
-            schema:
-              $ref: "#/definitions/Empty"
-        security:
-        - CognitoUserPool: []
-        x-amazon-apigateway-integration:
-          uri:
-            Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ListPipelines.Arn}/invocations
-          responses:
-            default:
-              statusCode: "200"
-          requestTemplates:
-            application/json: |
-              #set($allParams = $input.params())
-              {
-                "claims" : {
-                  "email" : "$context.authorizer.claims['email']",
-                  "groups" : "$context.authorizer.claims['cognito:groups']",
-                  "roles" : "admin"
-                }
-              }
-          passthroughBehavior: "when_no_match"
-          httpMethod: "POST"
-          contentHandling: "CONVERT_TO_TEXT"
-          type: "aws"
-      post:
-        consumes:
-        - "application/json"
-        produces:
-        - "application/json"
-        parameters:
-          - name: body
-            in: body
-            required: true
-            schema:
-              $ref: '#/definitions/CreatePipelineRequest'
+          default:
+            statusCode: "200"
+        requestTemplates:
+          application/json: |
+            #set($allParams = $input.params())
+            {
+              "claims" : {
+                "email" : "$context.authorizer.claims['email']",
+                "groups" : "$context.authorizer.claims['cognito:groups']",
+                "roles" : "admin"
+              },
+              "body-json" : $input.json('$')
+            }
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws"
+    delete:
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "name"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        '200':
+          description: "200 response"
+          schema:
+            $ref: "#/definitions/Empty"
+      security:
+      - CognitoUserPool: []
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DeleteService.Arn}/invocations
         responses:
-          '200':
-            description: "200 response"
-            schema:
-              $ref: "#/definitions/Empty"
-        security:
-        - CognitoUserPool: []
-        x-amazon-apigateway-integration:
-          uri:
-            Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${CreatePipeline.Arn}/invocations
-          responses:
-            default:
-              statusCode: "200"
-          requestTemplates:
-            application/json: |
-              #set($allParams = $input.params())
-              {
-                "claims" : {
-                  "email" : "$context.authorizer.claims['email']",
-                  "groups" : "$context.authorizer.claims['cognito:groups']",
-                  "roles" : "admin"
-                },
-                "body-json" : $input.json('$')
+          default:
+            statusCode: "200"
+        requestTemplates:
+          application/json: |
+            #set($allParams = $input.params())
+            {
+              "claims" : {
+                "email" : "$context.authorizer.claims['email']",
+                "groups" : "$context.authorizer.claims['cognito:groups']",
+                "roles" : "admin"
+              },
+              "params" : {
+                "name" : "$input.params('name')"
               }
-          passthroughBehavior: "when_no_match"
-          httpMethod: "POST"
-          contentHandling: "CONVERT_TO_TEXT"
-          type: "aws"
-    /pipelines/{name}:
-      get:
-        consumes:
-        - "application/json"
-        produces:
-        - "application/json"
-        parameters:
-        - name: "name"
-          in: "path"
-          required: true
-          type: "string"
+            }
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws"
+    patch:
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "name"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        '200':
+          description: "200 response"
+          schema:
+            $ref: "#/definitions/Empty"
+      security:
+      - CognitoUserPool: []
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UpdateService.Arn}/invocations
         responses:
-          '200':
-            description: "200 response"
-            schema:
-              $ref: "#/definitions/Empty"
-        security:
-        - CognitoUserPool: []
-        x-amazon-apigateway-integration:
-          uri:
-            Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DescribePipeline.Arn}/invocations
-          responses:
-            default:
-              statusCode: "200"
-          requestTemplates:
-            application/json: |
-              #set($allParams = $input.params())
-              {
-                "claims" : {
-                  "email" : "$context.authorizer.claims['email']",
-                  "groups" : "$context.authorizer.claims['cognito:groups']",
-                  "roles" : "admin"
-                },
-                "params" : {
-                  "name" : "$input.params('name')"
-                }
-              }
-          passthroughBehavior: "when_no_match"
-          httpMethod: "POST"
-          contentHandling: "CONVERT_TO_TEXT"
-          type: "aws"
-      post:
-        consumes:
-        - "application/json"
-        produces:
-        - "application/json"
-        parameters:
-        - name: "name"
-          in: "path"
-          required: true
-          type: "string"
-        responses:
-          '200':
-            description: "200 response"
-            schema:
-              $ref: "#/definitions/Empty"
-        security:
-        - CognitoUserPool: []
-        x-amazon-apigateway-integration:
-          uri:
-            Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${CreatePipeline.Arn}/invocations
-          responses:
-            default:
-              statusCode: "200"
-          requestTemplates:
-            application/json: |
-              #set($allParams = $input.params())
-              {
-                "claims" : {
-                  "email" : "$context.authorizer.claims['email']",
-                  "groups" : "$context.authorizer.claims['cognito:groups']",
-                  "roles" : "admin"
-                },
-                "body-json" : $input.json('$')
-              }
-          passthroughBehavior: "when_no_match"
-          httpMethod: "POST"
-          contentHandling: "CONVERT_TO_TEXT"
-          type: "aws"
-      delete:
-        consumes:
-        - "application/json"
-        produces:
-        - "application/json"
-        parameters:
-        - name: "name"
-          in: "path"
-          required: true
-          type: "string"
-        responses:
-          '200':
-            description: "200 response"
-            schema:
-              $ref: "#/definitions/Empty"
-        security:
-        - CognitoUserPool: []
-        x-amazon-apigateway-integration:
-          uri:
-            Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DeletePipeline.Arn}/invocations
-          responses:
-            default:
-              statusCode: "200"
-          requestTemplates:
-            application/json: |
-              #set($allParams = $input.params())
-              {
-                "claims" : {
-                  "email" : "$context.authorizer.claims['email']",
-                  "groups" : "$context.authorizer.claims['cognito:groups']",
-                  "roles" : "admin"
-                },
-                "params" : {
-                  "name" : "$input.params('name')"
-                }
-              }
-          passthroughBehavior: "when_no_match"
-          httpMethod: "POST"
-          contentHandling: "CONVERT_TO_TEXT"
-          type: "aws"
-      patch:
-        consumes:
-        - "application/json"
-        produces:
-        - "application/json"
-        parameters:
-        - name: "name"
-          in: "path"
-          required: true
-          type: "string"
-        responses:
-          '200':
-            description: "200 response"
-            schema:
-              $ref: "#/definitions/Empty"
-        security:
-        - CognitoUserPool: []
-        x-amazon-apigateway-integration:
-          uri:
-            Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UpdatePipeline.Arn}/invocations
-          responses:
-            default:
-              statusCode: "200"
-          requestTemplates:
-            application/json: |
-              #set($allParams = $input.params())
-              {
-                "claims" : {
-                  "email" : "$context.authorizer.claims['email']",
-                  "groups" : "$context.authorizer.claims['cognito:groups']",
-                  "roles" : "admin"
-                },
-                "params" : {
-                  "name" : "$input.params('name')"
-                },
-                "body-json" : $input.json('$')
-              }
-          passthroughBehavior: "when_no_match"
-          httpMethod: "POST"
-          contentHandling: "CONVERT_TO_TEXT"
-          type: "aws"
-    /pipelines/{name}/state:
-      get:
-        consumes:
-        - "application/json"
-        produces:
-        - "application/json"
-        parameters:
-        - name: "name"
-          in: "path"
-          required: true
-          type: "string"
-        responses:
-          '200':
-            description: "200 response"
-            schema:
-              $ref: "#/definitions/Empty"
-        security:
-        - CognitoUserPool: []
-        x-amazon-apigateway-integration:
-          uri:
-            Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DescribePipelineState.Arn}/invocations
-          responses:
-            default:
-              statusCode: "200"
-          requestTemplates:
-            application/json: |
-              #set($allParams = $input.params())
-              {
-                "claims" : {
-                  "email" : "$context.authorizer.claims['email']",
-                  "groups" : "$context.authorizer.claims['cognito:groups']",
-                  "roles" : "admin"
-                },
-                "params" : {
-                  "name" : "$input.params('name')"
-                }
-              }
-          passthroughBehavior: "when_no_match"
-          httpMethod: "POST"
-          contentHandling: "CONVERT_TO_TEXT"
-          type: "aws"
-    /services:
-      get:
-        consumes:
-        - "application/json"
-        produces:
-        - "application/json"
-        responses:
-          '200':
-            description: "200 response"
-            schema:
-              $ref: "#/definitions/Empty"
-        security:
-        - CognitoUserPool: []
-        x-amazon-apigateway-integration:
-          uri:
-            Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ListServices.Arn}/invocations
-          responses:
-            default:
-              statusCode: "200"
-          requestTemplates:
-            application/json: |
-              #set($allParams = $input.params())
-              {
-                "claims" : {
-                  "email" : "$context.authorizer.claims['email']",
-                  "groups" : "$context.authorizer.claims['cognito:groups']",
-                  "roles" : "admin"
-                }
-              }
-          passthroughBehavior: "when_no_match"
-          httpMethod: "POST"
-          contentHandling: "CONVERT_TO_TEXT"
-          type: "aws"
-      post:
-        consumes:
-        - "application/json"
-        produces:
-        - "application/json"
-        parameters:
-          - name: body
-            in: body
-            required: true
-            schema:
-              $ref: '#/definitions/CreateServiceRequest'
-        responses:
-          '200':
-            description: "200 response"
-            schema:
-              $ref: "#/definitions/Empty"
-        security:
-        - CognitoUserPool: []
-        x-amazon-apigateway-integration:
-          uri:
-            Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${CreateService.Arn}/invocations
-          responses:
-            default:
-              statusCode: "200"
-          requestTemplates:
-            application/json: |
-              #set($allParams = $input.params())
-              {
-                "claims" : {
-                  "email" : "$context.authorizer.claims['email']",
-                  "groups" : "$context.authorizer.claims['cognito:groups']",
-                  "roles" : "admin"
-                },
-                "body-json" : $input.json('$')
-              }
-          passthroughBehavior: "when_no_match"
-          httpMethod: "POST"
-          contentHandling: "CONVERT_TO_TEXT"
-          type: "aws"
-    /services/{name}:
-      get:
-        consumes:
-        - "application/json"
-        produces:
-        - "application/json"
-        parameters:
-        - name: "name"
-          in: "path"
-          required: true
-          type: "string"
-        responses:
-          '200':
-            description: "200 response"
-            schema:
-              $ref: "#/definitions/Empty"
-        security:
-        - CognitoUserPool: []
-        x-amazon-apigateway-integration:
-          uri:
-            Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DescribeService.Arn}/invocations
-          responses:
-            default:
-              statusCode: "200"
-          requestTemplates:
-            application/json: |
-              #set($allParams = $input.params())
-              {
-                "claims" : {
-                  "email" : "$context.authorizer.claims['email']",
-                  "groups" : "$context.authorizer.claims['cognito:groups']",
-                  "roles" : "admin"
-                },
-                "params" : {
-                  "name" : "$input.params('name')"
-                }
-              }
-          passthroughBehavior: "when_no_match"
-          httpMethod: "POST"
-          contentHandling: "CONVERT_TO_TEXT"
-          type: "aws"
-      post:
-        consumes:
-        - "application/json"
-        produces:
-        - "application/json"
-        parameters:
-        - name: "name"
-          in: "path"
-          required: true
-          type: "string"
-        responses:
-          '200':
-            description: "200 response"
-            schema:
-              $ref: "#/definitions/Empty"
-        security:
-        - CognitoUserPool: []
-        x-amazon-apigateway-integration:
-          uri:
-            Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${CreateService.Arn}/invocations
-          responses:
-            default:
-              statusCode: "200"
-          requestTemplates:
-            application/json: |
-              #set($allParams = $input.params())
-              {
-                "claims" : {
-                  "email" : "$context.authorizer.claims['email']",
-                  "groups" : "$context.authorizer.claims['cognito:groups']",
-                  "roles" : "admin"
-                },
-                "body-json" : $input.json('$')
-              }
-          passthroughBehavior: "when_no_match"
-          httpMethod: "POST"
-          contentHandling: "CONVERT_TO_TEXT"
-          type: "aws"
-      delete:
-        consumes:
-        - "application/json"
-        produces:
-        - "application/json"
-        parameters:
-        - name: "name"
-          in: "path"
-          required: true
-          type: "string"
-        responses:
-          '200':
-            description: "200 response"
-            schema:
-              $ref: "#/definitions/Empty"
-        security:
-        - CognitoUserPool: []
-        x-amazon-apigateway-integration:
-          uri:
-            Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DeleteService.Arn}/invocations
-          responses:
-            default:
-              statusCode: "200"
-          requestTemplates:
-            application/json: |
-              #set($allParams = $input.params())
-              {
-                "claims" : {
-                  "email" : "$context.authorizer.claims['email']",
-                  "groups" : "$context.authorizer.claims['cognito:groups']",
-                  "roles" : "admin"
-                },
-                "params" : {
-                  "name" : "$input.params('name')"
-                }
-              }
-          passthroughBehavior: "when_no_match"
-          httpMethod: "POST"
-          contentHandling: "CONVERT_TO_TEXT"
-          type: "aws"
-      patch:
-        consumes:
-        - "application/json"
-        produces:
-        - "application/json"
-        parameters:
-        - name: "name"
-          in: "path"
-          required: true
-          type: "string"
-        responses:
-          '200':
-            description: "200 response"
-            schema:
-              $ref: "#/definitions/Empty"
-        security:
-        - CognitoUserPool: []
-        x-amazon-apigateway-integration:
-          uri:
-            Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UpdateService.Arn}/invocations
-          responses:
-            default:
-              statusCode: "200"
-          requestTemplates:
-            application/json: |
-              #set($allParams = $input.params())
-              {
-                "claims" : {
-                  "email" : "$context.authorizer.claims['email']",
-                  "groups" : "$context.authorizer.claims['cognito:groups']",
-                  "roles" : "admin"
-                },
-                "params" : {
-                  "name" : "$input.params('name')"
-                },
-                "body-json" : $input.json('$')
-              }
-          passthroughBehavior: "when_no_match"
-          httpMethod: "POST"
-          contentHandling: "CONVERT_TO_TEXT"
-          type: "aws"
-  securityDefinitions:
-    CognitoUserPool:
-      in: header
-      type: apiKey
-      name: Authorization
-      x-amazon-apigateway-authtype: cognito_user_pools
-      x-amazon-apigateway-authorizer:
-        type: cognito_user_pools
-        providerARNs:
-          - !GetAtt UserPool.Arn
-  definitions:
-    Empty:
-      type: "object"
-      title: "Empty Schema"
-    CreateAppRequest:
-      type: object
-      properties:
-        name:
-          type: string
-        tasks:
-          type: int
-        health_check_path:
-          type: string
-        image:
-          type: string
-      required:
-        - name
-        - tasks
-        - health_check_path
-    CreatePipelineRequest:
-      type: object
-      properties:
-        name:
-          type: string
-        app_name:
-          type: string
-        app_dev:
-          type: string
-        app_test:
-          type: string
-        github_repo:
-          type: string
-        github_branch:
-          type: string
-        github_token:
-          type: string
-        github_user:
-          type: string
-      required:
-        - name
-        - app_name
-        - github_repo
-        - github_branch
-        - github_token
-        - github_user
-    CreateServiceRequest:
-      type: object
-      properties:
-        name:
-          type: string
-        service_type:
-          type: string
-        service_bindings:
-          type: string
-        service_version:
-          type: string
-      required:
-        - name
-        - service_type
-        - service_bindings
-  x-amazon-apigateway-binary-media-types:
-  - "application/octet-stream"
-  - "application/x-tar"
-  - "application/zip"
-  - "audio/basic"
-  - "audio/ogg"
-  - "audio/mp4"
-  - "audio/mpeg"
-  - "audio/wav"
-  - "audio/webm"
-  - "image/png"
-  - "image/jpg"
-  - "image/jpeg"
-  - "image/gif"
-  - "video/ogg"
-  - "video/mpeg"
-  - "video/webm"
+          default:
+            statusCode: "200"
+        requestTemplates:
+          application/json: |
+            #set($allParams = $input.params())
+            {
+              "claims" : {
+                "email" : "$context.authorizer.claims['email']",
+                "groups" : "$context.authorizer.claims['cognito:groups']",
+                "roles" : "admin"
+              },
+              "params" : {
+                "name" : "$input.params('name')"
+              },
+              "body-json" : $input.json('$')
+            }
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws"
+securityDefinitions:
+  CognitoUserPool:
+    in: header
+    type: apiKey
+    name: Authorization
+    x-amazon-apigateway-authtype: cognito_user_pools
+    x-amazon-apigateway-authorizer:
+      type: cognito_user_pools
+      providerARNs:
+        - Fn::GetAtt: UserPool.Arn
+definitions:
+  Empty:
+    type: "object"
+    title: "Empty Schema"
+  CreateAppRequest:
+    type: object
+    properties:
+      name:
+        type: string
+      tasks:
+        type: int
+      health_check_path:
+        type: string
+      image:
+        type: string
+    required:
+      - name
+      - tasks
+      - health_check_path
+  CreatePipelineRequest:
+    type: object
+    properties:
+      name:
+        type: string
+      app_name:
+        type: string
+      app_dev:
+        type: string
+      app_test:
+        type: string
+      github_repo:
+        type: string
+      github_branch:
+        type: string
+      github_token:
+        type: string
+      github_user:
+        type: string
+    required:
+      - name
+      - app_name
+      - github_repo
+      - github_branch
+      - github_token
+      - github_user
+  PutPipelineStateRequest:
+    type: object
+    properties:
+      name:
+        type: string
+      summary:
+        type: string
+      status:
+        type: string
+    required:
+      - name
+      - summary
+      - status
+  CreateServiceRequest:
+    type: object
+    properties:
+      name:
+        type: string
+      service_type:
+        type: string
+      service_bindings:
+        type: string
+      service_version:
+        type: string
+    required:
+      - name
+      - service_type
+      - service_bindings
+x-amazon-apigateway-binary-media-types:
+- "application/octet-stream"
+- "application/x-tar"
+- "application/zip"
+- "audio/basic"
+- "audio/ogg"
+- "audio/mp4"
+- "audio/mpeg"
+- "audio/wav"
+- "audio/webm"
+- "image/png"
+- "image/jpg"
+- "image/jpeg"
+- "image/gif"
+- "video/ogg"
+- "video/mpeg"
+- "video/webm"
