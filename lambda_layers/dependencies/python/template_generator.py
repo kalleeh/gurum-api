@@ -23,11 +23,11 @@ def generate_template_url(region, bucket, stack_type, payload):
     """
 
     if stack_type == 'app':
-        prefix_path = 'cfn/apps'
+        prefix_path = 'apps'
     elif stack_type == 'pipeline':
-        prefix_path = 'cfn/pipelines'
+        prefix_path = 'pipelines'
     elif stack_type == 'service':
-        prefix_path = 'cfn/services'
+        prefix_path = 'services'
     
     template_url = 'https://s3.amazonaws.com/{}/{}/{}-{}-{}.yaml'.format(
         bucket,
