@@ -17,16 +17,6 @@ Description: >
 
 Parameters:
 
-  # Email address for Cognito Admin user
-  CognitoAdminEmail:
-    Type: String
-    AllowedPattern: '^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$'
-    Description: E-mail address of the Cognito admin
-
-  PlatformRegion:
-    Description: Region to deploy the platform resources in
-    Type: String
-
   PlatformPrefix:
     Description: String to use as prefix for platform resources
     Type: String
@@ -39,9 +29,9 @@ Globals:
     Handler: index.handler
     Environment:
       Variables:
-        PLATFORM_REGION: !Ref PlatformRegion
+        PLATFORM_REGION: !Ref "AWS::Region"
         PLATFORM_PREFIX: !Sub "${PlatformPrefix}-"
-        PLATFORM_BUCKET: !Ref PlatformBucket
+        PLATFORM_BUCKET: !Ref ProductsBucket
         PLATFORM_DEPLOYMENT_ROLE: !GetAtt DeploymentRole.Arn
 
   Api:
@@ -50,10 +40,10 @@ Globals:
 Resources:
 
   #
-  # Platform Bucket
+  # Products Bucket
   #
   # Bucket to hold templates for apps, pipelines and services
-  PlatformBucket:
+  ProductsBucket:
     Type: AWS::S3::Bucket
     Properties:
       AccessControl: BucketOwnerFullControl
@@ -64,11 +54,11 @@ Resources:
       VersioningConfiguration:
         Status: Enabled
   
-  PlatformBucketPolicy:
+  ProductsBucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
       Bucket:
-        Ref: PlatformBucket
+        Ref: ProductsBucket
       PolicyDocument:
         Statement:
         - Action:
@@ -76,7 +66,7 @@ Resources:
           - s3:List*
           Effect: Allow
           Resource:
-          - Fn::Sub: arn:aws:s3:::${PlatformBucket}/*
+          - Fn::Sub: arn:aws:s3:::${ProductsBucket}/*
           Principal:
             AWS:
               - !GetAtt CreateAppRole.Arn
@@ -229,17 +219,6 @@ Resources:
       Roles:
         authenticated: !GetAtt CognitoAuthorizedRole.Arn
         unauthenticated: !GetAtt CognitoUnAuthorizedRole.Arn
-
-  AdminUser:
-    Type: 'AWS::Cognito::UserPoolUser'
-    Properties:
-      DesiredDeliveryMediums:
-        - 'EMAIL'
-      UserAttributes:
-        - Name: email
-          Value: !Ref CognitoAdminEmail
-      Username: !Ref CognitoAdminEmail
-      UserPoolId: !Ref UserPool
   
   DeploymentRole:
     Type: AWS::IAM::Role
