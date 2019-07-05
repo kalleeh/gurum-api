@@ -92,7 +92,7 @@ Once you have the API up and running you will need to configure your developer a
 
 2.1.2 Select `Users and groups` from the navigation panel under general settings.
 
-2.1.3 From the group tab create a new group for each team and assign the correct roles created in the last step. *Note: the group name should match the 'team name' defined in the policy.*
+2.1.3 From the group tab create a new group for each team and assign the correct IAM role created in the last step. *Note: the group name should match the 'team name' defined in the policy.*
 
 #### 2.2 Create Users
 
