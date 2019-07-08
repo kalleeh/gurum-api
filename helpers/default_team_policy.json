@@ -1,0 +1,29 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": [
+                "logs:Describe*",
+                "logs:Get*",
+                "logs:List*",
+                "logs:TestMetricFilter"
+            ],
+            "Effect": "Allow",
+            "Resource": "*"
+        },
+        {
+            "Action": [
+                "logs:FilterLogEvents"
+            ],
+            "Effect": "Allow",
+            "Resource": "arn:aws:logs:[Enter region id]:[Enter account id]:log-group:[Enter team name]*"
+        },
+        {
+            "Action": [
+                "logs:FilterLogEvents"
+            ],
+            "Effect": "Allow",
+            "Resource": "arn:aws:logs:[Enter region id]:[Enter account id]:log-group:/aws/codebuild/*"
+        }
+    ]
+}
