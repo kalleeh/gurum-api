@@ -104,7 +104,6 @@ def dict_to_kv(my_dict, key_name, value_name, clean=False):
             }
         ]
     """
-
     my_list = []
     for k, v in my_dict.items():
         if clean and v == None:
@@ -175,15 +174,31 @@ def reuse_vals(key_names, key_type='param'):
     return my_list
 
 
-def boto_exception(err):
-    """
-    generic error message handler
-    """
-    if hasattr(err, 'error_message'):
-        error = err.error_message
-    elif hasattr(err, 'message'):
-        error = err.message + ' ' + str(err) + ' - ' + str(type(err))
-    else:
-        error = '%s: %s' % (Exception, err)
+def build_nested_helper(path, value, container):
+    """ Helper function for build_nested function """
+    segs = path.split('/')
+    head = segs[0]
+    tail = segs[1:]
 
-    return error
+    if not tail:
+        # found end of path, write value to key
+        container[head] = value
+        LOGGER.debug('Wrote {} to {}'.format(value, head))
+    elif not head or 'gureume' in head:
+        # don't create container if empty or is platform name
+        build_nested_helper('/'.join(tail), value, container)
+    else:
+        if head not in container:
+            container[head] = {}
+        build_nested_helper('/'.join(tail), value, container[head])
+
+
+def build_nested(paths):
+    """ Function to build a python dict representing 
+    a SSM parameter paths """
+    container = {}
+
+    for path, value in paths.items():
+        build_nested_helper(path, value, container)
+    print(container)
+    return container

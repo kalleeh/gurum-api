@@ -75,31 +75,4 @@ def get_ssm_params():
     # think about paging
     ssm_params = tu.kv_to_dict(ssm_params, 'Name', 'Value')
 
-    return build_nested(ssm_params)
-
-
-def build_nested_helper(path, value, container):
-    segs = path.split('/')
-    head = segs[0]
-    tail = segs[1:]
-
-    if not tail:
-        # found end of path, write value to key
-        container[head] = value
-        LOGGER.debug('Wrote {} to {}'.format(value, head))
-    elif not head or 'gureume' in head:
-        # don't create container if empty or is platform name
-        build_nested_helper('/'.join(tail), value, container)
-    else:
-        if head not in container:
-            container[head] = {}
-        build_nested_helper('/'.join(tail), value, container[head])
-
-
-def build_nested(paths):
-    container = {}
-
-    for path, value in paths.items():
-        build_nested_helper(path, value, container)
-    print(container)
-    return container
+    return tu.build_nested(ssm_params)
