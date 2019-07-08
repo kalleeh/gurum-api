@@ -129,7 +129,6 @@ class PipelineManager(StackManager):
             ]
         """
         params = {}
-        # exports = self._get_exports()
         
         # mark parameters that should be re-used in CloudFormation and modify depending on payload.
         reuse_params = []

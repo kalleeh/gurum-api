@@ -61,18 +61,16 @@ class AppManager(StackManager):
             ]
         """
         params = {}
-        exports = self._get_exports()
+        ssm = config.get_ssm_params()
         
         # mark parameters that should be re-used in CloudFormation and modify depending on payload.
         reuse_params = []
         params['DesiredCount'] = payload['tasks'] if 'tasks' in payload else reuse_params.append('DesiredCount')
         params['HealthCheckPath'] = payload['health_check_path'] if 'health_check_path' in payload else reuse_params.append('HealthCheckPath')
         params['DockerImage'] = payload['image'] if 'image' in payload else reuse_params.append('DockerImage')
-
-        params['Priority'] = str(self._iterate_rule_priority(exports['LoadBalancerListener']))
-        params['Listener'] = exports['LoadBalancerListener']
-        params['PlatformDomainName'] = exports['PlatformDomainName']
-        params['GroupName'] = self._groups
+        
+        # we need to dynamically generate the priorty param to insert since it's required by cfn
+        params['Priority'] = str(self._iterate_rule_priority(ssm['platform']['loadbalancer']['listener-arn']))
         params = tu.dict_to_kv(params, 'ParameterKey', 'ParameterValue', clean=True)
         params = params + tu.reuse_vals(reuse_params)
 
