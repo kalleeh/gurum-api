@@ -14,6 +14,9 @@ Config information passed to each command
 """
 
 import os
+import boto3
+
+import transform_utils as tu
 
 from logger import configure_logger
 
@@ -58,3 +61,45 @@ def get_request_params(event):
         params = event['params']
 
     return params
+
+
+def get_ssm_params():
+    """
+    Get the users groups and roles from the claims
+    in the Lambda event
+    """
+    SSM_CLIENT = boto3.client('ssm', PLATFORM_REGION)
+    ssm_params = SSM_CLIENT.get_parameters_by_path(Path='/gureume', Recursive=True)
+    ssm_params = ssm_params['Parameters']
+
+    # think about paging
+    ssm_params = tu.kv_to_dict(ssm_params, 'Name', 'Value')
+
+    return build_nested(ssm_params)
+
+
+def build_nested_helper(path, value, container):
+    segs = path.split('/')
+    head = segs[0]
+    tail = segs[1:]
+
+    if not tail:
+        # found end of path, write value to key
+        container[head] = value
+        LOGGER.debug('Wrote {} to {}'.format(value, head))
+    elif not head or 'gureume' in head:
+        # don't create container if empty or is platform name
+        build_nested_helper('/'.join(tail), value, container)
+    else:
+        if head not in container:
+            container[head] = {}
+        build_nested_helper('/'.join(tail), value, container[head])
+
+
+def build_nested(paths):
+    container = {}
+
+    for path, value in paths.items():
+        build_nested_helper(path, value, container)
+    print(container)
+    return container

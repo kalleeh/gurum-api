@@ -41,13 +41,12 @@ def datetime_serialize(o):
         return o.strftime('%Y-%m-%d %H:%M:%S')
 
 
-def subdict(dict, keys):
+def filter_dict(dict, keys):
     """ Dict modifier to only return selected keys
     Args:
         dict (dict): Dict to remove items from.
         keys (list): List of keys to save and return.
     """
-    
     # Create an empty key if requested key does not exist in dict
     for key in keys:
         if not key in dict.keys():
