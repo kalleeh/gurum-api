@@ -211,8 +211,9 @@ Resources:
             Action:
               - 'sts:AssumeRole'
 
+  # Default Managed Policy for 
   CognitoDefaultGroupPolicy:
-    Type: 'AWS::IAM::Policy'
+    Type: 'AWS::IAM::ManagedPolicy'
     Properties:
       PolicyName: CognitoDefaultGroupPolicy
       PolicyDocument:
