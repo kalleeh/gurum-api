@@ -37,8 +37,11 @@ def patch(event, context):
         >>> Payload Example:
             [{
                 "tasks": "2",
-                "health_check_path": "/health",
-                "image": "nginx:latest"     [Optional]
+                "health_check_path": "/",   [Optional]
+                "tasks": "1",               [Optional]
+                "image": "nginx:latest",    [Optional]
+                "subtype": "shared-lb",     [Optional]
+                "version": "latest"         [Optional] No effect unless upgrade_version is True
                 "upgrade_version": "False"  [Optional] Forces platform version upgrade
             }]
     Returns:

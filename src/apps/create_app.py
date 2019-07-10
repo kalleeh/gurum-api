@@ -9,7 +9,7 @@ or other written agreement between Customer and either
 Amazon Web Services, Inc. or Amazon Web Services EMEA SARL or both.
 """
 
-from exceptions import AlreadyExists
+from exceptions import AlreadyExists, InsufficientCapabilities, LimitExceeded
 import json
 
 from logger import configure_logger
@@ -35,9 +35,11 @@ def post(event, context):
         >>> Payload Example:
             {
                 "name": "my-app",
-                "tasks": "1",
-                "health_check_path": "/health",
-                "image": "nginx:latest" [Optional]
+                "health_check_path": "/",   [Optional]
+                "tasks": "1",               [Optional]
+                "image": "nginx:latest",    [Optional]
+                "subtype": "shared-lb",     [Optional]
+                "version": "latest"         [Optional]
             }
     Returns:
         List: List of JSON objects containing app information
@@ -48,6 +50,7 @@ def post(event, context):
     data['apps'] = []
 
     payload = json.loads(event['body-json'][0])
+    LOGGER.debug('Received payload:\n{}'.format(payload))
 
     """
     Configure default values if not present
@@ -67,6 +70,8 @@ def post(event, context):
     except AlreadyExists:
         return tu.respond(400, 'An app with that name already exists.')
     except Exception as ex:
+        LOGGER.debug('Received payload:\n{}'.format(payload))
+        LOGGER.debug('Exception:\n{}'.format(ex))
         return tu.respond(500, 'Unknown Error: {}'.format(ex))
     else:
         data['apps'] = resp

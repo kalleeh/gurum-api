@@ -20,6 +20,16 @@ class PermissionDenied(Error):
     the principal doesn't have permissions to."""
     pass
 
+class LimitExceeded(Error):
+    """Raised for unhandled exceptions or errors
+    that should be hidden from the client"""
+    pass
+
+class InsufficientCapabilities(Error):
+    """Raised for unhandled exceptions or errors
+    that should be hidden from the client"""
+    pass
+
 class UnknownError(Error):
     """Raised for unhandled exceptions or errors
     that should be hidden from the client"""
