@@ -59,27 +59,10 @@ Once you have the API up and running you will need to configure your developer a
     "Statement": [
         {
             "Action": [
-                "logs:Describe*",
-                "logs:Get*",
-                "logs:List*",
-                "logs:TestMetricFilter"
-            ],
-            "Effect": "Allow",
-            "Resource": "*"
-        },
-        {
-            "Action": [
                 "logs:FilterLogEvents"
             ],
             "Effect": "Allow",
-            "Resource": "arn:aws:logs:[Enter region id]:[Enter account id]:log-group:[Enter team name]*"
-        },
-        {
-            "Action": [
-                "logs:FilterLogEvents"
-            ],
-            "Effect": "Allow",
-            "Resource": "arn:aws:logs:[Enter region id]:[Enter account id]:log-group:/aws/codebuild/*"
+            "Resource": "arn:aws:logs:[Enter region id]:[Enter account id]:log-group:*"
         }
     ]
 }
@@ -96,6 +79,4 @@ Once you have the API up and running you will need to configure your developer a
 
 #### 2.2 Create Users
 
-2.2.1 From the `Users and groups` page, select `Create user` and enter the user's details.
-
-2.2.2 Go back to the groups that you created in the last section and added the newly created users to the correct groups.
+2.2.1 Use the `./helpers/cognito_quick_user.sh` script to create a new cognito user.
