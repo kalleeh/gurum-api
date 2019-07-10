@@ -211,22 +211,13 @@ Resources:
             Action:
               - 'sts:AssumeRole'
 
-  # Default Managed Policy for 
   CognitoDefaultGroupPolicy:
     Type: 'AWS::IAM::ManagedPolicy'
     Properties:
-      PolicyName: CognitoDefaultGroupPolicy
+      PolicyName: !Sub ${PlatformPrefix}_CognitoDefaultGroupPolicy
       PolicyDocument:
         Version: "2012-10-17"
         Statement:
-          -
-            Effect: 'Allow'
-            Action:
-              - 'logs:Describe*'
-              - 'logs:Get*'
-              - 'logs:List*'
-              - 'logs:TestMetricFilter'
-            Resource: '*'
           -
             Effect: 'Allow'
             Action:
