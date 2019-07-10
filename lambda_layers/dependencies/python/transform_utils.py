@@ -39,6 +39,8 @@ def datetime_serialize(o):
     """
     if isinstance(o, datetime.datetime):
         return o.strftime('%Y-%m-%d %H:%M:%S')
+    else:
+        return '?'
 
 
 def filter_dict(dict, keys):
