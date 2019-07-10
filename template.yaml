@@ -211,19 +211,6 @@ Resources:
             Action:
               - 'sts:AssumeRole'
 
-  CognitoDefaultGroupPolicy:
-    Type: 'AWS::IAM::ManagedPolicy'
-    Properties:
-      PolicyName: !Sub ${PlatformPrefix}_CognitoDefaultGroupPolicy
-      PolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          -
-            Effect: 'Allow'
-            Action:
-              - 'logs:FilterLogEvents'
-            Resource: !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*'
-
   # Assigns the roles to the Identity Pool
   IdentityPoolRoleMapping:
     Type: 'AWS::Cognito::IdentityPoolRoleAttachment'
