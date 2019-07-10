@@ -18,6 +18,7 @@ from stackmanager import StackManager
 
 import transform_utils as tu
 import template_generator as tg
+import ssm_helper
 import config
 
 from aws_xray_sdk.core import xray_recorder
@@ -61,13 +62,15 @@ class AppManager(StackManager):
             ]
         """
         params = {}
-        ssm = config.get_ssm_params()
+        LOGGER.debug('Generating parameters.')
+        ssm = ssm_helper.get_ssm_params()
         
         # mark parameters that should be re-used in CloudFormation and modify depending on payload.
         reuse_params = []
         params['DesiredCount'] = payload['tasks'] if 'tasks' in payload else reuse_params.append('DesiredCount')
         params['HealthCheckPath'] = payload['health_check_path'] if 'health_check_path' in payload else reuse_params.append('HealthCheckPath')
         params['DockerImage'] = payload['image'] if 'image' in payload else reuse_params.append('DockerImage')
+        LOGGER.debug('Reusing parameters: {}'.format(reuse_params))
         
         # we need to dynamically generate the priorty param to insert since it's required by cfn
         params['Priority'] = str(self._iterate_rule_priority(ssm['platform']['loadbalancer']['listener-arn']))

@@ -13,7 +13,7 @@ from abc import ABCMeta, abstractmethod
 
 import boto3
 from botocore.exceptions import ValidationError, ClientError
-from exceptions import AlreadyExists, InvalidInput, NoSuchObject, PermissionDenied, UnknownError
+from exceptions import AlreadyExists, InvalidInput, NoSuchObject, PermissionDenied, InsufficientCapabilities, LimitExceeded, UnknownError
 
 from logger import configure_logger
 from paginator import paginator
@@ -89,7 +89,6 @@ class StackManager():
         Returns:
             List: List of ..
         """
-        LOGGER.debug('Creating stack: {}'.format(stack_name))
 
         params = self._generate_params(payload)
         tags = self._generate_tags(payload)
@@ -99,10 +98,7 @@ class StackManager():
             self._stack_type,
             payload)
         
-        LOGGER.debug('Generated Parameters: {}'.format(params))
-        LOGGER.debug('Generated Tags: {}'.format(tags))
-        LOGGER.debug('Using template: {}'.format(template_url))
-
+        LOGGER.debug('Creating stack: {}'.format(stack_name))
         try:
             stack = self.client.create_stack(
                 StackName=stack_name,
@@ -121,30 +117,27 @@ class StackManager():
         except self.client.exceptions.InsufficientCapabilities as ex:
             LOGGER.exception(ex)
             LOGGER.debug('Error: The template contains resources with capabilities that weren\'t specified in the Capabilities parameter.')
-            raise UnknownError from ex
+            raise InsufficientCapabilities from ex
         except self.client.exceptions.LimitExceeded as ex:
             LOGGER.exception(ex)
             LOGGER.debug('Error: The quota for the resource has already been reached.')
-            raise UnknownError from ex
+            raise LimitExceeded from ex
         except Exception as ex:
             LOGGER.exception(ex)
+            LOGGER.debug('Unknown error: {}'.format(ex))
             raise UnknownError from ex
         else:
             return stack
 
 
     def describe_stack(self):
-        """ List of stacks validating they are stacks in the platform
-        and belongs to the user performing the request and returns the chosen
-        keys (arg) for those stacks.
+        """ Describe a stack validating it is in the platform
+        and belongs to the user performing the request.
 
-        Args:
-            stack_type (string): Filter based on stack type, valid options are
-                'app','pipeline' or 'any'
         Basic Usage:
-            >>> list_stacks('app')
+            >>> describe_stack('app')
         Returns:
-            List: List of dicts representing AWS Stacks and information
+            Dict: Dict representing AWS Stacks and information
             [
                 {
                     'StackName': 'mystack',
@@ -426,35 +419,6 @@ class StackManager():
         if tags[config.PLATFORM_TAGS['GROUPS']] == self._groups:
             return True
 
-
-    def _get_exports(self):
-        """ Gets the CloudFormation Exports in the region and returns
-        a flat dict of key:value pairs
-
-        Args:
-        Basic Usage:
-            >>> resp = get_exports()
-        Returns:
-            Dict: Dict of key:value pairs representing AWS output
-            {
-                'MyExportName': 'MyExportValue',
-                'MyExportName2': 'MyExportValue2'
-            }
-        """
-        cfn_exports = {}
-
-        try:
-            cfn_exports = self.client.list_exports()
-        except Exception as ex:
-            LOGGER.exception(ex)
-            raise UnknownError from ex
-
-        exports = {}
-        for export in cfn_exports['Exports']:
-            exports[export['Name']] = export['Value']
-
-        return exports
-
     
     @abstractmethod
     def _generate_params(self, payload):
@@ -482,6 +446,7 @@ class StackManager():
             ]
         """
         tags = {}
+        LOGGER.debug('Fetching platform Tags.')
 
         tags[config.PLATFORM_TAGS['TYPE']] = self._stack_type
         tags[config.PLATFORM_TAGS['SUBTYPE']] = payload['subtype']
@@ -490,5 +455,7 @@ class StackManager():
         tags[config.PLATFORM_TAGS['REGION']] = config.PLATFORM_REGION
         tags[config.PLATFORM_TAGS['OWNER']] = self._user
         tags = tu.dict_to_kv(tags, 'Key', 'Value')
+
+        LOGGER.debug('Loaded Tags:\n {} '.format(tags))
 
         return tags

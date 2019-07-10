@@ -21,6 +21,7 @@ def generate_template_url(region, bucket, stack_type, payload):
     """Generates a template URL to pass to CloudFormation based on input
     parameters for type, region, version etc.
     """
+    LOGGER.debug('Generating template URL.')
 
     if stack_type == 'app':
         prefix_path = 'apps'
@@ -37,4 +38,6 @@ def generate_template_url(region, bucket, stack_type, payload):
         payload['version']
     )
     
+    LOGGER.debug('Returning template URL: {}'.format(template_url))
+
     return template_url

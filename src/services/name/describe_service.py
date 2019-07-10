@@ -51,15 +51,13 @@ def get(event, context):
         stack = stacks[0]
         
         outputs = tu.kv_to_dict(stack['Outputs'], 'OutputKey', 'OutputValue') if 'Outputs' in stack else []
-        params = tu.kv_to_dict(stack['Parameters'], 'ParameterKey', 'ParameterValue')
 
         data['services'].append(
             {
                 'name': stack['StackName'],
                 'description': stack['Description'],
                 'status': stack['StackStatus'],
-                'outputs': outputs,
-                'params': params
+                'outputs': outputs
             })
         
         return tu.respond(None, data)

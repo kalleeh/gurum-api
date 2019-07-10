@@ -759,8 +759,6 @@ Resources:
           Type: "String"
           Value: !Ref UserPool
           Description: "Cognito User Pool ID to be used by clients."
-          Tags:
-              "Environment": !Ref AWS::StackName
 
   CognitoIdentityPoolIDParam:
       Type: "AWS::SSM::Parameter"
@@ -769,8 +767,6 @@ Resources:
           Type: "String"
           Value: !Ref IdentityPool
           Description: "Cognito User Pool ID to be used by clients."
-          Tags:
-              "Environment": !Ref AWS::StackName
 
   CognitoAppClientIDParam:
       Type: "AWS::SSM::Parameter"
@@ -779,8 +775,6 @@ Resources:
           Type: "String"
           Value: !Ref UserPoolClient
           Description: "Cognito App Client ID to be used by clients."
-          Tags:
-              "Environment": !Ref AWS::StackName
 
   APIGatewayProdEndpointParam:
       Type: "AWS::SSM::Parameter"
@@ -789,18 +783,3 @@ Resources:
           Type: "String"
           Value: !Sub "https://${ApiGatewayApi}.execute-api.${AWS::Region}.amazonaws.com/v1/"
           Description: "API Endpoint for the API."
-          Tags:
-              "Environment": !Ref AWS::StackName
-Outputs:
-
-    CognitoUserPoolID:
-      Description: Cognito User Pool ID to be used by clients
-      Value: !Ref UserPool
-
-    CognitoIdentityPoolID:
-      Description: Cognito Identity Pool ID to be used by clients
-      Value: !Ref IdentityPool
-
-    CognitoAppClientID:
-      Description: Cognito App Client ID to be used by clients
-      Value: !Ref UserPoolClient

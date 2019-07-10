@@ -16,6 +16,8 @@ Config information passed to each command
 import os
 import boto3
 
+from paginator import paginator
+
 import transform_utils as tu
 
 from logger import configure_logger
@@ -61,18 +63,3 @@ def get_request_params(event):
         params = event['params']
 
     return params
-
-
-def get_ssm_params():
-    """
-    Get the users groups and roles from the claims
-    in the Lambda event
-    """
-    SSM_CLIENT = boto3.client('ssm', PLATFORM_REGION)
-    ssm_params = SSM_CLIENT.get_parameters_by_path(Path='/gureume', Recursive=True)
-    ssm_params = ssm_params['Parameters']
-
-    # think about paging
-    ssm_params = tu.kv_to_dict(ssm_params, 'Name', 'Value')
-
-    return tu.build_nested(ssm_params)
