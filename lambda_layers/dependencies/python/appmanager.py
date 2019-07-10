@@ -63,7 +63,7 @@ class AppManager(StackManager):
         """
         params = {}
         LOGGER.debug('Generating parameters.')
-        ssm = ssm_helper.get_ssm_params()
+        ssm = ssm_helper.get_params()
         
         # mark parameters that should be re-used in CloudFormation and modify depending on payload.
         reuse_params = []
