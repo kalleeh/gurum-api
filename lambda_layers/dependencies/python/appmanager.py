@@ -10,18 +10,14 @@ Amazon Web Services, Inc. or Amazon Web Services EMEA SARL or both.
 """
 
 import boto3
-from botocore.exceptions import ValidationError, ClientError
 
 from logger import configure_logger
-from paginator import paginator
 from stackmanager import StackManager
 
 import transform_utils as tu
-import template_generator as tg
 import ssm_helper
 import config
 
-from aws_xray_sdk.core import xray_recorder
 from aws_xray_sdk.core import patch_all
 
 patch_all()
@@ -33,16 +29,16 @@ LOGGER = configure_logger(__name__)
 Application Stack Manager
 """
 
+
 class AppManager(StackManager):
     def __init__(self, event):
         self._stack_type = 'app'
-        
+
         StackManager.__init__(
             self,
             event=event,
             stack_type=self._stack_type
         )
-    
 
     def _generate_params(self, payload):
         """ Dynamically generates a CloudFormation compatible
@@ -64,21 +60,29 @@ class AppManager(StackManager):
         params = {}
         LOGGER.debug('Generating parameters.')
         ssm = ssm_helper.get_params()
-        
-        # mark parameters that should be re-used in CloudFormation and modify depending on payload.
+
+        # mark parameters that should be re-used in CloudFormation and
+        # modify depending on payload.
         reuse_params = []
         params['DesiredCount'] = payload['tasks'] if 'tasks' in payload else reuse_params.append('DesiredCount')
         params['HealthCheckPath'] = payload['health_check_path'] if 'health_check_path' in payload else reuse_params.append('HealthCheckPath')
         params['DockerImage'] = payload['image'] if 'image' in payload else reuse_params.append('DockerImage')
-        LOGGER.debug('Reusing parameters: {}'.format(reuse_params))
-        
-        # we need to dynamically generate the priorty param to insert since it's required by cfn
-        params['Priority'] = str(self._iterate_rule_priority(ssm['platform']['loadbalancer']['listener-arn']))
-        params = tu.dict_to_kv(params, 'ParameterKey', 'ParameterValue', clean=True)
+        LOGGER.debug(
+            'Reusing parameters: %s',
+            reuse_params)
+
+        # we need to dynamically generate the priorty param to insert
+        # since it's required by CFN.
+        params['Priority'] = str(self._iterate_rule_priority(
+            ssm['platform']['loadbalancer']['listener-arn']))
+        params = tu.dict_to_kv(
+            params,
+            'ParameterKey',
+            'ParameterValue',
+            clean=True)
         params = params + tu.reuse_vals(reuse_params)
 
         return params
-
 
     def _iterate_rule_priority(self, listener_arn):
         """ Returns the next rule priority number for a given ALB Listener Arn

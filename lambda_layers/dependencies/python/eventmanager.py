@@ -35,13 +35,12 @@ Stack Event Manager
 class EventManager(StackManager):
     def __init__(self, event):
         self._stack_type = 'any'
-        
+
         StackManager.__init__(
             self,
             event=event,
             stack_type=self._stack_type
         )
-
 
     def get_stack_events(self, max_items=10):
         """ Return stack events for the queried stack.
@@ -60,7 +59,9 @@ class EventManager(StackManager):
             ]
         """
         name = tu.add_prefix(self._params['name'])
-        LOGGER.debug('Getting events for stack {}:'.format(name))
+        LOGGER.debug(
+            'Getting events for stack %s:',
+            name)
         events = []
 
         try:

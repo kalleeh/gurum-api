@@ -9,11 +9,6 @@ or other written agreement between Customer and either
 Amazon Web Services, Inc. or Amazon Web Services EMEA SARL or both.
 """
 
-"""
-Helper for managing SSM parameters
-"""
-
-import os
 import boto3
 
 from paginator import paginator
@@ -27,7 +22,9 @@ LOGGER = configure_logger(__name__)
 
 
 def get_params(path='/gureume', max_items=100):
-    LOGGER.debug('Fetching SSM parameters.')
+    LOGGER.debug(
+        'Fetching SSM parameters.')
+
     SSM_CLIENT = boto3.client('ssm', config.PLATFORM_REGION)
     params = []
 
@@ -43,12 +40,16 @@ def get_params(path='/gureume', max_items=100):
             params.append(param)
     except Exception as ex:
         LOGGER.exception(ex)
-    
-    LOGGER.debug('Got params from SSM:\n {} '.format(params))
-    
+
+    LOGGER.debug(
+        'Got params from SSM: %s',
+        params)
+
     ssm_params = tu.kv_to_dict(params, 'Name', 'Value')
     ssm_params = tu.build_nested(ssm_params)
 
-    LOGGER.debug('Loaded SSM Dictionary into Config:\n {} '.format(ssm_params))
-    
+    LOGGER.debug(
+        'Loaded SSM Dictionary into Config: %s',
+        ssm_params)
+
     return ssm_params

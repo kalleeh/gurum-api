@@ -14,7 +14,6 @@ from pipelinemanager import PipelineManager
 
 import transform_utils as tu
 
-from aws_xray_sdk.core import xray_recorder
 from aws_xray_sdk.core import patch_all
 
 patch_all()
@@ -24,8 +23,9 @@ LOGGER = configure_logger(__name__)
 
 def get(event, context):
     """ Returns the pipelines belonging to the authenticated user.
-    It uses filter_stacks() to filter the CloudFormation stacks with type 'pipeline'
-    and owner belonging to the same Cognito group as the user is logged in as.
+    It uses filter_stacks() to filter the CloudFormation stacks with type
+    'pipeline' and owner belonging to the same Cognito group as the user
+    is logged in as.
 
     Args:
         None:
@@ -38,7 +38,7 @@ def get(event, context):
 
     data = {}
     data['pipelines'] = []
-    
+
     keys = ['StackName', 'Parameters', 'CreationTime', 'LastUpdatedTime']
 
     try:
@@ -47,8 +47,12 @@ def get(event, context):
         return tu.respond(500, 'Unknown Error: {}'.format(ex))
     else:
         for stack in stacks:
-            name = tu.remove_prefix(stack['StackName'])
-            params = tu.kv_to_dict(stack['Parameters'], 'ParameterKey', 'ParameterValue')
+            name = tu.remove_prefix(
+                stack['StackName'])
+            params = tu.kv_to_dict(
+                stack['Parameters'],
+                'ParameterKey',
+                'ParameterValue')
             data['pipelines'].append(
                 {
                     'name': name,

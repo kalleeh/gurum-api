@@ -10,17 +10,13 @@ Amazon Web Services, Inc. or Amazon Web Services EMEA SARL or both.
 """
 
 import boto3
-from botocore.exceptions import ValidationError, ClientError
 
 from logger import configure_logger
-from paginator import paginator
 from stackmanager import StackManager
 
 import transform_utils as tu
-import template_generator as tg
 import config
 
-from aws_xray_sdk.core import xray_recorder
 from aws_xray_sdk.core import patch_all
 
 patch_all()
