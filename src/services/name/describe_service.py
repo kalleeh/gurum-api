@@ -38,7 +38,7 @@ def get(event, context):
 
     data = {}
     data['services'] = []
-    
+
     try:
         stacks = sm.describe_stack()
     except NoSuchObject:
@@ -49,7 +49,7 @@ def get(event, context):
         return tu.respond(500, 'Unknown Error: {}'.format(ex))
     else:
         stack = stacks[0]
-        
+
         outputs = tu.kv_to_dict(stack['Outputs'], 'OutputKey', 'OutputValue') if 'Outputs' in stack else []
 
         data['services'].append(
@@ -59,5 +59,5 @@ def get(event, context):
                 'status': stack['StackStatus'],
                 'outputs': outputs
             })
-        
+
         return tu.respond(None, data)

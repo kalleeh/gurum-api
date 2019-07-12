@@ -29,13 +29,13 @@ Application Stack Manager
 class ServiceManager(StackManager):
     def __init__(self, event):
         self._stack_type = 'service'
-        
+
         StackManager.__init__(
             self,
             event=event,
             stack_type=self._stack_type
         )
-    
+
 
     def _generate_params(self, payload):
         """ Dynamically generates a CloudFormation compatible
@@ -55,13 +55,13 @@ class ServiceManager(StackManager):
             ]
         """
         params = {}
-        
+
         # mark parameters that should be re-used in CloudFormation and modify depending on payload.
         reuse_params = []
-        
+
         params['ServiceBindings'] = payload['service_bindings'] if 'service_bindings' in payload else None
 
         params = tu.dict_to_kv(params, 'ParameterKey', 'ParameterValue', clean=True)
         params = params + tu.reuse_vals(reuse_params)
-        
+
         return params

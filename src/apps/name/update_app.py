@@ -18,7 +18,6 @@ from appmanager import AppManager
 
 import transform_utils as tu
 
-from aws_xray_sdk.core import xray_recorder
 from aws_xray_sdk.core import patch_all
 
 patch_all()
@@ -57,11 +56,11 @@ def patch(event, context):
     """
     Configure default values if not present
     """
-    if not 'subtype' in payload:
+    if 'subtype' not in payload:
         payload['subtype'] = 'shared-lb'
-    if not 'version' in payload:
+    if 'version' not in payload:
         payload['version'] = 'latest'
-    
+
     try:
         resp = app.update_stack(
             payload
@@ -74,5 +73,5 @@ def patch(event, context):
         return tu.respond(500, 'Unknown Error: {}'.format(ex))
     else:
         data['apps'] = resp
-        
+
         return tu.respond(None, data)

@@ -60,7 +60,7 @@ def post(event, context):
         payload['subtype'] = 's3'
     if not 'version' in payload:
         payload['version'] = 'latest'
-    
+
     try:
         resp = sm.create_stack(
             name,

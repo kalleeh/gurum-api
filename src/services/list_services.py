@@ -38,9 +38,9 @@ def get(event, context):
 
     data = {}
     data['services'] = []
-    
+
     keys = ['StackName', 'Parameters', 'CreationTime', 'LastUpdatedTime']
-    
+
     try:
         stacks = sm.list_stacks(keys)
     except Exception as ex:

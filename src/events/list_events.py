@@ -14,7 +14,6 @@ from eventmanager import EventManager
 
 import transform_utils as tu
 
-from aws_xray_sdk.core import xray_recorder
 from aws_xray_sdk.core import patch_all
 
 patch_all()
@@ -45,7 +44,7 @@ def get(event, context):
     em = EventManager(event)
     data = {}
     data['events'] = []
-    
+
     for event in em.get_stack_events():
         if not 'ResourceStatusReason' in event:
             event['ResourceStatusReason'] = ""
@@ -57,5 +56,5 @@ def get(event, context):
                 'status': event['ResourceStatus'],
                 'message': event['ResourceStatusReason']
             })
-    
+
     return tu.respond(None, data)

@@ -10,12 +10,10 @@ Amazon Web Services, Inc. or Amazon Web Services EMEA SARL or both.
 """
 
 from logger import configure_logger
-from stackmanager import StackManager
 
 import transform_utils as tu
 import config
 
-from aws_xray_sdk.core import xray_recorder
 from aws_xray_sdk.core import patch_all
 
 patch_all()
@@ -27,10 +25,22 @@ Static dict for role and permission mapping
 Sets permission constant to grant permission based on role membership
 """
 ROLE_PERMISSIONS = {}
-ROLE_PERMISSIONS['owner'] = ['create','read','update','delete','transfer_ownership']
-ROLE_PERMISSIONS['admin'] = ['create','read','update','delete']
-ROLE_PERMISSIONS['operator'] = ['read','update']
-ROLE_PERMISSIONS['read_only'] = ['read']
+ROLE_PERMISSIONS['owner'] = [
+    'create',
+    'read',
+    'update',
+    'delete',
+    'transfer_ownership']
+ROLE_PERMISSIONS['admin'] = [
+    'create',
+    'read',
+    'update',
+    'delete']
+ROLE_PERMISSIONS['operator'] = [
+    'read',
+    'update']
+ROLE_PERMISSIONS['read_only'] = [
+    'read']
 
 """
 Authentication Class
@@ -41,8 +51,10 @@ class Auth:
     """ Class validating the user performing the request
         has permissions to perform the operation on the stack.
     Args:
-        required_permission (string): Permission required to perform oepration (read, write, admin, owner)
-        stack_type (string): Optionally validates the stack type the operation is to be performed on.
+        required_permission (string): Permission required to
+            perform operation (read, write, admin, owner)
+        stack_type (string): Optionally validates the stack
+            type the operation is to be performed on.
     Basic Usage:
         >>> @authenticate_access('read','app')
         >>> my_decorated_function():
@@ -53,14 +65,14 @@ class Auth:
         self.required_permission = required_permission
         self.stack_type = stack_type
 
-    def validate_permissions(self, config, tags):
+    def validate_permissions(self, tags):
         """
         First validate that the users roles give enough
         permissions to perform the requested action.
         """
-        if not self.required_permission in self._get_permissions_from_roles():
+        if self.required_permission not in self._get_permissions_from_roles():
             raise PermissionError('Permission denied.', 403)
-        
+
         """
         Secondly validate that the tags on the stack
         matches the users groups and that it's a part of the platform.
@@ -73,22 +85,22 @@ class Auth:
 
         if not config.PLATFORM_TAGS['TYPE'] in stack_tags:
             return False
-        
+
         if not stack_type == config.PLATFORM_TAGS['TYPE']:
             return False
 
         if stack_tags[config.PLATFORM_TAGS['GROUPS']] == self._groups:
             return True
-        
-        return False
 
+        return False
 
     def _get_permissions_from_roles(self):
         """ Function to retrieve the permissions that a set of roles give.
         Args:
             roles (list): A list of roles that the function can map to.
         Basic Usage:
-            >>> my_permissions = get_permissions_from_roles(['admin', 'operator'])
+            >>> my_permissions = get_permissions_from_roles(['admin',
+                    'operator'])
             >>> my_permissions['read','write']
         Returns:
             List: List of permissions granted by roles.
@@ -97,11 +109,19 @@ class Auth:
 
         try:
             for role in self._roles:
-                LOGGER.debug('Member of Role: {}'.format(role))
+                LOGGER.debug(
+                    'Member of Role: %s',
+                    role)
                 for permission in ROLE_PERMISSIONS[role]:
-                    LOGGER.debug('Adding {} from role: {}'.format(permission, role))
+                    LOGGER.debug(
+                        'Adding %s from role: %s',
+                        permission,
+                        role)
                     permissions.append(permission)
         except Exception:
-            raise PermissionError('Permission denied. Invalid role or role does not grant any permissions.', 403)
-        
+            raise PermissionError(
+                'Permission denied. Invalid role or role does not \
+                    grant any permissions.',
+                403)
+
         return permissions

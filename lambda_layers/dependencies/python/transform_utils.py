@@ -71,18 +71,13 @@ def remove_prefix(string_to_remove_prefix_from):
     return string_to_remove_prefix_from
 
 
-def dict_to_kv(my_dict, key_name, value_name, clean=False):
+def dict_to_kv(dict_to_expand, key_name, value_name, clean=False):
     """
     Convert a flat dict of key:value pairs representing AWS resource tags
     to a boto3 list of dicts.
 
-    Args:
-        my_dict (dict): Dict representing AWS resource dict.
-        key_name (string): String of the key name that holds the key name.
-        value_name (string): String of the key name that holds the value.
-        clean (bool): If true, remove keys that have a None value.
     Basic Usage:
-        >>> my_dict = {'MyTagKey': 'MyTagValue'}
+        >>> dict_to_expand = {'MyTagKey': 'MyTagValue'}
         >>> dict_to_kv(my_dict, 'Key', 'Value')
     Returns:
         List: List of dicts containing tag keys and values
@@ -93,26 +88,22 @@ def dict_to_kv(my_dict, key_name, value_name, clean=False):
             }
         ]
     """
-    my_list = []
-    for k, v in my_dict.items():
+    list_to_return = []
+    for k, v in dict_to_expand.items():
         if clean and v is None:
             continue
-        my_list.append({key_name: k, value_name: v})
+        list_to_return.append({key_name: k, value_name: v})
 
-    return my_list
+    return list_to_return
 
 
-def kv_to_dict(my_list, key_name, value_name):
+def kv_to_dict(list_to_flatten, key_name, value_name):
     """
     Convert boto3 list of dicts to a flat dict of key:value pairs
     representing AWS resource tags.
 
-    Args:
-        my_list (list): List of dicts containing tag keys and values.
-        key_name (string): String of the key name that holds the key name.
-        value_name (string): String of the key name that holds the value.
     Basic Usage:
-        >>> my_list = [{ 'Key': 'MyTagKey', 'Value': 'MyTagValue' }]
+        >>> list_to_flatten = [{ 'Key': 'MyTagKey', 'Value': 'MyTagValue' }]
         >>> dict_to_kv(my_list, 'Key', 'Value')
     Returns:
         my_dict (dict): Dict representing AWS resource dict.
@@ -120,11 +111,11 @@ def kv_to_dict(my_list, key_name, value_name):
             'MyTagKey': 'MyTagValue'
         }
     """
-    my_dict = {}
-    for item in my_list:
-        my_dict[item[key_name]] = item[value_name]
+    dict_to_return = {}
+    for item in list_to_flatten:
+        dict_to_return[item[key_name]] = item[value_name]
 
-    return my_dict
+    return dict_to_return
 
 
 def reuse_vals(key_names):

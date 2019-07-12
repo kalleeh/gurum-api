@@ -7,16 +7,12 @@ This AWS Content is provided subject to the terms of the
 AWS Customer Agreement available at http://aws.amazon.com/agreement
 or other written agreement between Customer and either
 Amazon Web Services, Inc. or Amazon Web Services EMEA SARL or both.
-"""
 
-"""
+CONFIG MODULE
 Config information passed to each command
 """
 
 import os
-import boto3
-
-import transform_utils as tu
 
 from logger import configure_logger
 
@@ -47,7 +43,7 @@ def get_user_context(event):
     user = event['claims']['email']
     groups = event['claims']['groups']
     roles = event['claims']['roles'].split(',')
-    
+
     return user, groups, roles
 
 
