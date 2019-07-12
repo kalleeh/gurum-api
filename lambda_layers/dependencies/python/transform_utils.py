@@ -66,9 +66,13 @@ def add_prefix(string_to_add_prefix_to):
 def remove_prefix(string_to_remove_prefix_from):
     """ String modifier to remove platform prefix from application names
     """
-    # if string_to_remove_prefix_from.startswith(config.PLATFORM_PREFIX):
-    #    return string_to_remove_prefix_from[len(config.PLATFORM_PREFIX):]
-    return string_to_remove_prefix_from
+    return_string = string_to_remove_prefix_from
+
+    if string_to_remove_prefix_from.startswith(config.PLATFORM_PREFIX):
+        return_string = string_to_remove_prefix_from[
+            len(config.PLATFORM_PREFIX):]
+
+    return return_string
 
 
 def dict_to_kv(dict_to_expand, key_name, value_name, clean=False):
