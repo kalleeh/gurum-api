@@ -16,7 +16,6 @@ from servicemanager import ServiceManager
 
 import transform_utils as tu
 
-from aws_xray_sdk.core import xray_recorder
 from aws_xray_sdk.core import patch_all
 
 patch_all()
@@ -24,7 +23,7 @@ patch_all()
 LOGGER = configure_logger(__name__)
 
 
-def post(event, context):
+def post(event):
     """ Creates a new service belonging to the authenticated user.
     Pre-requisites: User must create a new OAuth token on his GitHub-account
     that allows repo access to the requested repository for the service
@@ -51,14 +50,13 @@ def post(event, context):
 
     payload = json.loads(event['body-json'][0])
 
-    """
-    Configure default values if not present
-    """
+    # Configure default values if not present
+
     name = tu.add_prefix(payload['name'])
 
-    if not 'subtype' in payload:
+    if 'subtype' not in payload:
         payload['subtype'] = 's3'
-    if not 'version' in payload:
+    if 'version' not in payload:
         payload['version'] = 'latest'
 
     try:

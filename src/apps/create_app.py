@@ -24,7 +24,7 @@ patch_all()
 LOGGER = configure_logger(__name__)
 
 
-def post(event, context):
+def post(event):
     """ Creates a new app belonging to the authenticated user.
 
     Args:
@@ -53,9 +53,8 @@ def post(event, context):
         'Received payload: %s',
         payload)
 
-    """
-    Configure default values if not present
-    """
+    # Configure default values if not present
+
     name = tu.add_prefix(payload['name'])
 
     if 'subtype' not in payload:

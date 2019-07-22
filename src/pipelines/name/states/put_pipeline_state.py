@@ -22,7 +22,7 @@ patch_all()
 LOGGER = configure_logger(__name__)
 
 
-def put(event, context):
+def put(event):
     """ Send an approval result to the approval stage of a pipeline.
 
     Args:

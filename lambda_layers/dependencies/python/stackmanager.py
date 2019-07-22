@@ -9,7 +9,7 @@ or other written agreement between Customer and either
 Amazon Web Services, Inc. or Amazon Web Services EMEA SARL or both.
 """
 
-from collections.abc import ABCMeta, abstractmethod
+from abc import ABCMeta, abstractmethod
 
 from exceptions import AlreadyExists, InvalidInput, NoSuchObject, \
     PermissionDenied, InsufficientCapabilities, LimitExceeded, UnknownError
@@ -96,8 +96,6 @@ class StackManager():
         params = self._generate_params(payload)
         tags = self._generate_tags(payload)
         template_url = tg.generate_template_url(
-            config.PLATFORM_REGION,
-            config.PLATFORM_BUCKET,
             self._stack_type,
             payload)
 
@@ -193,8 +191,6 @@ class StackManager():
         try:
             if payload['upgrade_version']:
                 template_url = tg.generate_template_url(
-                    config.PLATFORM_REGION,
-                    config.PLATFORM_BUCKET,
                     self._stack_type,
                     payload)
 

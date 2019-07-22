@@ -25,7 +25,7 @@ patch_all()
 LOGGER = configure_logger(__name__)
 
 
-def patch(event, context):
+def patch(event):
     """ Validates that the app belongs to the authenticated user
     and updates the configuration.
 
@@ -53,9 +53,7 @@ def patch(event, context):
 
     payload = json.loads(event['body-json'][0])
 
-    """
-    Configure default values if not present
-    """
+    # Configure default values if not present
     if 'subtype' not in payload:
         payload['subtype'] = 'shared-lb'
     if 'version' not in payload:

@@ -21,7 +21,7 @@ patch_all()
 LOGGER = configure_logger(__name__)
 
 
-def get(event, context):
+def get(event):
     """ Fetches the 10 (default) latest CloudFormation Events for stack
 
     Args:
@@ -45,16 +45,16 @@ def get(event, context):
     data = {}
     data['events'] = []
 
-    for event in em.get_stack_events():
-        if not 'ResourceStatusReason' in event:
-            event['ResourceStatusReason'] = ""
+    for stack_event in em.get_stack_events():
+        if 'ResourceStatusReason' not in stack_event:
+            stack_event['ResourceStatusReason'] = ""
         data['events'].append(
             {
-                'name': event['StackName'],
-                'timestamp': event['Timestamp'],
-                'resource': event['LogicalResourceId'],
-                'status': event['ResourceStatus'],
-                'message': event['ResourceStatusReason']
+                'name': stack_event['StackName'],
+                'timestamp': stack_event['Timestamp'],
+                'resource': stack_event['LogicalResourceId'],
+                'status': stack_event['ResourceStatus'],
+                'message': stack_event['ResourceStatusReason']
             })
 
     return tu.respond(None, data)

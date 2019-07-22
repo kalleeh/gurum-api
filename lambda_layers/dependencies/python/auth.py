@@ -20,10 +20,10 @@ patch_all()
 
 LOGGER = configure_logger(__name__)
 
-"""
-Static dict for role and permission mapping
-Sets permission constant to grant permission based on role membership
-"""
+
+# Static dict for role and permission mapping
+# Sets permission constant to grant permission based on role membership
+
 ROLE_PERMISSIONS = {}
 ROLE_PERMISSIONS['owner'] = [
     'create',
@@ -41,10 +41,6 @@ ROLE_PERMISSIONS['operator'] = [
     'update']
 ROLE_PERMISSIONS['read_only'] = [
     'read']
-
-"""
-Authentication Class
-"""
 
 
 class Auth:
@@ -73,10 +69,9 @@ class Auth:
         if self.required_permission not in self._get_permissions_from_roles():
             raise PermissionError('Permission denied.', 403)
 
-        """
-        Secondly validate that the tags on the stack
-        matches the users groups and that it's a part of the platform.
-        """
+        # Secondly validate that the tags on the stack
+        # matches the users groups and that it's a part of the platform.
+
         if not self._tags_are_valid(tags, self.stack_type):
             raise PermissionError('Permission denied.', 403)
 

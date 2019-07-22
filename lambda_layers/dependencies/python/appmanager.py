@@ -9,14 +9,12 @@ or other written agreement between Customer and either
 Amazon Web Services, Inc. or Amazon Web Services EMEA SARL or both.
 """
 
-import boto3
-
 from logger import configure_logger
 from stackmanager import StackManager
 
 import transform_utils as tu
 import ssm_helper
-import config
+import elb_helper
 
 from aws_xray_sdk.core import patch_all
 
@@ -73,7 +71,7 @@ class AppManager(StackManager):
 
         # we need to dynamically generate the priorty param to insert
         # since it's required by CFN.
-        params['Priority'] = str(self._iterate_rule_priority(
+        params['Priority'] = str(elb_helper.get_next_rule_priority(
             ssm['platform']['loadbalancer']['listener-arn']))
         params = tu.dict_to_kv(
             params,
@@ -83,35 +81,3 @@ class AppManager(StackManager):
         params = params + tu.reuse_vals(reuse_params)
 
         return params
-
-    def _iterate_rule_priority(self, listener_arn):
-        """ Returns the next rule priority number for a given ALB Listener Arn
-
-        Args:
-            listener_arn (string): String of the ARN to the ALB Listener
-        Basic Usage:
-            >>> resp = iterate_rule_priority(listener_arn)
-        Returns:
-            Number: Number of the next available rule priority number
-            Default: 1
-        """
-        client = boto3.client('elbv2', region_name=config.PLATFORM_REGION)
-        rules = {}
-
-        try:
-            rules = client.describe_rules(
-                ListenerArn=listener_arn,
-            )['Rules']
-        except Exception as ex:
-            LOGGER.exception(ex)
-            raise
-
-        rules = [rule for rule in rules if rule['Priority'].isdigit()]
-
-        if not rules:
-            return 1
-
-        sorted_rules = sorted(rules, key=lambda x: int(x['Priority']), reverse=True)
-        priority = int(sorted_rules[0]['Priority'])+1
-
-        return priority

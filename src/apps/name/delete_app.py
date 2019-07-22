@@ -23,7 +23,7 @@ patch_all()
 LOGGER = configure_logger(__name__)
 
 
-def delete(event, context):
+def delete(event):
     """ Validates that the app belongs to the authenticated user
     and deletes the app.
 

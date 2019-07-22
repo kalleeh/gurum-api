@@ -18,7 +18,6 @@ from servicemanager import ServiceManager
 
 import transform_utils as tu
 
-from aws_xray_sdk.core import xray_recorder
 from aws_xray_sdk.core import patch_all
 
 patch_all()
@@ -26,7 +25,7 @@ patch_all()
 LOGGER = configure_logger(__name__)
 
 
-def patch(event, context):
+def patch(event):
     """ Updates the service belonging to the authenticated user.
 
     Args:
@@ -49,9 +48,9 @@ def patch(event, context):
 
     payload = json.loads(event['body-json'][0])
 
-    if not 'subtype' in payload:
+    if 'subtype' not in payload:
         payload['subtype'] = 's3'
-    if not 'version' in payload:
+    if 'version' not in payload:
         payload['version'] = 'latest'
 
     bindings = payload['service_bindings'].split(',')

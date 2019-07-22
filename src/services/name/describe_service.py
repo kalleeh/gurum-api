@@ -16,7 +16,6 @@ from servicemanager import ServiceManager
 
 import transform_utils as tu
 
-from aws_xray_sdk.core import xray_recorder
 from aws_xray_sdk.core import patch_all
 
 patch_all()
@@ -24,7 +23,7 @@ patch_all()
 LOGGER = configure_logger(__name__)
 
 
-def get(event, context):
+def get(event):
     """ Describes detailed information about a service
 
     Args:

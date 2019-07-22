@@ -25,7 +25,7 @@ patch_all()
 LOGGER = configure_logger(__name__)
 
 
-def patch(event, context):
+def patch(event):
     """ Updates the pipeline belonging to the authenticated user.
 
     Args:
@@ -61,19 +61,13 @@ def patch(event, context):
         payload['version'] = 'latest'
 
     if 'app_name' in payload and not pm.has_permissions(payload['app_name']):
-        return tu.respond(
-            400,
-            'App doesn\'t exist or not enough permissions')
+        raise PermissionDenied
 
     if 'app_dev' in payload and not pm.has_permissions(payload['app_dev']):
-        return tu.respond(
-            400,
-            'App (dev) doesn\'t exist or not enough permissions')
+        raise PermissionDenied
 
     if 'app_test' in payload and not pm.has_permissions(payload['app_test']):
-        return tu.respond(
-            400,
-            'App (test) doesn\'t exist or not enough permissions')
+        raise PermissionDenied
 
     try:
         resp = pm.update_stack(
