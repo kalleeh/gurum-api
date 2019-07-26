@@ -25,7 +25,7 @@ patch_all()
 LOGGER = configure_logger(__name__)
 
 
-def patch(event):
+def patch(event, context):
     """ Updates the service belonging to the authenticated user.
 
     Args:

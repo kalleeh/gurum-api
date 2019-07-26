@@ -25,7 +25,7 @@ patch_all()
 LOGGER = configure_logger(__name__)
 
 
-def patch(event):
+def patch(event, context):
     """ Validates that the app belongs to the authenticated user
     and updates the configuration.
 

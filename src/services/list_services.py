@@ -21,7 +21,7 @@ patch_all()
 LOGGER = configure_logger(__name__)
 
 
-def get(event):
+def get(event, context):
     """ Returns the services belonging to the authenticated user.
     It uses filter_stacks() to filter the CloudFormation stacks with type 'service'
     and owner belonging to the same Cognito group as the user is logged in as.

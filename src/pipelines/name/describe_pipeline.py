@@ -23,7 +23,7 @@ patch_all()
 LOGGER = configure_logger(__name__)
 
 
-def get(event):
+def get(event, context):
     """ Describes detailed information about a pipeline
 
     Args:

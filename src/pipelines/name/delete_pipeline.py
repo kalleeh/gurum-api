@@ -23,7 +23,7 @@ patch_all()
 LOGGER = configure_logger(__name__)
 
 
-def delete(event):
+def delete(event, context):
     """ Validates that the pipeline belongs to the authenticated user
     and deletes the pipeline.
 

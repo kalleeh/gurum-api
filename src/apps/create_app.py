@@ -24,7 +24,7 @@ patch_all()
 LOGGER = configure_logger(__name__)
 
 
-def post(event):
+def post(event, context):
     """ Creates a new app belonging to the authenticated user.
 
     Args:

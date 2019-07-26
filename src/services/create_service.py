@@ -23,7 +23,7 @@ patch_all()
 LOGGER = configure_logger(__name__)
 
 
-def post(event):
+def post(event, context):
     """ Creates a new service belonging to the authenticated user.
     Pre-requisites: User must create a new OAuth token on his GitHub-account
     that allows repo access to the requested repository for the service

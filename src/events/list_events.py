@@ -21,7 +21,7 @@ patch_all()
 LOGGER = configure_logger(__name__)
 
 
-def get(event):
+def get(event, context):
     """ Fetches the 10 (default) latest CloudFormation Events for stack
 
     Args:
