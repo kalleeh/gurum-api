@@ -113,11 +113,11 @@ def kv_to_dict(list_to_flatten, key_name, value_name):
             'MyTagKey': 'MyTagValue'
         }
     """
-    dict_to_return = {}
+    key_value_dictionary = {}
     for item in list_to_flatten:
-        dict_to_return[item[key_name]] = item[value_name]
+        key_value_dictionary[item[key_name]] = item[value_name]
 
-    return dict_to_return
+    return key_value_dictionary
 
 
 def reuse_vals(key_names):
