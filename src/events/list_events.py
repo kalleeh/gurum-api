@@ -14,7 +14,6 @@ from eventmanager import EventManager
 
 import transform_utils as tu
 
-from aws_xray_sdk.core import xray_recorder
 from aws_xray_sdk.core import patch_all
 
 patch_all()
@@ -45,17 +44,17 @@ def get(event, context):
     em = EventManager(event)
     data = {}
     data['events'] = []
-    
-    for event in em.get_stack_events():
-        if not 'ResourceStatusReason' in event:
-            event['ResourceStatusReason'] = ""
+
+    for stack_event in em.get_stack_events():
+        if 'ResourceStatusReason' not in stack_event:
+            stack_event['ResourceStatusReason'] = ""
         data['events'].append(
             {
-                'name': event['StackName'],
-                'timestamp': event['Timestamp'],
-                'resource': event['LogicalResourceId'],
-                'status': event['ResourceStatus'],
-                'message': event['ResourceStatusReason']
+                'name': stack_event['StackName'],
+                'timestamp': stack_event['Timestamp'],
+                'resource': stack_event['LogicalResourceId'],
+                'status': stack_event['ResourceStatus'],
+                'message': stack_event['ResourceStatusReason']
             })
-    
+
     return tu.respond(None, data)

@@ -18,7 +18,6 @@ from servicemanager import ServiceManager
 
 import transform_utils as tu
 
-from aws_xray_sdk.core import xray_recorder
 from aws_xray_sdk.core import patch_all
 
 patch_all()
@@ -46,19 +45,19 @@ def patch(event, context):
 
     data = {}
     data['services'] = []
-    
+
     payload = json.loads(event['body-json'][0])
 
-    if not 'subtype' in payload:
+    if 'subtype' not in payload:
         payload['subtype'] = 's3'
-    if not 'version' in payload:
+    if 'version' not in payload:
         payload['version'] = 'latest'
-    
+
     bindings = payload['service_bindings'].split(',')
     for binding in bindings:
         if not sm.has_permissions(binding):
             return tu.respond(400, '{} doesn\'t exist or not enough permissions.'.format(binding))
-    
+
     try:
         resp = sm.update_stack(
             payload

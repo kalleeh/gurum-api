@@ -14,7 +14,6 @@ from pipelinemanager import PipelineManager
 
 import transform_utils as tu
 
-from aws_xray_sdk.core import xray_recorder
 from aws_xray_sdk.core import patch_all
 
 patch_all()
@@ -46,7 +45,7 @@ def get(event, context):
 
     data = {}
     data['states'] = []
-    
+
     try:
         stacks = pm.describe_stack()
     except Exception as ex:
@@ -56,11 +55,11 @@ def get(event, context):
         outputs = tu.kv_to_dict(stack['Outputs'], 'OutputKey', 'OutputValue') if 'Outputs' in stack else []
 
         states = pm.get_pipeline_state(outputs['PipelineName'])
-        
+
         for state in states:
             keys = ['actionName', 'latestExecution']
             actions = pm.filter_keys(state['actionStates'], keys)
-            
+
             for action in actions:
                 latest_execution = action['latestExecution']
                 status = latest_execution['status'] if 'status' in latest_execution else 'N/A'
@@ -78,5 +77,5 @@ def get(event, context):
                         'error_details': error_details
                     }
                 )
-        
+
         return tu.respond(None, data)

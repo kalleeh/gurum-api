@@ -18,7 +18,6 @@ from pipelinemanager import PipelineManager
 
 import transform_utils as tu
 
-from aws_xray_sdk.core import xray_recorder
 from aws_xray_sdk.core import patch_all
 
 patch_all()
@@ -42,7 +41,8 @@ def patch(event, context):
                 "github_branch": "master",
                 "github_token": "b248f1e7360fe21c33e12d4bca3feaweEXAMPLE",
                 "github_user": "mygithubuser",
-                "upgrade_version": "False"  [Optional] Forces platform version upgrade
+                "upgrade_version": "False"  [Optional] Forces platform
+                    version upgrade
             }]
     Returns:
         List: List of JSON objects containing app information
@@ -54,21 +54,21 @@ def patch(event, context):
 
     payload = json.loads(event['body-json'][0])
 
-    """
-    Configure default values if not present
-    """
-    if not 'subtype' in payload:
+    # Configure default values if not present
+    if 'subtype' not in payload:
         payload['subtype'] = 'shared-lb'
-    if not 'version' in payload:
+    if 'version' not in payload:
         payload['version'] = 'latest'
-    
+
     if 'app_name' in payload and not pm.has_permissions(payload['app_name']):
-        return tu.respond(400, 'App doesn\'t exist or not enough permissions')
+        raise PermissionDenied
+
     if 'app_dev' in payload and not pm.has_permissions(payload['app_dev']):
-        return tu.respond(400, 'App (dev) doesn\'t exist or not enough permissions')
+        raise PermissionDenied
+
     if 'app_test' in payload and not pm.has_permissions(payload['app_test']):
-        return tu.respond(400, 'App (test) doesn\'t exist or not enough permissions')
-    
+        raise PermissionDenied
+
     try:
         resp = pm.update_stack(
             payload

@@ -14,7 +14,6 @@ from appmanager import AppManager
 
 import transform_utils as tu
 
-from aws_xray_sdk.core import xray_recorder
 from aws_xray_sdk.core import patch_all
 
 patch_all()
@@ -48,7 +47,7 @@ def get(event, context):
 
     data = {}
     data['apps'] = []
-    
+
     keys = ['StackName', 'Parameters', 'CreationTime', 'LastUpdatedTime']
 
     try:
@@ -66,5 +65,5 @@ def get(event, context):
                     'updated_at': stack['LastUpdatedTime'],
                     'tasks': params['DesiredCount']
                 })
-        
+
         return tu.respond(None, data)

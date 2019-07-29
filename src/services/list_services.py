@@ -14,7 +14,6 @@ from servicemanager import ServiceManager
 
 import transform_utils as tu
 
-from aws_xray_sdk.core import xray_recorder
 from aws_xray_sdk.core import patch_all
 
 patch_all()
@@ -38,9 +37,9 @@ def get(event, context):
 
     data = {}
     data['services'] = []
-    
+
     keys = ['StackName', 'Parameters', 'CreationTime', 'LastUpdatedTime']
-    
+
     try:
         stacks = sm.list_stacks(keys)
     except Exception as ex:

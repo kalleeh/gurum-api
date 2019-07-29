@@ -16,7 +16,6 @@ from appmanager import AppManager
 
 import transform_utils as tu
 
-from aws_xray_sdk.core import xray_recorder
 from aws_xray_sdk.core import patch_all
 
 patch_all()
@@ -48,7 +47,7 @@ def get(event, context):
 
     data = {}
     data['apps'] = []
-    
+
     try:
         stacks = app.describe_stack()
     except NoSuchObject:
@@ -59,7 +58,7 @@ def get(event, context):
         return tu.respond(500, 'Unknown Error: {}'.format(ex))
     else:
         stack = stacks[0]
-        
+
         outputs = tu.kv_to_dict(stack['Outputs'], 'OutputKey', 'OutputValue') if 'Outputs' in stack else []
         tags = tu.kv_to_dict(stack['Tags'], 'Key', 'Value')
 
@@ -71,5 +70,5 @@ def get(event, context):
                 'outputs': outputs,
                 'tags': tags
             })
-        
+
         return tu.respond(None, data)

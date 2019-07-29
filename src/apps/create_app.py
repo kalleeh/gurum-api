@@ -9,7 +9,7 @@ or other written agreement between Customer and either
 Amazon Web Services, Inc. or Amazon Web Services EMEA SARL or both.
 """
 
-from exceptions import AlreadyExists, InsufficientCapabilities, LimitExceeded
+from exceptions import AlreadyExists
 import json
 
 from logger import configure_logger
@@ -17,7 +17,6 @@ from appmanager import AppManager
 
 import transform_utils as tu
 
-from aws_xray_sdk.core import xray_recorder
 from aws_xray_sdk.core import patch_all
 
 patch_all()
@@ -50,18 +49,19 @@ def post(event, context):
     data['apps'] = []
 
     payload = json.loads(event['body-json'][0])
-    LOGGER.debug('Received payload:\n{}'.format(payload))
+    LOGGER.debug(
+        'Received payload: %s',
+        payload)
 
-    """
-    Configure default values if not present
-    """
+    # Configure default values if not present
+
     name = tu.add_prefix(payload['name'])
 
-    if not 'subtype' in payload:
+    if 'subtype' not in payload:
         payload['subtype'] = 'shared-lb'
-    if not 'version' in payload:
+    if 'version' not in payload:
         payload['version'] = 'latest'
-    
+
     try:
         resp = app.create_stack(
             name,
@@ -70,8 +70,10 @@ def post(event, context):
     except AlreadyExists:
         return tu.respond(400, 'An app with that name already exists.')
     except Exception as ex:
-        LOGGER.debug('Received payload:\n{}'.format(payload))
-        LOGGER.debug('Exception:\n{}'.format(ex))
+        LOGGER.debug(
+            'Exception: %s',
+            ex,
+            exc_info=True)
         return tu.respond(500, 'Unknown Error: {}'.format(ex))
     else:
         data['apps'] = resp

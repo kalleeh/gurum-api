@@ -16,7 +16,6 @@ from pipelinemanager import PipelineManager
 
 import transform_utils as tu
 
-from aws_xray_sdk.core import xray_recorder
 from aws_xray_sdk.core import patch_all
 
 patch_all()
@@ -54,16 +53,14 @@ def post(event, context):
 
     payload = json.loads(event['body-json'][0])
 
-    """
-    Configure default values if not present
-    """
     name = tu.add_prefix(payload['name'])
 
-    if not 'subtype' in payload:
+    # Configure default values if not present
+    if 'subtype' not in payload:
         payload['subtype'] = 'github'
-    if not 'version' in payload:
+    if 'version' not in payload:
         payload['version'] = 'latest'
-    
+
     try:
         resp = pm.create_stack(
             name,

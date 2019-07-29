@@ -5,12 +5,14 @@ name = "pypi"
 
 [packages]
 "boto3" = "*"
+tox = "*"
 
 [dev-packages]
 tox = "*"
 pylint = "*"
 pytest = "*"
 mock = "*"
+autopep8 = "*"
 
 [requires]
 python_version = "3.7"

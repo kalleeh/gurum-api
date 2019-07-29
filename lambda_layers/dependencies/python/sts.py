@@ -9,9 +9,6 @@ or other written agreement between Customer and either
 Amazon Web Services, Inc. or Amazon Web Services EMEA SARL or both.
 """
 
-"""STS module
-"""
-
 import boto3
 from logger import configure_logger
 

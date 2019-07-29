@@ -12,6 +12,8 @@ Amazon Web Services, Inc. or Amazon Web Services EMEA SARL or both.
 import datetime
 import json
 
+import config
+
 from logger import configure_logger
 
 LOGGER = configure_logger(__name__)
@@ -39,63 +41,45 @@ def datetime_serialize(o):
     """
     if isinstance(o, datetime.datetime):
         return o.strftime('%Y-%m-%d %H:%M:%S')
-    else:
-        return '?'
+
+    return '?'
 
 
-def filter_dict(dict, keys):
+def filter_dict(dict_to_filter, keys_to_save):
     """ Dict modifier to only return selected keys
-    Args:
-        dict (dict): Dict to remove items from.
-        keys (list): List of keys to save and return.
     """
     # Create an empty key if requested key does not exist in dict
-    for key in keys:
-        if not key in dict.keys():
-            dict[key] = ""
-    
-    return {key: dict[key] for key in keys}
+    for key in keys_to_save:
+        if key not in dict_to_filter.keys():
+            dict_to_filter[key] = ""
+
+    return {key: dict_to_filter[key] for key in keys_to_save}
 
 
-def add_prefix(s):
+def add_prefix(string_to_add_prefix_to):
     """ String modifier to add platform prefix to application names
-    Args:
-        s (string): String to add prefix to.
-    Basic Usage:
-        >>> app_name = "app-name"
-        >>> add_prefix(app_name)
-    Returns:
-        (string): "platform-app-name"
     """
-    # return PLATFORM_PREFIX + s
-    return s
+    return config.PLATFORM_PREFIX + string_to_add_prefix_to
 
-
-def remove_prefix(s):
+def remove_prefix(string_to_remove_prefix_from):
     """ String modifier to remove platform prefix from application names
-    Args:
-        s (string): String to remove prefix from.
-    Basic Usage:
-        >>> prefixed_app_name = "platform-app-name"
-        >>> remove_prefix(prefixed_app_name)
-    Returns:
-        (string): "app-name"
     """
-    # if s.startswith(PLATFORM_PREFIX):
-    #    return s[len(PLATFORM_PREFIX):]
-    return s
+    processed_string = string_to_remove_prefix_from
+
+    if string_to_remove_prefix_from.startswith(config.PLATFORM_PREFIX):
+        processed_string = string_to_remove_prefix_from[
+            len(config.PLATFORM_PREFIX):]
+
+    return processed_string
 
 
-def dict_to_kv(my_dict, key_name, value_name, clean=False):
+def dict_to_kv(dict_to_expand, key_name, value_name, clean=False):
     """
-    Convert a flat dict of key:value pairs representing AWS resource tags to a boto3 list of dicts
-    Args:
-        my_dict (dict): Dict representing AWS resource dict.
-        key_name (string): String of the key name that holds the key name.
-        value_name (string): String of the key name that holds the value.
-        clean (bool): If true, remove keys that have a None value.
+    Convert a flat dict of key:value pairs representing AWS resource tags
+    to a boto3 list of dicts.
+
     Basic Usage:
-        >>> my_dict = {'MyTagKey': 'MyTagValue'}
+        >>> dict_to_expand = {'MyTagKey': 'MyTagValue'}
         >>> dict_to_kv(my_dict, 'Key', 'Value')
     Returns:
         List: List of dicts containing tag keys and values
@@ -106,24 +90,22 @@ def dict_to_kv(my_dict, key_name, value_name, clean=False):
             }
         ]
     """
-    my_list = []
-    for k, v in my_dict.items():
-        if clean and v == None:
+    key_value_list = []
+    for k, v in dict_to_expand.items():
+        if clean and v is None:
             continue
-        my_list.append({key_name: k, value_name: v})
+        key_value_list.append({key_name: k, value_name: v})
 
-    return my_list
+    return key_value_list
 
 
-def kv_to_dict(my_list, key_name, value_name):
+def kv_to_dict(list_to_flatten, key_name, value_name):
     """
-    Convert boto3 list of dicts to a flat dict of key:value pairs representing AWS resource tags
-    Args:
-        my_list (list): List of dicts containing tag keys and values.
-        key_name (string): String of the key name that holds the key name.
-        value_name (string): String of the key name that holds the value.
+    Convert boto3 list of dicts to a flat dict of key:value pairs
+    representing AWS resource tags.
+
     Basic Usage:
-        >>> my_list = [{ 'Key': 'MyTagKey', 'Value': 'MyTagValue' }]
+        >>> list_to_flatten = [{ 'Key': 'MyTagKey', 'Value': 'MyTagValue' }]
         >>> dict_to_kv(my_list, 'Key', 'Value')
     Returns:
         my_dict (dict): Dict representing AWS resource dict.
@@ -131,25 +113,28 @@ def kv_to_dict(my_list, key_name, value_name):
             'MyTagKey': 'MyTagValue'
         }
     """
-    my_dict = {}
-    for item in my_list:
-        my_dict[item[key_name]] = item[value_name]
+    key_value_dictionary = {}
+    for item in list_to_flatten:
+        key_value_dictionary[item[key_name]] = item[value_name]
 
-    return my_dict
+    return key_value_dictionary
 
 
-def reuse_vals(key_names, key_type='param'):
+def reuse_vals(key_names):
     """
-    Used for keys that are required to be passed to CloudFormation but you don't want to update.
-    Takes the key type (param|tag) and appends the key name and sets key value to 'UsePreviousValue'.
+    Used for keys that are required to be passed to CloudFormation but you
+    don't want to update. Takes the key type (param|tag) and appends the
+    key name and sets key value to 'UsePreviousValue'.
 
     Args:
         key_name (list): List of key names to re-use (case-sensitive)
-        key_type (param|tag): Defines the format for key name. Defaults to 'param'.
+        key_type (param|tag): Defines the format for key name.
+            Defaults to 'param'.
     Basic Usage:
         >>> params = tu.reuse_vals(params, ['Listener','Priority'])
     Returns:
-        my_list (list): List representing AWS exitinsg keypairs with the new one appended.
+        my_list (list): List representing AWS exitinsg keypairs with the new
+            one appended.
         {
             "ParameterKey": 'ExistingKey',
             "ParameterValue": 'ExistingValue'
@@ -164,7 +149,7 @@ def reuse_vals(key_names, key_type='param'):
         }
     """
     my_list = []
-    
+
     for key_name in key_names:
         my_list.append(
             {
@@ -195,11 +180,11 @@ def build_nested_helper(path, value, container):
 
 
 def build_nested(paths):
-    """ Function to build a python dict representing 
+    """ Function to build a python dict representing
     a SSM parameter paths """
     container = {}
 
     for path, value in paths.items():
         build_nested_helper(path, value, container)
-    
+
     return container

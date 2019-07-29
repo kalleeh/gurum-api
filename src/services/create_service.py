@@ -16,7 +16,6 @@ from servicemanager import ServiceManager
 
 import transform_utils as tu
 
-from aws_xray_sdk.core import xray_recorder
 from aws_xray_sdk.core import patch_all
 
 patch_all()
@@ -51,16 +50,15 @@ def post(event, context):
 
     payload = json.loads(event['body-json'][0])
 
-    """
-    Configure default values if not present
-    """
+    # Configure default values if not present
+
     name = tu.add_prefix(payload['name'])
 
-    if not 'subtype' in payload:
+    if 'subtype' not in payload:
         payload['subtype'] = 's3'
-    if not 'version' in payload:
+    if 'version' not in payload:
         payload['version'] = 'latest'
-    
+
     try:
         resp = sm.create_stack(
             name,
