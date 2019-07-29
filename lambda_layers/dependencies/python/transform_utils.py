@@ -60,8 +60,6 @@ def add_prefix(string_to_add_prefix_to):
     """ String modifier to add platform prefix to application names
     """
     return config.PLATFORM_PREFIX + string_to_add_prefix_to
-    # return string_to_add_prefix_to
-
 
 def remove_prefix(string_to_remove_prefix_from):
     """ String modifier to remove platform prefix from application names
