@@ -90,13 +90,13 @@ def dict_to_kv(dict_to_expand, key_name, value_name, clean=False):
             }
         ]
     """
-    list_to_return = []
+    key_value_list = []
     for k, v in dict_to_expand.items():
         if clean and v is None:
             continue
-        list_to_return.append({key_name: k, value_name: v})
+        key_value_list.append({key_name: k, value_name: v})
 
-    return list_to_return
+    return key_value_list
 
 
 def kv_to_dict(list_to_flatten, key_name, value_name):
