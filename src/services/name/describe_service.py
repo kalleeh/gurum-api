@@ -16,6 +16,8 @@ from servicemanager import ServiceManager
 
 import transform_utils as tu
 
+import response_builder
+
 from aws_xray_sdk.core import patch_all
 
 patch_all()
@@ -41,11 +43,11 @@ def get(event, context):
     try:
         stacks = sm.describe_stack()
     except NoSuchObject:
-        return tu.respond(400, 'No such service.')
+        return response_builder.error(400, 'No such service.')
     except PermissionDenied:
-        return tu.respond(401, 'Permission denied.')
+        return response_builder.error(401, 'Permission denied.')
     except Exception as ex:
-        return tu.respond(500, 'Unknown Error: {}'.format(ex))
+        return response_builder.error(500, 'Unknown Error: {}'.format(ex))
     else:
         stack = stacks[0]
 
@@ -59,4 +61,4 @@ def get(event, context):
                 'outputs': outputs
             })
 
-        return tu.respond(None, data)
+        return response_builder.success(data)

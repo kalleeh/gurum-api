@@ -14,6 +14,8 @@ from appmanager import AppManager
 
 import transform_utils as tu
 
+import response_builder
+
 from aws_xray_sdk.core import patch_all
 
 patch_all()
@@ -53,7 +55,7 @@ def get(event, context):
     try:
         stacks = app.list_stacks(keys)
     except Exception as ex:
-        return tu.respond(500, 'Unknown Error: {}'.format(ex))
+        return response_builder.error(500, 'Unknown Error: {}'.format(ex))
     else:
         for stack in stacks:
             name = tu.remove_prefix(stack['StackName'])
@@ -66,4 +68,4 @@ def get(event, context):
                     'tasks': params['DesiredCount']
                 })
 
-        return tu.respond(None, data)
+        return response_builder.success(data)

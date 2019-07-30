@@ -16,6 +16,8 @@ from servicemanager import ServiceManager
 
 import transform_utils as tu
 
+import response_builder
+
 from aws_xray_sdk.core import patch_all
 
 patch_all()
@@ -65,8 +67,8 @@ def post(event, context):
             payload
         )
     except Exception as ex:
-        return tu.respond(500, 'Unknown Error: {}'.format(ex))
+        return response_builder.error(500, 'Unknown Error: {}'.format(ex))
     else:
         data['services'] = resp
 
-        return tu.respond(None, data)
+        return response_builder.success(data)

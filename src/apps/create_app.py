@@ -17,6 +17,8 @@ from appmanager import AppManager
 
 import transform_utils as tu
 
+import response_builder
+
 from aws_xray_sdk.core import patch_all
 
 patch_all()
@@ -68,14 +70,14 @@ def post(event, context):
             payload
         )
     except AlreadyExists:
-        return tu.respond(400, 'An app with that name already exists.')
+        return response_builder.error(400, 'An app with that name already exists.')
     except Exception as ex:
         LOGGER.debug(
             'Exception: %s',
             ex,
             exc_info=True)
-        return tu.respond(500, 'Unknown Error: {}'.format(ex))
+        return response_builder.error(500, 'Unknown Error: {}'.format(ex))
     else:
         data['apps'] = resp
 
-        return tu.respond(None, data)
+        return response_builder.success(data)

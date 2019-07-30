@@ -12,7 +12,7 @@ Amazon Web Services, Inc. or Amazon Web Services EMEA SARL or both.
 from logger import configure_logger
 from eventmanager import EventManager
 
-import transform_utils as tu
+import response_builder
 
 from aws_xray_sdk.core import patch_all
 
@@ -57,4 +57,4 @@ def get(event, context):
                 'message': stack_event['ResourceStatusReason']
             })
 
-    return tu.respond(None, data)
+    return response_builder.success(data)
