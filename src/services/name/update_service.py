@@ -16,7 +16,7 @@ import json
 from logger import configure_logger
 from servicemanager import ServiceManager
 
-import transform_utils as tu
+import response_builder
 
 from aws_xray_sdk.core import patch_all
 
@@ -56,19 +56,19 @@ def patch(event, context):
     bindings = payload['service_bindings'].split(',')
     for binding in bindings:
         if not sm.has_permissions(binding):
-            return tu.respond(400, '{} doesn\'t exist or not enough permissions.'.format(binding))
+            return response_builder.error('{} doesn\'t exist or not enough permissions.'.format(binding), 400)
 
     try:
         resp = sm.update_stack(
             payload
         )
     except NoSuchObject:
-        return tu.respond(400, 'No such service.')
+        return response_builder.error('No such service.', 400)
     except PermissionDenied:
-        return tu.respond(401, 'Permission denied.')
+        return response_builder.error('Permission denied.', 401)
     except Exception as ex:
-        return tu.respond(500, 'Unknown Error: {}'.format(ex))
+        return response_builder.error('Unknown Error: {}'.format(ex))
     else:
         data['services'] = resp
 
-        return tu.respond(None, data)
+        return response_builder.success(data)

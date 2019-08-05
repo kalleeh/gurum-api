@@ -18,24 +18,6 @@ from logger import configure_logger
 
 LOGGER = configure_logger(__name__)
 
-
-def respond(err, res=None):
-    """ Function to correctly format HTTP responses
-
-    Args:
-        err (int|None): HTTP Response code to return, no value will
-            generate a 200 OK response.
-        res (string): Response message to include in body.
-    """
-    return {
-        'body': res if err else json.dumps(res, default=datetime_serialize),
-        'statusCode': err if err else '200',
-        'headers': {
-            'Content-Type': 'application/json',
-        },
-    }
-
-
 def datetime_serialize(o):
     """ Serialize boto3 datetime response to JSON compatible format
     """

@@ -16,6 +16,8 @@ from servicemanager import ServiceManager
 
 import transform_utils as tu
 
+import response_builder
+
 from aws_xray_sdk.core import patch_all
 
 patch_all()
@@ -41,10 +43,10 @@ def delete(event, context):
     try:
         sm.delete_stack()
     except NoSuchObject:
-        return tu.respond(400, 'No such service.')
+        return response_builder.error('No such service.', 400)
     except PermissionDenied:
-        return tu.respond(401, 'Permission denied.')
+        return response_builder.error('Permission denied.', 401)
     except Exception as ex:
-        return tu.respond(500, 'Unknown Error: {}'.format(ex))
+        return response_builder.error('Unknown Error: {}'.format(ex))
     else:
-        return tu.respond(None, 'Successfully deleted the service.')
+        return response_builder.success('Successfully deleted the service.')

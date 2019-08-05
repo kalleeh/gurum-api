@@ -14,6 +14,8 @@ from pipelinemanager import PipelineManager
 
 import transform_utils as tu
 
+import response_builder
+
 from aws_xray_sdk.core import patch_all
 
 patch_all()
@@ -49,7 +51,7 @@ def get(event, context):
     try:
         stacks = pm.describe_stack()
     except Exception as ex:
-        return tu.respond(500, 'Unknown Error: {}'.format(ex))
+        return response_builder.error('Unknown Error: {}'.format(ex))
     else:
         stack = stacks[0]
         outputs = tu.kv_to_dict(stack['Outputs'], 'OutputKey', 'OutputValue') if 'Outputs' in stack else []
@@ -78,4 +80,4 @@ def get(event, context):
                     }
                 )
 
-        return tu.respond(None, data)
+        return response_builder.success(data)

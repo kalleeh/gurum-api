@@ -14,6 +14,8 @@ from servicemanager import ServiceManager
 
 import transform_utils as tu
 
+import response_builder
+
 from aws_xray_sdk.core import patch_all
 
 patch_all()
@@ -43,7 +45,7 @@ def get(event, context):
     try:
         stacks = sm.list_stacks(keys)
     except Exception as ex:
-        return tu.respond(500, 'Unknown Error: {}'.format(ex))
+        return response_builder.error('Unknown Error: {}'.format(ex))
     else:
         for stack in stacks:
             name = tu.remove_prefix(stack['StackName'])
@@ -56,4 +58,4 @@ def get(event, context):
                     'service_bindings': params['ServiceBindings']
                 })
 
-        return tu.respond(None, data)
+        return response_builder.success(data)
