@@ -23,7 +23,7 @@ patch_all()
 LOGGER = configure_logger(__name__)
 
 
-def get(event, context):
+def get(event, _context):
     """ Returns the apps belonging to the authenticated user.
     It uses filter_stacks() to filter the CloudFormation stacks with type 'app'
     and owner belonging to the same Cognito group as the user is logged in as.

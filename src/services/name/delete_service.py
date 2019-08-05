@@ -25,7 +25,7 @@ patch_all()
 LOGGER = configure_logger(__name__)
 
 
-def delete(event, context):
+def delete(event, _context):
     """ Validates that the service belongs to the authenticated user
     and deletes the service.
 
