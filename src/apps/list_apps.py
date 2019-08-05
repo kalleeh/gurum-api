@@ -10,7 +10,7 @@ Amazon Web Services, Inc. or Amazon Web Services EMEA SARL or both.
 """
 
 from logger import configure_logger
-from appmanager import AppManager
+from app_manager import AppManager
 
 import transform_utils as tu
 

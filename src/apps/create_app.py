@@ -13,7 +13,7 @@ from exceptions import AlreadyExists
 import json
 
 from logger import configure_logger
-from appmanager import AppManager
+from app_manager import AppManager
 
 import transform_utils as tu
 

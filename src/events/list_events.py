@@ -10,7 +10,7 @@ Amazon Web Services, Inc. or Amazon Web Services EMEA SARL or both.
 """
 
 from logger import configure_logger
-from eventmanager import EventManager
+from event_manager import EventManager
 
 import response_builder
 

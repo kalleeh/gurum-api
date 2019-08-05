@@ -14,7 +14,7 @@ from exceptions import NoSuchObject, PermissionDenied
 import json
 
 from logger import configure_logger
-from appmanager import AppManager
+from app_manager import AppManager
 
 import response_builder
 

@@ -12,7 +12,7 @@ Amazon Web Services, Inc. or Amazon Web Services EMEA SARL or both.
 import json
 
 from logger import configure_logger
-from pipelinemanager import PipelineManager
+from pipeline_manager import PipelineManager
 
 import transform_utils as tu
 

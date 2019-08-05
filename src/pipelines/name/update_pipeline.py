@@ -14,7 +14,7 @@ from exceptions import NoSuchObject, PermissionDenied
 import json
 
 from logger import configure_logger
-from pipelinemanager import PipelineManager
+from pipeline_manager import PipelineManager
 
 import response_builder
 

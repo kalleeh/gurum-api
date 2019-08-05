@@ -14,7 +14,7 @@ from exceptions import NoSuchObject, PermissionDenied
 import json
 
 from logger import configure_logger
-from servicemanager import ServiceManager
+from service_manager import ServiceManager
 
 import response_builder
 
