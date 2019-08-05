@@ -55,7 +55,7 @@ def get(event, context):
     try:
         stacks = app.list_stacks(keys)
     except Exception as ex:
-        return response_builder.error(500, 'Unknown Error: {}'.format(ex))
+        return response_builder.error('Unknown Error: {}'.format(ex))
     else:
         for stack in stacks:
             name = tu.remove_prefix(stack['StackName'])

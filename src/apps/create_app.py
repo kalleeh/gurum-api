@@ -70,13 +70,13 @@ def post(event, context):
             payload
         )
     except AlreadyExists:
-        return response_builder.error(400, 'An app with that name already exists.')
+        return response_builder.error('An app with that name already exists.', 400)
     except Exception as ex:
         LOGGER.debug(
             'Exception: %s',
             ex,
             exc_info=True)
-        return response_builder.error(500, 'Unknown Error: {}'.format(ex))
+        return response_builder.error('Unknown Error: {}'.format(ex))
     else:
         data['apps'] = resp
 

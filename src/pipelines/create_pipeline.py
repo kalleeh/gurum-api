@@ -69,7 +69,7 @@ def post(event, context):
             payload
         )
     except Exception as ex:
-        return response_builder.error(500, 'Unknown Error: {}'.format(ex))
+        return response_builder.error('Unknown Error: {}'.format(ex))
     else:
         data['pipelines'] = resp
 

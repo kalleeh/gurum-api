@@ -51,7 +51,7 @@ def get(event, context):
     try:
         stacks = pm.describe_stack()
     except Exception as ex:
-        return response_builder.error(500, 'Unknown Error: {}'.format(ex))
+        return response_builder.error('Unknown Error: {}'.format(ex))
     else:
         stack = stacks[0]
         outputs = tu.kv_to_dict(stack['Outputs'], 'OutputKey', 'OutputValue') if 'Outputs' in stack else []

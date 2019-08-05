@@ -13,20 +13,27 @@ import json
 
 from transform_utils import datetime_serialize
 
-def success(data):
+def success(data, code=200):
     return {
-        'body': json.dumps(data, default=datetime_serialize),
-        'statusCode': '200',
-        'headers': {
-            'Content-Type': 'application/json',
-        },
-    }
-
-def error(code, data):
-    return {
-        'body': data,
+        'body': prepareBody(data),
         'statusCode': code,
         'headers': {
             'Content-Type': 'application/json',
         },
     }
+
+
+def error(data, code=500):
+    return {
+        'body': prepareBody(data),
+        'statusCode': code,
+        'headers': {
+            'Content-Type': 'application/json',
+        },
+    }
+
+def prepareBody(data):
+    return serializeDict(data) if isinstance(data, dict) else data
+
+def serializeDict(obj):
+    return json.dumps(obj, default=datetime_serialize)

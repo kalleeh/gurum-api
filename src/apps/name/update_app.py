@@ -64,11 +64,11 @@ def patch(event, context):
             payload
         )
     except NoSuchObject:
-        return response_builder.error(400, 'No such application.')
+        return response_builder.error('No such application.', 400)
     except PermissionDenied:
-        return response_builder.error(401, 'Permission denied.')
+        return response_builder.error('Permission denied.', 401)
     except Exception as ex:
-        return response_builder.error(500, 'Unknown Error: {}'.format(ex))
+        return response_builder.error('Unknown Error: {}'.format(ex))
     else:
         data['apps'] = resp
 
