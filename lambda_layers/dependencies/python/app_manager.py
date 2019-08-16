@@ -13,12 +13,13 @@ import boto3
 
 from logger import configure_logger
 from stack_manager import StackManager
-from parameter_store import ParameterStore
+# from parameter_store import ParameterStore
 
 import transform_utils as tu
+import ssm_helper
 import elb_helper
 
-import config
+# import config
 
 from aws_xray_sdk.core import patch_all
 
@@ -61,10 +62,11 @@ class AppManager(StackManager):
         """
         params = {}
         LOGGER.debug('Generating parameters.')
-        parameter_store = ParameterStore(region=config.PLATFORM_REGION, role=boto3)
-        ssm = parameter_store.fetch_parameters_by_path('/gureume')
-        ssm_params = tu.kv_to_dict(ssm, 'Name', 'Value')
-        ssm_params = tu.build_nested(ssm_params)
+        ssm = ssm_helper.get_params()
+        # parameter_store = ParameterStore(region=config.PLATFORM_REGION, role=boto3)
+        # ssm = parameter_store.fetch_parameters_by_path('/gureume')
+        # ssm_params = tu.kv_to_dict(ssm, 'Name', 'Value')
+        # ssm_params = tu.build_nested(ssm_params)
 
         # mark parameters that should be re-used in CloudFormation and
         # modify depending on payload.
@@ -79,7 +81,7 @@ class AppManager(StackManager):
         # we need to dynamically generate the priorty param to insert
         # since it's required by CFN.
         params['Priority'] = str(elb_helper.get_next_rule_priority(
-            ssm_params['platform']['loadbalancer']['listener-arn']))
+            ssm['platform']['loadbalancer']['listener-arn']))
         params = tu.dict_to_kv(
             params,
             'ParameterKey',
