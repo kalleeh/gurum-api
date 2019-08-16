@@ -331,8 +331,6 @@ class StackManager():
                         stack['StackName'])
                     continue
 
-                """ If checks passed, add the requested keys to the data dict
-                to return """
                 LOGGER.debug(
                     '%s passed checks. Adding to return data.',
                     stack['StackName'])
