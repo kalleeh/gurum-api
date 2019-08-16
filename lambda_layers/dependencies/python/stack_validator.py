@@ -1,0 +1,28 @@
+"""
+This is a sample, non-production-ready template.
+
+© 2019 Amazon Web Services, In​c. or its affiliates. All Rights Reserved.
+
+This AWS Content is provided subject to the terms of the
+AWS Customer Agreement available at http://aws.amazon.com/agreement
+or other written agreement between Customer and either
+Amazon Web Services, Inc. or Amazon Web Services EMEA SARL or both.
+"""
+
+from logger import configure_logger
+
+import config
+
+LOGGER = configure_logger(__name__)
+
+def is_part_of_platform(stack_tags):
+    """
+    Validate that the stack is part of the platform.
+    """
+    platform_tags = config.PLATFORM_TAGS['VERSION']
+
+    if platform_tags in stack_tags:
+        LOGGER.debug('Found %s in tags', platform_tags)
+        return True
+
+    return False

@@ -22,6 +22,7 @@ from logger import configure_logger
 import transform_utils as tu
 import template_generator as tg
 import config
+import stack_validator
 
 from aws_xray_sdk.core import patch_all
 
@@ -314,7 +315,7 @@ class StackManager():
                 stack_tags = tu.kv_to_dict(stack['Tags'], 'Key', 'Value')
                 LOGGER.debug('(filter_stacks) Evaluating Stack: %s', stack)
 
-                if not self._is_platform_stack(stack_tags):
+                if not stack_validator.is_part_of_platform(stack_tags):
                     LOGGER.debug(
                         '%s is not part of the platform.',
                         stack['StackName'])
@@ -420,16 +421,6 @@ class StackManager():
                 return True
 
         return False
-
-    def _is_platform_stack(self, tags):
-        """
-        Validate that the stack is part of the platform.
-        """
-        if config.PLATFORM_TAGS['VERSION'] in tags:
-            LOGGER.debug(
-                'Found %s in tags', config.PLATFORM_TAGS['VERSION'])
-
-            return True
 
     def _is_requested_type(self, tags):
         """
