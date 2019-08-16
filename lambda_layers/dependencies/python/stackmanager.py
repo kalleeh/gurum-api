@@ -410,10 +410,7 @@ class StackManager():
                 return False
         except Exception as ex:
             LOGGER.exception(ex)
-
-            """ Catch and log unhandled exceptions but just returns False.
-            This is desired if something goes wrong permissions should
-            still be denied. """
+            LOGGER.debug('Unknown error occurred. Denying user permission to this resource.')
             return False
         else:
             stack = stacks['Stacks'][0]
