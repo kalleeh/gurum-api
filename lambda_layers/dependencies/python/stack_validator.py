@@ -16,9 +16,6 @@ import config
 LOGGER = configure_logger(__name__)
 
 def is_part_of_platform(stack_tags):
-    """
-    Validate that the stack is part of the platform.
-    """
     platform_tags = config.PLATFORM_TAGS['VERSION']
 
     if platform_tags in stack_tags:
@@ -26,3 +23,11 @@ def is_part_of_platform(stack_tags):
         return True
 
     return False
+
+def is_owned_by_group(groups, tags):
+    LOGGER.debug(
+        'Validating owning group %s is %s:',
+        tags[config.PLATFORM_TAGS['GROUPS']],
+        groups)
+
+    return tags[config.PLATFORM_TAGS['GROUPS']] == groups

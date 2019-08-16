@@ -326,7 +326,7 @@ class StackManager():
                         stack['StackName'],
                         self._stack_type)
                     continue
-                if not self._owned_by_group(stack_tags):
+                if not stack_validator.is_owned_by_group(self._groups, stack_tags):
                     LOGGER.debug(
                         '%s is not owned by requester.',
                         stack['StackName'])
@@ -416,9 +416,7 @@ class StackManager():
         else:
             stack = stacks['Stacks'][0]
             stack_tags = tu.kv_to_dict(stack['Tags'], 'Key', 'Value')
-
-            if self._owned_by_group(stack_tags):
-                return True
+            return stack_validator.is_owned_by_group(self._groups, stack_tags)
 
         return False
 
@@ -433,17 +431,6 @@ class StackManager():
         if self._stack_type == 'any':
             return True
         if tags[config.PLATFORM_TAGS['TYPE']] == self._stack_type:
-            return True
-
-    def _owned_by_group(self, tags):
-        """
-        Validate that the stack owned by the requesters groups.
-        """
-        LOGGER.debug(
-            'Validating owning group %s is %s:',
-            tags[config.PLATFORM_TAGS['GROUPS']],
-            self._groups)
-        if tags[config.PLATFORM_TAGS['GROUPS']] == self._groups:
             return True
 
     @abstractmethod
