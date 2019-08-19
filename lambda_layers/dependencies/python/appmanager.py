@@ -9,11 +9,15 @@ or other written agreement between Customer and either
 Amazon Web Services, Inc. or Amazon Web Services EMEA SARL or both.
 """
 
+import boto3
+
 from logger import configure_logger
 from stackmanager import StackManager
+from parameter_store import ParameterStore
+
+import config
 
 import transform_utils as tu
-import ssm_helper
 import elb_helper
 
 from aws_xray_sdk.core import patch_all
@@ -57,7 +61,21 @@ class AppManager(StackManager):
         """
         params = {}
         LOGGER.debug('Generating parameters.')
-        ssm = ssm_helper.get_params()
+        parameter_store = ParameterStore(
+            config.PLATFORM_REGION,
+            boto3
+        )
+
+        LOGGER.debug(
+            'Got params from SSM: %s',
+            parameter_store)
+
+        parameter_store = tu.kv_to_dict(parameter_store, 'Name', 'Value')
+        ssm = tu.build_nested(parameter_store)
+
+        LOGGER.debug(
+            'Loaded SSM Dictionary into Config: %s',
+            ssm)
 
         # mark parameters that should be re-used in CloudFormation and
         # modify depending on payload.
