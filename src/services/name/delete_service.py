@@ -14,8 +14,6 @@ from exceptions import NoSuchObject, PermissionDenied
 from logger import configure_logger
 from servicemanager import ServiceManager
 
-import transform_utils as tu
-
 import response_builder
 
 from aws_xray_sdk.core import patch_all
