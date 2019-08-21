@@ -18,21 +18,21 @@ from logger import configure_logger
 
 LOGGER = configure_logger(__name__)
 
-PLATFORM_PREFIX = os.getenv('PLATFORM_PREFIX', 'gureume-')
+PLATFORM_PREFIX = os.getenv('PLATFORM_PREFIX', 'gureume')
 PLATFORM_ACCOUNT_ID = os.getenv('PLATFORM_ACCOUNT_ID', '')
 PLATFORM_REGION = os.getenv('PLATFORM_REGION', 'eu-west-1')
-PLATFORM_ECS_CLUSTER = os.getenv('PLATFORM_ECS_CLUSTER', PLATFORM_PREFIX + 'cluster')
+PLATFORM_ECS_CLUSTER = os.getenv('PLATFORM_ECS_CLUSTER', '{}-{}'.format(PLATFORM_PREFIX, 'cluster'))
 PLATFORM_DEPLOYMENT_ROLE = os.getenv('PLATFORM_DEPLOYMENT_ROLE', 'deployment_role')
 PLATFORM_BUCKET = os.getenv('PLATFORM_BUCKET', None)
 
 # Tags for the platform
 PLATFORM_TAGS = {}
-PLATFORM_TAGS['TYPE'] = os.getenv('PLATFORM_TAGS_TYPE', PLATFORM_PREFIX + 'platform-type')
-PLATFORM_TAGS['SUBTYPE'] = os.getenv('PLATFORM_TAGS_SUBTYPE', PLATFORM_PREFIX + 'platform-subtype')
-PLATFORM_TAGS['VERSION'] = os.getenv('PLATFORM_TAGS_VERSION', PLATFORM_PREFIX + 'platform-version')
-PLATFORM_TAGS['OWNER'] = os.getenv('PLATFORM_TAGS_OWNER', PLATFORM_PREFIX + 'owner')
-PLATFORM_TAGS['REGION'] = os.getenv('PLATFORM_TAGS_REGION', PLATFORM_PREFIX + 'region')
-PLATFORM_TAGS['GROUPS'] = os.getenv('PLATFORM_TAGS_GROUPS', PLATFORM_PREFIX + 'groups')
+PLATFORM_TAGS['TYPE'] = os.getenv('PLATFORM_TAGS_TYPE', '{}-{}'.format(PLATFORM_PREFIX, 'platform-type'))
+PLATFORM_TAGS['SUBTYPE'] = os.getenv('PLATFORM_TAGS_SUBTYPE', '{}-{}'.format(PLATFORM_PREFIX, 'platform-subtype'))
+PLATFORM_TAGS['VERSION'] = os.getenv('PLATFORM_TAGS_VERSION', '{}-{}'.format(PLATFORM_PREFIX, 'platform-version'))
+PLATFORM_TAGS['OWNER'] = os.getenv('PLATFORM_TAGS_OWNER', '{}-{}'.format(PLATFORM_PREFIX, 'owner'))
+PLATFORM_TAGS['REGION'] = os.getenv('PLATFORM_TAGS_REGION', '{}-{}'.format(PLATFORM_PREFIX, 'region'))
+PLATFORM_TAGS['GROUPS'] = os.getenv('PLATFORM_TAGS_GROUPS', '{}-{}'.format(PLATFORM_PREFIX, 'groups'))
 
 
 def get_user_context(event):

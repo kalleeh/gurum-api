@@ -66,13 +66,7 @@ class AppManager(StackManager):
             boto3
         )
 
-        LOGGER.debug(
-            'Got params from SSM: %s',
-            parameter_store)
-
-        parameter_store = tu.kv_to_dict(parameter_store, 'Name', 'Value')
-        ssm = tu.build_nested(parameter_store)
-
+        ssm = parameter_store.get_parameters()
         LOGGER.debug(
             'Loaded SSM Dictionary into Config: %s',
             ssm)
