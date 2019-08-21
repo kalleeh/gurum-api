@@ -10,7 +10,6 @@ Amazon Web Services, Inc. or Amazon Web Services EMEA SARL or both.
 """
 
 import datetime
-
 import config
 
 from logger import configure_logger
