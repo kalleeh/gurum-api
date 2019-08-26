@@ -1,0 +1,27 @@
+environments:
+  - name: dev
+    vars:
+      - name: MyVar
+        value: EnvironmentVariable
+      - name: ThatVar
+        value: AnotherEnvVar
+  - name: prod
+pipeline:
+  source:
+    provider: github
+    repo: kalleeh/2048
+services:
+  - name: block_storage
+    type: s3
+    vars:
+      - name: sse_enabled
+        value: 'true'
+      - name: public_read
+        value: 'false'
+  - name: customer_database
+    type: rds
+    vars:
+      - name: engine
+        value: mysql
+      - name: instance_class
+        value: db.t2.small

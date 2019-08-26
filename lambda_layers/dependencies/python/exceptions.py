@@ -20,6 +20,11 @@ class InvalidInput(Error):
     pass
 
 
+class InvalidServiceManifest(Error):
+    """Raised when invalid service manifest has been passed"""
+    pass
+
+
 class AlreadyExists(Error):
     """Raised when a stack already exists"""
     pass
@@ -31,7 +36,7 @@ class NoSuchObject(Error):
     pass
 
 
-class ParameterNotFoundError(Error):
+class ParameterNotFound(Error):
     """
     Parameter not found in Parameter Store
     """

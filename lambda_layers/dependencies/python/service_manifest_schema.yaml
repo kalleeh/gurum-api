@@ -1,0 +1,19 @@
+environments: list(include('environment'))
+pipeline:
+  source:
+    provider: str()
+    repo: str()
+services: list(include('service'), required=False)
+---
+environment:
+  name: str()
+  vars: list(include('vars'), required=False)
+
+service:
+  name: str()
+  type: str()
+  vars: list(include('vars'), required=False)
+
+vars:
+  name: str()
+  value: str()

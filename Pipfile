@@ -5,6 +5,8 @@ name = "pypi"
 
 [packages]
 "boto3" = "*"
+pyyaml = "*"
+yamale = "*"
 
 [dev-packages]
 tox = "*"
