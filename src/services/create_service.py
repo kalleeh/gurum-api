@@ -11,14 +11,13 @@ Amazon Web Services, Inc. or Amazon Web Services EMEA SARL or both.
 
 import json
 
-from service_manager import ServiceManager
-
-import transform_utils
-import response_builder
-
 from aws_xray_sdk.core import patch_all
-
 from logger import configure_logger
+
+import response_builder
+import transform_utils
+
+from service_manager import ServiceManager
 
 patch_all()
 

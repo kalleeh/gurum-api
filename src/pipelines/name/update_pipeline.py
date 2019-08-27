@@ -9,17 +9,15 @@ or other written agreement between Customer and either
 Amazon Web Services, Inc. or Amazon Web Services EMEA SARL or both.
 """
 
-
 import json
 
 from exceptions import NoSuchObject, PermissionDenied
-from pipeline_manager import PipelineManager
+from aws_xray_sdk.core import patch_all
+from logger import configure_logger
 
 import response_builder
 
-from aws_xray_sdk.core import patch_all
-
-from logger import configure_logger
+from pipeline_manager import PipelineManager
 
 patch_all()
 

@@ -12,14 +12,13 @@ Amazon Web Services, Inc. or Amazon Web Services EMEA SARL or both.
 import json
 
 from exceptions import AlreadyExists
-from app_manager import AppManager
-
-import transform_utils
-import response_builder
-
 from aws_xray_sdk.core import patch_all
-
 from logger import configure_logger
+
+import response_builder
+import transform_utils
+
+from app_manager import AppManager
 
 patch_all()
 
