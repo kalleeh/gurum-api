@@ -3,15 +3,15 @@ project:
     provider: str()
     repo: str()
   type: str()
-  params: map()
 environments: list(include('environment'))
 services: list(include('service'), required=False)
 ---
 environment:
   name: str()
-  vars: map()
+  config: map()
+  env: map()
 
 service:
   name: str()
   type: str()
-  params: map()
+  config: map()

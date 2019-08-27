@@ -3,23 +3,27 @@ project:
     provider: github
     repo: kalleeh/2048
   type: ecs-shared-lb
-  params:
-    - cpu: '1024'
-    - memory: '4096'
 environments:
   - name: dev
-    vars:
-      - MyVar: EnvironmentVariable
+    &config:
+      - cpu: '256'
+      - memory: '1024'
+    env:
+      - environment: dev
       - YourVar: AnotherEnvVar
   - name: prod
+    *config
+    env:
+      - environment: prod
+      - YourVar: AnotherEnvVar
 services:
   - name: block_storage
     type: s3
-    params:
-      - sse_enabled: 'true'
-      - public_read: 'false'
+    config:
+      - BucketName: my-block-storage-bucket
+      - LoggingPrefix: log-prefix
   - name: customer_database
     type: rds
-    params:
+    config:
       - engine: mysql
       - instance_class: db.t2.small
