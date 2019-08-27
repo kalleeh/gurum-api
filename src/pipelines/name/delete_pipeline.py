@@ -15,7 +15,7 @@ from logger import configure_logger
 
 import response_builder
 
-from pipeline_manager import PipelineManager
+from managers.pipeline_manager import PipelineManager
 
 patch_all()
 

@@ -9,13 +9,13 @@ or other written agreement between Customer and either
 Amazon Web Services, Inc. or Amazon Web Services EMEA SARL or both.
 """
 
+from aws_xray_sdk.core import patch_all
 from logger import configure_logger
 from paginator import paginator
-from stack_manager import StackManager
 
 import transform_utils
 
-from aws_xray_sdk.core import patch_all
+from stack_manager import StackManager
 
 patch_all()
 

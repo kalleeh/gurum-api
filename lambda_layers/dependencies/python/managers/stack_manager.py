@@ -17,14 +17,13 @@ from exceptions import AlreadyExists, InvalidInput, NoSuchObject, \
 import boto3
 from botocore.exceptions import ValidationError, ClientError
 
+from aws_xray_sdk.core import patch_all
 from logger import configure_logger
 
 import transform_utils
 import template_generator as tg
 import config
 import stack_validator
-
-from aws_xray_sdk.core import patch_all
 
 patch_all()
 

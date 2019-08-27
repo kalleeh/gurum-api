@@ -16,7 +16,7 @@ from logger import configure_logger
 import response_builder
 import transform_utils
 
-from service_manager import ServiceManager
+from managers.service_manager import ServiceManager
 
 patch_all()
 

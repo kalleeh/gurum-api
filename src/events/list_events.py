@@ -14,7 +14,7 @@ from logger import configure_logger
 
 import response_builder
 
-from event_manager import EventManager
+from managers.event_manager import EventManager
 
 patch_all()
 

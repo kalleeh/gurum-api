@@ -11,13 +11,13 @@ Amazon Web Services, Inc. or Amazon Web Services EMEA SARL or both.
 
 import boto3
 
-from logger import configure_logger
-from stack_manager import StackManager
-
-import transform_utils
-import config
-
 from aws_xray_sdk.core import patch_all
+from logger import configure_logger
+
+import config
+import transform_utils
+
+from stack_manager import StackManager
 
 patch_all()
 

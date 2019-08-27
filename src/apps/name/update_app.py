@@ -17,7 +17,7 @@ from logger import configure_logger
 
 import response_builder
 
-from app_manager import AppManager
+from managers.app_manager import AppManager
 
 patch_all()
 
