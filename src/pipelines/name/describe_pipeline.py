@@ -10,15 +10,14 @@ Amazon Web Services, Inc. or Amazon Web Services EMEA SARL or both.
 """
 
 from exceptions import NoSuchObject, PermissionDenied
-
-from logger import configure_logger
 from pipeline_manager import PipelineManager
 
-import transform_utils as tu
-
+import transform_utils
 import response_builder
 
 from aws_xray_sdk.core import patch_all
+
+from logger import configure_logger
 
 patch_all()
 
@@ -61,7 +60,7 @@ def get(event, _context):
     else:
         stack = stacks[0]
 
-        outputs = tu.kv_to_dict(stack['Outputs'], 'OutputKey', 'OutputValue') if 'Outputs' in stack else []
+        outputs = transform_utils.kv_to_dict(stack['Outputs'], 'OutputKey', 'OutputValue') if 'Outputs' in stack else []
 
         data['pipelines'].append(
             {

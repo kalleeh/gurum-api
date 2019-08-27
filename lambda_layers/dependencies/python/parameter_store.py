@@ -9,7 +9,7 @@ from paginator import paginator
 from logger import configure_logger
 
 import config
-import transform_utils as tu
+import transform_utils
 
 LOGGER = configure_logger(__name__)
 
@@ -28,9 +28,9 @@ class ParameterStore:
         LOGGER.debug(
             'Got params from SSM: %s',
             params)
-        params = tu.kv_to_dict(params, 'Name', 'Value')
+        params = transform_utils.kv_to_dict(params, 'Name', 'Value')
 
-        return tu.build_nested(params)
+        return transform_utils.build_nested(params)
 
     def put_parameter(self, name, value):
         """Puts a Parameter into Parameter Store
@@ -43,7 +43,7 @@ class ParameterStore:
             LOGGER.debug('Putting SSM Parameter %s with value %s', name, value)
             self.client.put_parameter(
                 Name=name,
-                Description=PARAMETER_DESCRIPTION,
+                Description='Gurum Platform Parameter',
                 Value=value,
                 Type='String',
                 Overwrite=True

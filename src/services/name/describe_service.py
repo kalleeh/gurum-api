@@ -14,7 +14,7 @@ from exceptions import NoSuchObject, PermissionDenied
 from logger import configure_logger
 from service_manager import ServiceManager
 
-import transform_utils as tu
+import transform_utils
 
 import response_builder
 
@@ -51,7 +51,7 @@ def get(event, _context):
     else:
         stack = stacks[0]
 
-        outputs = tu.kv_to_dict(stack['Outputs'], 'OutputKey', 'OutputValue') if 'Outputs' in stack else []
+        outputs = transform_utils.kv_to_dict(stack['Outputs'], 'OutputKey', 'OutputValue') if 'Outputs' in stack else []
 
         data['services'].append(
             {

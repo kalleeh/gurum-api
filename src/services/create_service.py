@@ -14,7 +14,7 @@ import json
 from logger import configure_logger
 from service_manager import ServiceManager
 
-import transform_utils as tu
+import transform_utils
 
 import response_builder
 
@@ -54,7 +54,7 @@ def post(event, _context):
 
     # Configure default values if not present
 
-    name = tu.add_prefix(payload['name'])
+    name = transform_utils.add_prefix(payload['name'])
 
     if 'subtype' not in payload:
         payload['subtype'] = 's3'

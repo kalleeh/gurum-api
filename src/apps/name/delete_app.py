@@ -10,13 +10,13 @@ Amazon Web Services, Inc. or Amazon Web Services EMEA SARL or both.
 """
 
 from exceptions import NoSuchObject, PermissionDenied
-
-from logger import configure_logger
 from app_manager import AppManager
 
 import response_builder
 
 from aws_xray_sdk.core import patch_all
+
+from logger import configure_logger
 
 patch_all()
 

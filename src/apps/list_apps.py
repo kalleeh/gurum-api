@@ -9,14 +9,14 @@ or other written agreement between Customer and either
 Amazon Web Services, Inc. or Amazon Web Services EMEA SARL or both.
 """
 
-from logger import configure_logger
 from app_manager import AppManager
 
-import transform_utils as tu
-
+import transform_utils
 import response_builder
 
 from aws_xray_sdk.core import patch_all
+
+from logger import configure_logger
 
 patch_all()
 
@@ -59,8 +59,8 @@ def get(event, _context):
     else:
         LOGGER.debug('Looping through stacks and building response.')
         for stack in stacks:
-            name = tu.remove_prefix(stack['StackName'])
-            params = tu.kv_to_dict(stack['Parameters'], 'ParameterKey', 'ParameterValue')
+            name = transform_utils.remove_prefix(stack['StackName'])
+            params = transform_utils.kv_to_dict(stack['Parameters'], 'ParameterKey', 'ParameterValue')
             data['apps'].append(
                 {
                     'name': name,

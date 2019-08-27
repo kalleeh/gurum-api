@@ -12,7 +12,7 @@ Amazon Web Services, Inc. or Amazon Web Services EMEA SARL or both.
 from logger import configure_logger
 from service_manager import ServiceManager
 
-import transform_utils as tu
+import transform_utils
 
 import response_builder
 
@@ -48,8 +48,8 @@ def get(event, _context):
         return response_builder.error('Unknown Error: {}'.format(ex))
     else:
         for stack in stacks:
-            name = tu.remove_prefix(stack['StackName'])
-            params = tu.kv_to_dict(stack['Parameters'], 'ParameterKey', 'ParameterValue')
+            name = transform_utils.remove_prefix(stack['StackName'])
+            params = transform_utils.kv_to_dict(stack['Parameters'], 'ParameterKey', 'ParameterValue')
             data['services'].append(
                 {
                     'name': name,

@@ -9,17 +9,17 @@ or other written agreement between Customer and either
 Amazon Web Services, Inc. or Amazon Web Services EMEA SARL or both.
 """
 
-from exceptions import AlreadyExists
 import json
 
-from logger import configure_logger
+from exceptions import AlreadyExists
 from app_manager import AppManager
 
-import transform_utils as tu
-
+import transform_utils
 import response_builder
 
 from aws_xray_sdk.core import patch_all
+
+from logger import configure_logger
 
 patch_all()
 
@@ -57,7 +57,7 @@ def post(event, _context):
 
     # Configure default values if not present
 
-    name = tu.add_prefix(payload['name'])
+    name = transform_utils.add_prefix(payload['name'])
 
     if 'subtype' not in payload:
         payload['subtype'] = 'shared-lb'

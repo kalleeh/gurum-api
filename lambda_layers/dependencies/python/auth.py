@@ -11,7 +11,7 @@ Amazon Web Services, Inc. or Amazon Web Services EMEA SARL or both.
 
 from logger import configure_logger
 
-import transform_utils as tu
+import transform_utils
 import config
 
 from aws_xray_sdk.core import patch_all
@@ -76,7 +76,7 @@ class Auth:
             raise PermissionError('Permission denied.', 403)
 
     def _tags_are_valid(self, tags, stack_type):
-        stack_tags = tu.kv_to_dict(tags, 'Key', 'Value')
+        stack_tags = transform_utils.kv_to_dict(tags, 'Key', 'Value')
 
         if not config.PLATFORM_TAGS['TYPE'] in stack_tags:
             return False

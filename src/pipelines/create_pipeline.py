@@ -14,7 +14,7 @@ import json
 from logger import configure_logger
 from pipeline_manager import PipelineManager
 
-import transform_utils as tu
+import transform_utils
 
 import response_builder
 
@@ -55,7 +55,7 @@ def post(event, _context):
 
     payload = json.loads(event['body-json'][0])
 
-    name = tu.add_prefix(payload['name'])
+    name = transform_utils.add_prefix(payload['name'])
 
     # Configure default values if not present
     if 'subtype' not in payload:
