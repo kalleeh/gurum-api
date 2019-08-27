@@ -9,14 +9,14 @@ or other written agreement between Customer and either
 Amazon Web Services, Inc. or Amazon Web Services EMEA SARL or both.
 """
 
-from logger import configure_logger
 from service_manager import ServiceManager
 
 import transform_utils
-
 import response_builder
 
 from aws_xray_sdk.core import patch_all
+
+from logger import configure_logger
 
 patch_all()
 
