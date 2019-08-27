@@ -66,10 +66,10 @@ class AppManager(StackManager):
             boto3
         )
 
-        ssm = parameter_store.get_parameters()
+        ssm_params = parameter_store.get_parameters()
         LOGGER.debug(
             'Loaded SSM Dictionary into Config: %s',
-            ssm)
+            ssm_params)
 
         # mark parameters that should be re-used in CloudFormation and
         # modify depending on payload.
@@ -84,7 +84,7 @@ class AppManager(StackManager):
         # we need to dynamically generate the priorty param to insert
         # since it's required by CFN.
         params['Priority'] = str(elb_helper.get_next_rule_priority(
-            ssm['platform']['loadbalancer']['listener-arn']))
+            ssm_params['platform']['loadbalancer']['listener-arn']))
         params = tu.dict_to_kv(
             params,
             'ParameterKey',
