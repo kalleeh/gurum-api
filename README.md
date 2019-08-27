@@ -55,22 +55,27 @@ Once you have the API up and running you will need to configure your developer a
 
 ```json
 {
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Action": [
-                "logs:FilterLogEvents"
-            ],
-            "Effect": "Allow",
-            "Resource": "arn:aws:logs:[Enter region id]:[Enter account id]:log-group:*"
+    "Effect": "Allow",
+    "Action": [
+        "codecommit:*",
+        "logs:FilterLogEvents"
+    ],
+    "Resource": "*",
+    "Condition": {
+        "StringEquals": {
+            "aws:ResourceTag/gureume-groups": "${aws:PrincipalTag/gureume-groups}"
         }
-    ]
+    }
 }
 ```
+
+1.2 Add the tag gureume-groups on each of the IAM roles you create. The value should be equal to the Cognito group (tenant) you want them to have access to.
+This will dynamically give them permissions to all CodeCommit Repositories and CloudWatch Logs that are tagged with the same group value.
 
 ### 2. Configure Cognito
 
 #### 2.1 Create Groups
+
 2.1.1 Navigate to [Cognito User Pools](https://console.aws.amazon.com/cognito/users/) on the web console and select `gureume_users`.
 
 2.1.2 Select `Users and groups` from the navigation panel under general settings.

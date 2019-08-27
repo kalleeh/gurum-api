@@ -16,5 +16,5 @@ if [ ! -d "lambda_layers/aws-xray-sdk" ]; then
 fi
 # find lambda_layers -type d -name "__pycache__" -exec rm -r {} \;
 
-aws cloudformation package --template-file template.yaml --s3-bucket $S3_BUCKET --s3-prefix 'cfn' --output-template-file template-deploy.yaml
+aws cloudformation package --template-file src/template.yaml --s3-bucket $S3_BUCKET --s3-prefix 'cfn' --output-template-file template-deploy.yaml
 aws cloudformation deploy --template-file template-deploy.yaml --stack-name $STACK_NAME --capabilities CAPABILITY_NAMED_IAM

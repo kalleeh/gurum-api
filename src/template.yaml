@@ -14,6 +14,20 @@ Description: >
     'This SAM template creates the management API for the container platform.
     Last Modified: July 3rd 2019
     Author: Karl Wallbom <wallbomk@amazon.com'
+Metadata:
+  AWS::ServerlessRepo::Application:
+    Name: gureum-application-platform
+    Description: >
+      'The Gureum Application Platform helps organizations provide a simple and
+       efficient way to programmatically give their developers access to AWS environments.'
+    Author: Gureum Application Platform Team
+    SpdxLicenseId: Apache-2.0
+    LicenseUrl: ../LICENSE.txt
+    ReadmeUrl: ../README.md
+    Labels: ['container', 'application', 'platform', 'cicd', 'devops']
+    HomePageUrl: https://github.com/kalleeh/gureume-api
+    SemanticVersion: 0.0.1
+    SourceCodeUrl: https://github.com/kalleeh/gureume-api
 
 Parameters:
 
@@ -30,7 +44,7 @@ Globals:
     Environment:
       Variables:
         PLATFORM_REGION: !Ref "AWS::Region"
-        PLATFORM_PREFIX: !Sub "${PlatformPrefix}-"
+        PLATFORM_PREFIX: !Sub "${PlatformPrefix}"
         PLATFORM_BUCKET: !Ref ProductsBucket
         PLATFORM_DEPLOYMENT_ROLE: !GetAtt DeploymentRole.Arn
 
@@ -246,13 +260,13 @@ Resources:
         Fn::Transform:
           Name: AWS::Include
           Parameters:            
-            Location: "swagger/swagger.yaml"
+            Location: "swagger.yaml"
 
   ### Lambda Layers ###
   DependenciesLayerVersion:
     Type: "AWS::Serverless::LayerVersion"
     Properties:
-      ContentUri: "lambda_layers/dependencies"
+      ContentUri: "../lambda_layers/dependencies"
       CompatibleRuntimes: 
         - python3.6
         - python3.7
@@ -262,7 +276,7 @@ Resources:
   XRayLayerVersion:
     Type: "AWS::Serverless::LayerVersion"
     Properties:
-      ContentUri: "lambda_layers/aws-xray-sdk"
+      ContentUri: "../lambda_layers/aws-xray-sdk"
       CompatibleRuntimes: 
         - python3.6
         - python3.7
@@ -274,7 +288,7 @@ Resources:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: list_apps.get
-      CodeUri: src/apps
+      CodeUri: apps
       MemorySize: 1024
       Layers:
         - !Ref DependenciesLayerVersion
@@ -299,7 +313,7 @@ Resources:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: create_app.post
-      CodeUri: src/apps
+      CodeUri: apps
       MemorySize: 1024
       Layers:
         - !Ref DependenciesLayerVersion
@@ -328,7 +342,7 @@ Resources:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: describe_app.get
-      CodeUri: src/apps/name
+      CodeUri: apps/name
       MemorySize: 1024
       Layers:
         - !Ref DependenciesLayerVersion
@@ -353,7 +367,7 @@ Resources:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: delete_app.delete
-      CodeUri: src/apps/name
+      CodeUri: apps/name
       MemorySize: 1024
       Layers:
         - !Ref DependenciesLayerVersion
@@ -379,7 +393,7 @@ Resources:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: update_app.patch
-      CodeUri: src/apps/name
+      CodeUri: apps/name
       MemorySize: 1024
       Layers:
         - !Ref DependenciesLayerVersion
@@ -410,7 +424,7 @@ Resources:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: list_events.get
-      CodeUri: src/events
+      CodeUri: events
       MemorySize: 1024
       Layers:
         - !Ref DependenciesLayerVersion
@@ -437,7 +451,7 @@ Resources:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: list_pipelines.get
-      CodeUri: src/pipelines
+      CodeUri: pipelines
       MemorySize: 1024
       Layers:
         - !Ref DependenciesLayerVersion
@@ -462,7 +476,7 @@ Resources:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: create_pipeline.post
-      CodeUri: src/pipelines
+      CodeUri: pipelines
       MemorySize: 1024
       Layers:
         - !Ref DependenciesLayerVersion
@@ -489,7 +503,7 @@ Resources:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: describe_pipeline.get
-      CodeUri: src/pipelines/name
+      CodeUri: pipelines/name
       MemorySize: 1024
       Layers:
         - !Ref DependenciesLayerVersion
@@ -514,7 +528,7 @@ Resources:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: delete_pipeline.delete
-      CodeUri: src/pipelines/name
+      CodeUri: pipelines/name
       MemorySize: 1024
       Layers:
         - !Ref DependenciesLayerVersion
@@ -540,7 +554,7 @@ Resources:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: update_pipeline.patch
-      CodeUri: src/pipelines/name
+      CodeUri: pipelines/name
       MemorySize: 1024
       Layers:
         - !Ref DependenciesLayerVersion
@@ -568,7 +582,7 @@ Resources:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: describe_pipeline_state.get
-      CodeUri: src/pipelines/name/states
+      CodeUri: pipelines/name/states
       MemorySize: 1024
       Layers:
         - !Ref DependenciesLayerVersion
@@ -594,7 +608,7 @@ Resources:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: put_pipeline_state.put
-      CodeUri: src/pipelines/name/states
+      CodeUri: pipelines/name/states
       MemorySize: 1024
       Layers:
         - !Ref DependenciesLayerVersion
@@ -622,7 +636,7 @@ Resources:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: list_services.get
-      CodeUri: src/services
+      CodeUri: services
       MemorySize: 1024
       Layers:
         - !Ref DependenciesLayerVersion
@@ -647,7 +661,7 @@ Resources:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: create_service.post
-      CodeUri: src/services
+      CodeUri: services
       MemorySize: 1024
       Layers:
         - !Ref DependenciesLayerVersion
@@ -674,7 +688,7 @@ Resources:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: describe_service.get
-      CodeUri: src/services/name
+      CodeUri: services/name
       MemorySize: 1024
       Layers:
         - !Ref DependenciesLayerVersion
@@ -699,7 +713,7 @@ Resources:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: delete_service.delete
-      CodeUri: src/services/name
+      CodeUri: services/name
       MemorySize: 1024
       Layers:
         - !Ref DependenciesLayerVersion
@@ -725,7 +739,7 @@ Resources:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: update_service.patch
-      CodeUri: src/services/name
+      CodeUri: services/name
       MemorySize: 1024
       Layers:
         - !Ref DependenciesLayerVersion
