@@ -6,19 +6,19 @@
 import os
 import boto3
 
-from exceptions import InvalidServiceManifest
+from exceptions import InvalidGurumManifest
 from pytest import fixture, raises
 from mock import Mock
-from service_manifest import ServiceManifest
+from gurum_manifest import GurumManifest
 
 
 @fixture
 def cls():
-    return ServiceManifest(
-        manifest_schema_path='{0}/../service_manifest_schema.yaml'.format(
+    return GurumManifest(
+        manifest_schema_path='{0}/../gurum_manifest_schema.yaml'.format(
             os.path.dirname(os.path.realpath(__file__))
         ),
-        manifest_path='{0}/stubs/service_manifest_stub.yaml'.format(
+        manifest_path='{0}/stubs/gurum_manifest_stub.yaml'.format(
             os.path.dirname(os.path.realpath(__file__))
         )
     )
@@ -30,7 +30,7 @@ def test_validate_schema(cls):
 
 def test_validate_invalid_no_content(cls):
     cls.manifest_path = ''
-    with raises(InvalidServiceManifest):
+    with raises(InvalidGurumManifest):
         cls._validate()
 
 

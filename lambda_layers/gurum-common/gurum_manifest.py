@@ -7,7 +7,7 @@ Module used for working with the Service Manifest file.
 
 import os
 
-from exceptions import InvalidServiceManifest
+from exceptions import InvalidGurumManifest
 
 import yaml
 import yamale
@@ -16,15 +16,15 @@ from logger import configure_logger
 LOGGER = configure_logger(__name__)
 
 
-class ServiceManifest:
+class GurumManifest:
     def __init__(
             self,
             manifest_schema_path,
             manifest_path=None
     ):
-        self.manifest_path = manifest_path or 'service.yaml'
-        self.manifest_dir_path = manifest_path or 'service_manifest'
-        self.manifest_schema_path = manifest_schema_path or 'service_manifest_schema.yaml'
+        self.manifest_path = manifest_path or 'gurum.yaml'
+        self.manifest_dir_path = manifest_path or 'gurum_manifest'
+        self.manifest_schema_path = manifest_schema_path or 'gurum_manifest_schema.yaml'
         self._get_all()
         self.account_ou_names = {}
         self._validate()
@@ -37,7 +37,7 @@ class ServiceManifest:
             with open(file_path, 'r') as stream:
                 return yaml.load(stream, Loader=yaml.FullLoader)
         except FileNotFoundError:
-            LOGGER.info('No service manifest file found at %s, continuing', file_path)
+            LOGGER.info('No manifest file found at %s, continuing', file_path)
             return {}
 
     def determine_extend_map(self, service_manifest):
@@ -49,7 +49,7 @@ class ServiceManifest:
         self.manifest_contents['environments'] = []
         if os.path.isdir(self.manifest_dir_path):
             for file in os.listdir(self.manifest_dir_path):
-                if file.endswith(".yaml") and file != 'example-service.yaml':
+                if file.endswith(".yaml") and file != 'example-gurum.yaml':
                     self.determine_extend_map(
                         self._read('{0}/{1}'.format(self.manifest_dir_path, file))
                     )
@@ -57,7 +57,7 @@ class ServiceManifest:
             self._read()  # Calling with default no args to get service.yaml in root if it exists
         )
         if not self.manifest_contents['environments']:
-            raise InvalidServiceManifest("No Service Manifest files found..")
+            raise InvalidGurumManifest("No manifest files found..")
 
     def _validate(self):
         """
@@ -69,14 +69,14 @@ class ServiceManifest:
 
             yamale.validate(schema, data)
         except ValueError:
-            raise InvalidServiceManifest(
+            raise InvalidGurumManifest(
                 "Deployment Map target or regions specification is invalid"
             )
         except KeyError:
-            raise InvalidServiceManifest(
+            raise InvalidGurumManifest(
                 "Deployment Map target or regions specification is invalid"
             )
         except FileNotFoundError:
-            raise InvalidServiceManifest(
+            raise InvalidGurumManifest(
                 "No Service Map files found, create a service.yaml file."
             )

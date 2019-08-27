@@ -20,7 +20,7 @@ class InvalidInput(Error):
     pass
 
 
-class InvalidServiceManifest(Error):
+class InvalidGurumManifest(Error):
     """Raised when invalid service manifest has been passed"""
     pass
 

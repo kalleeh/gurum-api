@@ -1,0 +1,17 @@
+project:
+  source:
+    provider: str()
+    repo: str()
+  type: str()
+  params: map()
+environments: list(include('environment'))
+services: list(include('service'), required=False)
+---
+environment:
+  name: str()
+  vars: map()
+
+service:
+  name: str()
+  type: str()
+  params: map()
