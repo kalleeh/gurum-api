@@ -16,6 +16,7 @@ from logger import configure_logger
 
 LOGGER = configure_logger(__name__)
 
+
 def datetime_serialize(o):
     """ Serialize boto3 datetime response to JSON compatible format
     """
@@ -39,7 +40,12 @@ def filter_dict(dict_to_filter, keys_to_save):
 def add_prefix(string_to_add_prefix_to):
     """ String modifier to add platform prefix to application names
     """
-    return config.PLATFORM_PREFIX + string_to_add_prefix_to
+    processed_string = '{}-{}'.format(
+        config.PLATFORM_PREFIX,
+        string_to_add_prefix_to)
+
+    return processed_string
+
 
 def remove_prefix(string_to_remove_prefix_from):
     """ String modifier to remove platform prefix from application names
@@ -48,7 +54,7 @@ def remove_prefix(string_to_remove_prefix_from):
 
     if string_to_remove_prefix_from.startswith(config.PLATFORM_PREFIX):
         processed_string = string_to_remove_prefix_from[
-            len(config.PLATFORM_PREFIX):]
+            len(config.PLATFORM_PREFIX)+1:]
 
     return processed_string
 

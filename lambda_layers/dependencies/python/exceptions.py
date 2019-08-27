@@ -31,6 +31,13 @@ class NoSuchObject(Error):
     pass
 
 
+class ParameterNotFoundError(Error):
+    """
+    Parameter not found in Parameter Store
+    """
+    pass
+
+
 class PermissionDenied(Error):
     """Raised when an action is performed on a resource
     the principal doesn't have permissions to."""
