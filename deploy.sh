@@ -17,6 +17,3 @@ fi
 
 aws cloudformation package --template-file src/template.yaml --s3-bucket $S3_BUCKET --s3-prefix 'cfn' --output-template-file template-deploy.yaml
 aws cloudformation deploy --template-file template-deploy.yaml --stack-name $STACK_NAME --capabilities CAPABILITY_NAMED_IAM
-
-# Build and publish to SAR
-# sam build -t src/template.yaml --use-container && sam package --output-template-file packaged.yaml --s3-bucket gureum-sar-eu-west-1 && sam publish --template packaged.yaml --region eu-west-1
