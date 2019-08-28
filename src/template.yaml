@@ -271,7 +271,7 @@ Resources:
         - python3.6
         - python3.7
       Description: "Shared libraries across functions"
-      LayerName: shared_layer
+      LayerName: shared_dependencies_layer
   
   XRayLayerVersion:
     Type: "AWS::Serverless::LayerVersion"

@@ -117,7 +117,7 @@ def reuse_vals(key_names):
         key_type (param|tag): Defines the format for key name.
             Defaults to 'param'.
     Basic Usage:
-        >>> params = tu.reuse_vals(params, ['Listener','Priority'])
+        >>> params = transform_utils.reuse_vals(params, ['Listener','Priority'])
     Returns:
         my_list (list): List representing AWS exitinsg keypairs with the new
             one appended.

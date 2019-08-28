@@ -11,16 +11,15 @@ Amazon Web Services, Inc. or Amazon Web Services EMEA SARL or both.
 
 import boto3
 
+from aws_xray_sdk.core import patch_all
 from logger import configure_logger
-from stackmanager import StackManager
-from parameter_store import ParameterStore
 
 import config
-
-import transform_utils as tu
+import transform_utils
 import elb_helper
 
-from aws_xray_sdk.core import patch_all
+from managers.stack_manager import StackManager
+from parameter_store import ParameterStore
 
 patch_all()
 
@@ -66,10 +65,10 @@ class AppManager(StackManager):
             boto3
         )
 
-        ssm = parameter_store.get_parameters()
+        ssm_params = parameter_store.get_parameters()
         LOGGER.debug(
             'Loaded SSM Dictionary into Config: %s',
-            ssm)
+            ssm_params)
 
         # mark parameters that should be re-used in CloudFormation and
         # modify depending on payload.
@@ -84,12 +83,12 @@ class AppManager(StackManager):
         # we need to dynamically generate the priorty param to insert
         # since it's required by CFN.
         params['Priority'] = str(elb_helper.get_next_rule_priority(
-            ssm['platform']['loadbalancer']['listener-arn']))
-        params = tu.dict_to_kv(
+            ssm_params['platform']['loadbalancer']['listener-arn']))
+        params = transform_utils.dict_to_kv(
             params,
             'ParameterKey',
             'ParameterValue',
             clean=True)
-        params = params + tu.reuse_vals(reuse_params)
+        params = params + transform_utils.reuse_vals(reuse_params)
 
         return params

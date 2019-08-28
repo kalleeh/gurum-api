@@ -17,14 +17,13 @@ from exceptions import AlreadyExists, InvalidInput, NoSuchObject, \
 import boto3
 from botocore.exceptions import ValidationError, ClientError
 
+from aws_xray_sdk.core import patch_all
 from logger import configure_logger
 
-import transform_utils as tu
-import template_generator as tg
 import config
 import stack_validator
-
-from aws_xray_sdk.core import patch_all
+import template_generator
+import transform_utils
 
 patch_all()
 
@@ -96,7 +95,7 @@ class StackManager():
 
         params = self._generate_params(payload)
         tags = self._generate_tags(payload)
-        template_url = tg.generate_template_url(
+        template_url = template_generator.generate_template_url(
             self._stack_type,
             payload)
 
@@ -155,7 +154,7 @@ class StackManager():
                 }
             ]
         """
-        stack_name = tu.add_prefix(self._params['name'])
+        stack_name = transform_utils.add_prefix(self._params['name'])
         LOGGER.debug('Describing stack %s', stack_name)
 
         try:
@@ -181,7 +180,7 @@ class StackManager():
         Returns:
             List: List of ..
         """
-        stack_name = tu.add_prefix(self._params['name'])
+        stack_name = transform_utils.add_prefix(self._params['name'])
         LOGGER.debug(
             'Updating stack %s',
             stack_name)
@@ -191,7 +190,7 @@ class StackManager():
 
         try:
             if payload['upgrade_version']:
-                template_url = tg.generate_template_url(
+                template_url = template_generator.generate_template_url(
                     self._stack_type,
                     payload)
 
@@ -248,7 +247,7 @@ class StackManager():
         Returns:
             List: List of JSON objects containing stack information
         """
-        stack_name = tu.add_prefix(self._params['name'])
+        stack_name = transform_utils.add_prefix(self._params['name'])
         LOGGER.debug(
             'Deleting stack: %s',
             stack_name)
@@ -312,7 +311,7 @@ class StackManager():
 
         try:
             for stack in list_of_dicts_of_stacks:
-                stack_tags = tu.kv_to_dict(stack['Tags'], 'Key', 'Value')
+                stack_tags = transform_utils.kv_to_dict(stack['Tags'], 'Key', 'Value')
                 LOGGER.debug('(filter_stacks) Evaluating Stack: %s', stack)
 
                 if not stack_validator.is_part_of_platform(stack_tags):
@@ -415,7 +414,7 @@ class StackManager():
             return False
         else:
             stack = stacks['Stacks'][0]
-            stack_tags = tu.kv_to_dict(stack['Tags'], 'Key', 'Value')
+            stack_tags = transform_utils.kv_to_dict(stack['Tags'], 'Key', 'Value')
             return stack_validator.is_owned_by_group(self._groups, stack_tags)
 
         return False
@@ -428,10 +427,8 @@ class StackManager():
             'Validating type %s is %s:',
             tags[config.PLATFORM_TAGS['TYPE']],
             self._stack_type)
-        if self._stack_type == 'any':
-            return True
-        if tags[config.PLATFORM_TAGS['TYPE']] == self._stack_type:
-            return True
+        return self._stack_type == 'any' or \
+            tags[config.PLATFORM_TAGS['TYPE']] == self._stack_type
 
     @abstractmethod
     def _generate_params(self, payload):
@@ -467,7 +464,7 @@ class StackManager():
         tags[config.PLATFORM_TAGS['GROUPS']] = self._groups
         tags[config.PLATFORM_TAGS['REGION']] = config.PLATFORM_REGION
         tags[config.PLATFORM_TAGS['OWNER']] = self._user
-        tags = tu.dict_to_kv(tags, 'Key', 'Value')
+        tags = transform_utils.dict_to_kv(tags, 'Key', 'Value')
 
         LOGGER.debug(
             'Loaded Tags: %s ',

@@ -10,15 +10,13 @@ Amazon Web Services, Inc. or Amazon Web Services EMEA SARL or both.
 """
 
 from exceptions import NoSuchObject, PermissionDenied
-
+from aws_xray_sdk.core import patch_all
 from logger import configure_logger
-from appmanager import AppManager
-
-import transform_utils as tu
 
 import response_builder
+import transform_utils
 
-from aws_xray_sdk.core import patch_all
+from managers.app_manager import AppManager
 
 patch_all()
 
@@ -61,8 +59,8 @@ def get(event, _context):
     else:
         stack = stacks[0]
 
-        outputs = tu.kv_to_dict(stack['Outputs'], 'OutputKey', 'OutputValue') if 'Outputs' in stack else []
-        tags = tu.kv_to_dict(stack['Tags'], 'Key', 'Value')
+        outputs = transform_utils.kv_to_dict(stack['Outputs'], 'OutputKey', 'OutputValue') if 'Outputs' in stack else []
+        tags = transform_utils.kv_to_dict(stack['Tags'], 'Key', 'Value')
 
         data['apps'].append(
             {
