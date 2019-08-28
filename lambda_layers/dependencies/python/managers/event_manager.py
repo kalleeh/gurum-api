@@ -9,13 +9,13 @@ or other written agreement between Customer and either
 Amazon Web Services, Inc. or Amazon Web Services EMEA SARL or both.
 """
 
+from aws_xray_sdk.core import patch_all
 from logger import configure_logger
 from paginator import paginator
-from stackmanager import StackManager
 
-import transform_utils as tu
+import transform_utils
 
-from aws_xray_sdk.core import patch_all
+from managers.stack_manager import StackManager
 
 patch_all()
 
@@ -53,7 +53,7 @@ class EventManager(StackManager):
                 }
             ]
         """
-        name = tu.add_prefix(self._params['name'])
+        name = transform_utils.add_prefix(self._params['name'])
         LOGGER.debug(
             'Getting events for stack %s:',
             name)
@@ -66,7 +66,7 @@ class EventManager(StackManager):
                     PaginationConfig={
                         'MaxItems': max_items
                     }
-                ):
+            ):
                 events.append(event)
         except Exception as ex:
             LOGGER.exception(ex)

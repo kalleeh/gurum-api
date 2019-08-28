@@ -11,14 +11,13 @@ Amazon Web Services, Inc. or Amazon Web Services EMEA SARL or both.
 
 import json
 
+from aws_xray_sdk.core import patch_all
 from logger import configure_logger
-from servicemanager import ServiceManager
-
-import transform_utils as tu
 
 import response_builder
+import transform_utils
 
-from aws_xray_sdk.core import patch_all
+from managers.service_manager import ServiceManager
 
 patch_all()
 
@@ -54,7 +53,7 @@ def post(event, _context):
 
     # Configure default values if not present
 
-    name = tu.add_prefix(payload['name'])
+    name = transform_utils.add_prefix(payload['name'])
 
     if 'subtype' not in payload:
         payload['subtype'] = 's3'

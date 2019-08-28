@@ -9,13 +9,12 @@ or other written agreement between Customer and either
 Amazon Web Services, Inc. or Amazon Web Services EMEA SARL or both.
 """
 
-
-from logger import configure_logger
-from stackmanager import StackManager
-
-import transform_utils as tu
-
 from aws_xray_sdk.core import patch_all
+from logger import configure_logger
+
+import transform_utils
+
+from managers.stack_manager import StackManager
 
 patch_all()
 
@@ -26,6 +25,7 @@ LOGGER = configure_logger(__name__)
 Application Stack Manager
 """
 
+
 class ServiceManager(StackManager):
     def __init__(self, event):
         self._stack_type = 'service'
@@ -35,7 +35,6 @@ class ServiceManager(StackManager):
             event=event,
             stack_type=self._stack_type
         )
-
 
     def _generate_params(self, payload):
         """ Dynamically generates a CloudFormation compatible
@@ -61,7 +60,7 @@ class ServiceManager(StackManager):
 
         params['ServiceBindings'] = payload['service_bindings'] if 'service_bindings' in payload else None
 
-        params = tu.dict_to_kv(params, 'ParameterKey', 'ParameterValue', clean=True)
-        params = params + tu.reuse_vals(reuse_params)
+        params = transform_utils.dict_to_kv(params, 'ParameterKey', 'ParameterValue', clean=True)
+        params = params + transform_utils.reuse_vals(reuse_params)
 
         return params

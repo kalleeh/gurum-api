@@ -11,16 +11,15 @@ Amazon Web Services, Inc. or Amazon Web Services EMEA SARL or both.
 
 import boto3
 
+from aws_xray_sdk.core import patch_all
 from logger import configure_logger
-from stackmanager import StackManager
-from parameter_store import ParameterStore
 
 import config
-
-import transform_utils as tu
+import transform_utils
 import elb_helper
 
-from aws_xray_sdk.core import patch_all
+from managers.stack_manager import StackManager
+from parameter_store import ParameterStore
 
 patch_all()
 
@@ -85,11 +84,11 @@ class AppManager(StackManager):
         # since it's required by CFN.
         params['Priority'] = str(elb_helper.get_next_rule_priority(
             ssm_params['platform']['loadbalancer']['listener-arn']))
-        params = tu.dict_to_kv(
+        params = transform_utils.dict_to_kv(
             params,
             'ParameterKey',
             'ParameterValue',
             clean=True)
-        params = params + tu.reuse_vals(reuse_params)
+        params = params + transform_utils.reuse_vals(reuse_params)
 
         return params

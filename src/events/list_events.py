@@ -9,12 +9,12 @@ or other written agreement between Customer and either
 Amazon Web Services, Inc. or Amazon Web Services EMEA SARL or both.
 """
 
+from aws_xray_sdk.core import patch_all
 from logger import configure_logger
-from eventmanager import EventManager
 
 import response_builder
 
-from aws_xray_sdk.core import patch_all
+from managers.event_manager import EventManager
 
 patch_all()
 

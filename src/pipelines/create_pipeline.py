@@ -11,14 +11,13 @@ Amazon Web Services, Inc. or Amazon Web Services EMEA SARL or both.
 
 import json
 
+from aws_xray_sdk.core import patch_all
 from logger import configure_logger
-from pipelinemanager import PipelineManager
-
-import transform_utils as tu
 
 import response_builder
+import transform_utils
 
-from aws_xray_sdk.core import patch_all
+from managers.pipeline_manager import PipelineManager
 
 patch_all()
 
@@ -55,7 +54,7 @@ def post(event, _context):
 
     payload = json.loads(event['body-json'][0])
 
-    name = tu.add_prefix(payload['name'])
+    name = transform_utils.add_prefix(payload['name'])
 
     # Configure default values if not present
     if 'subtype' not in payload:

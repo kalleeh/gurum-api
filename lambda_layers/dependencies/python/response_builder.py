@@ -13,6 +13,7 @@ import json
 
 from transform_utils import datetime_serialize
 
+
 def success(data, code=200):
     return {
         'body': prepareBody(data),
@@ -32,8 +33,10 @@ def error(data, code=500):
         },
     }
 
+
 def prepareBody(data):
     return serializeDict(data) if isinstance(data, dict) else data
+
 
 def serializeDict(obj):
     return json.dumps(obj, default=datetime_serialize)

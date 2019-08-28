@@ -11,13 +11,13 @@ Amazon Web Services, Inc. or Amazon Web Services EMEA SARL or both.
 
 import boto3
 
-from logger import configure_logger
-from stackmanager import StackManager
-
-import transform_utils as tu
-import config
-
 from aws_xray_sdk.core import patch_all
+from logger import configure_logger
+
+import config
+import transform_utils
+
+from managers.stack_manager import StackManager
 
 patch_all()
 
@@ -148,19 +148,19 @@ class PipelineManager(StackManager):
         params['GitHubRepo'] = payload['github_repo'] \
             if 'github_repo' in payload else reuse_params.append('GitHubRepo')
 
-        params['ServiceDev'] = tu.add_prefix(payload['app_dev']) \
+        params['ServiceDev'] = transform_utils.add_prefix(payload['app_dev']) \
             if 'app_dev' in payload else None
-        params['ServiceTest'] = tu.add_prefix(payload['app_test']) \
+        params['ServiceTest'] = transform_utils.add_prefix(payload['app_test']) \
             if 'app_test' in payload else None
-        params['ServiceProd'] = tu.add_prefix(payload['app_name']) \
+        params['ServiceProd'] = transform_utils.add_prefix(payload['app_name']) \
             if 'app_name' in payload else None
         params['GitHubBranch'] = payload['github_branch'] \
             if 'github_branch' in payload else None
-        params = tu.dict_to_kv(
+        params = transform_utils.dict_to_kv(
             params,
             'ParameterKey',
             'ParameterValue',
             clean=True)
-        params = params + tu.reuse_vals(reuse_params)
+        params = params + transform_utils.reuse_vals(reuse_params)
 
         return params
