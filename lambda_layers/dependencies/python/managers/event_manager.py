@@ -66,7 +66,7 @@ class EventManager(StackManager):
                     PaginationConfig={
                         'MaxItems': max_items
                     }
-                ):
+            ):
                 events.append(event)
         except Exception as ex:
             LOGGER.exception(ex)

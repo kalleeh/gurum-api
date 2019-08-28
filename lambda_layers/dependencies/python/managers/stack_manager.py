@@ -20,10 +20,10 @@ from botocore.exceptions import ValidationError, ClientError
 from aws_xray_sdk.core import patch_all
 from logger import configure_logger
 
-import transform_utils
-import template_generator as tg
 import config
 import stack_validator
+import template_generator
+import transform_utils
 
 patch_all()
 
@@ -95,7 +95,7 @@ class StackManager():
 
         params = self._generate_params(payload)
         tags = self._generate_tags(payload)
-        template_url = tg.generate_template_url(
+        template_url = template_generator.generate_template_url(
             self._stack_type,
             payload)
 
@@ -190,7 +190,7 @@ class StackManager():
 
         try:
             if payload['upgrade_version']:
-                template_url = tg.generate_template_url(
+                template_url = template_generator.generate_template_url(
                     self._stack_type,
                     payload)
 
