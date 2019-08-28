@@ -76,7 +76,7 @@ This will dynamically give them permissions to all CodeCommit Repositories and C
 
 #### 2.1 Create Groups
 
-2.1.1 Navigate to [Cognito User Pools](https://console.aws.amazon.com/cognito/users/) on the web console and select `gureume_users`.
+2.1.1 Navigate to [Cognito User Pools](https://console.aws.amazon.com/cognito/users/) on the web console and select `gurum_users`.
 
 2.1.2 Select `Users and groups` from the navigation panel under general settings.
 

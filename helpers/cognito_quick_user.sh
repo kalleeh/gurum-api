@@ -4,7 +4,7 @@ set -e
 echo -e "Checking if the platform has been setup..\n"
 
 ## Retreive Cognito Details
-POOL_ID=$(aws cognito-idp list-user-pools --max-results 20 | jq -r '.UserPools[] | select(.Name == "gureume_users") | .Id')
+POOL_ID=$(aws cognito-idp list-user-pools --max-results 20 | jq -r '.UserPools[] | select(.Name == "gurum_users") | .Id')
 if [ -z $POOL_ID ]; then 
     echo "No user pool found. Ensure the platform has been setup first."
     exit 1

@@ -16,11 +16,11 @@ Description: >
     Author: Karl Wallbom <wallbomk@amazon.com'
 Metadata:
   AWS::ServerlessRepo::Application:
-    Name: gureum-application-platform
+    Name: gurum-application-platform
     Description: >
-      'The Gureum Application Platform helps organizations provide a simple and
+      'The Gurum Application Platform helps organizations provide a simple and
        efficient way to programmatically give their developers access to AWS environments.'
-    Author: Gureum Application Platform Team
+    Author: Gurum Application Platform Team
     SpdxLicenseId: Apache-2.0
     LicenseUrl: ../LICENSE.txt
     ReadmeUrl: ../README.md
