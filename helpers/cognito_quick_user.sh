@@ -11,7 +11,7 @@ if [ -z $POOL_ID ]; then
 fi
 
 ##App client id
-CLIENT_ID=$(aws cognito-idp list-user-pool-clients --user-pool-id $POOL_ID | jq -r '.UserPoolClients[] | select(.ClientName == "gureume-client") | .ClientId')
+CLIENT_ID=$(aws cognito-idp list-user-pool-clients --user-pool-id $POOL_ID | jq -r '.UserPoolClients[] | select(.ClientName == "gurum-client") | .ClientId')
 if [ -z $CLIENT_ID ]; then 
     echo "No client id found. Ensure the platform has been setup first."
     exit 1

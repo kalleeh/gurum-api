@@ -1,11 +1,11 @@
-# Gureume Management API
+# Gurum Management API
 
-This reference architecture provides a set of YAML templates for deploying the Gureume Management API with [AWS CloudFormation](https://aws.amazon.com/cloudformation/).
+This reference architecture provides a set of YAML templates for deploying the Gurum Management API with [AWS CloudFormation](https://aws.amazon.com/cloudformation/).
 
 ## Overview
 
 The architecture consists of two parts, the supporting platform and the management API.
-This repository and templates deploy the management API. To modify or deploy the platform, please see the gureume-platform repository.
+This repository and templates deploy the management API. To modify or deploy the platform, please see the gurum-platform repository.
 
 ### Architecture Overview
 
@@ -63,13 +63,13 @@ Once you have the API up and running you will need to configure your developer a
     "Resource": "*",
     "Condition": {
         "StringEquals": {
-            "aws:ResourceTag/gureume-groups": "${aws:PrincipalTag/gureume-groups}"
+            "aws:ResourceTag/gurum-groups": "${aws:PrincipalTag/gurum-groups}"
         }
     }
 }
 ```
 
-1.2 Add the tag gureume-groups on each of the IAM roles you create. The value should be equal to the Cognito group (tenant) you want them to have access to.
+1.2 Add the tag gurum-groups on each of the IAM roles you create. The value should be equal to the Cognito group (tenant) you want them to have access to.
 This will dynamically give them permissions to all CodeCommit Repositories and CloudWatch Logs that are tagged with the same group value.
 
 ### 2. Configure Cognito

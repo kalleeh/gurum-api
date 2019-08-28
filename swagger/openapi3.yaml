@@ -1,6 +1,6 @@
 openapi: "3.0.1"
 info:
-  title: "gureume-api"
+  title: "gurum-api"
   version: "1.0"
 servers:
 - url: "https://api.gureu.me"
@@ -53,7 +53,7 @@ paths:
       security:
       - CognitoUserPool: []
       x-amazon-apigateway-integration:
-        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:789073296014:function:gureume-api-CreateApp-1C0JTD9MC795H/invocations"
+        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:789073296014:function:gurum-api-CreateApp-1C0JTD9MC795H/invocations"
         responses:
           default:
             statusCode: "200"
@@ -84,7 +84,7 @@ paths:
       security:
       - CognitoUserPool: []
       x-amazon-apigateway-integration:
-        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:789073296014:function:gureume-api-DescribeApp-52BLLADY3H0W/invocations"
+        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:789073296014:function:gurum-api-DescribeApp-52BLLADY3H0W/invocations"
         responses:
           default:
             statusCode: "200"
@@ -115,7 +115,7 @@ paths:
       security:
       - CognitoUserPool: []
       x-amazon-apigateway-integration:
-        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:789073296014:function:gureume-api-DeleteApp-1R14EMWNX831S/invocations"
+        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:789073296014:function:gurum-api-DeleteApp-1R14EMWNX831S/invocations"
         responses:
           default:
             statusCode: "200"
@@ -146,7 +146,7 @@ paths:
       security:
       - CognitoUserPool: []
       x-amazon-apigateway-integration:
-        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:789073296014:function:gureume-api-UpdateApp-BXIXDDUZDCUX/invocations"
+        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:789073296014:function:gurum-api-UpdateApp-BXIXDDUZDCUX/invocations"
         responses:
           default:
             statusCode: "200"
@@ -178,7 +178,7 @@ paths:
       security:
       - CognitoUserPool: []
       x-amazon-apigateway-integration:
-        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:789073296014:function:gureume-api-DescribePipeline-2KZMLEK70PFK/invocations"
+        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:789073296014:function:gurum-api-DescribePipeline-2KZMLEK70PFK/invocations"
         responses:
           default:
             statusCode: "200"
@@ -209,7 +209,7 @@ paths:
       security:
       - CognitoUserPool: []
       x-amazon-apigateway-integration:
-        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:789073296014:function:gureume-api-CreatePipeline-1UL2C5QVHHSW0/invocations"
+        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:789073296014:function:gurum-api-CreatePipeline-1UL2C5QVHHSW0/invocations"
         responses:
           default:
             statusCode: "200"
@@ -239,7 +239,7 @@ paths:
       security:
       - CognitoUserPool: []
       x-amazon-apigateway-integration:
-        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:789073296014:function:gureume-api-DeletePipeline-99K50PCKV5SW/invocations"
+        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:789073296014:function:gurum-api-DeletePipeline-99K50PCKV5SW/invocations"
         responses:
           default:
             statusCode: "200"
@@ -270,7 +270,7 @@ paths:
       security:
       - CognitoUserPool: []
       x-amazon-apigateway-integration:
-        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:789073296014:function:gureume-api-UpdatePipeline-3DQSV93K1JK5/invocations"
+        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:789073296014:function:gurum-api-UpdatePipeline-3DQSV93K1JK5/invocations"
         responses:
           default:
             statusCode: "200"
@@ -296,7 +296,7 @@ paths:
       security:
       - CognitoUserPool: []
       x-amazon-apigateway-integration:
-        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:789073296014:function:gureume-api-ListServices-1Q1W0RU7R4NOJ/invocations"
+        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:789073296014:function:gurum-api-ListServices-1Q1W0RU7R4NOJ/invocations"
         responses:
           default:
             statusCode: "200"
@@ -326,7 +326,7 @@ paths:
       security:
       - CognitoUserPool: []
       x-amazon-apigateway-integration:
-        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:789073296014:function:gureume-api-CreateService-1159ZRP7NZROQ/invocations"
+        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:789073296014:function:gurum-api-CreateService-1159ZRP7NZROQ/invocations"
         responses:
           default:
             statusCode: "200"
@@ -357,7 +357,7 @@ paths:
       security:
       - CognitoUserPool: []
       x-amazon-apigateway-integration:
-        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:789073296014:function:gureume-api-DescribeService-JWYVDOKOPZKP/invocations"
+        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:789073296014:function:gurum-api-DescribeService-JWYVDOKOPZKP/invocations"
         responses:
           default:
             statusCode: "200"
@@ -388,7 +388,7 @@ paths:
       security:
       - CognitoUserPool: []
       x-amazon-apigateway-integration:
-        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:789073296014:function:gureume-api-CreateService-1159ZRP7NZROQ/invocations"
+        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:789073296014:function:gurum-api-CreateService-1159ZRP7NZROQ/invocations"
         responses:
           default:
             statusCode: "200"
@@ -418,7 +418,7 @@ paths:
       security:
       - CognitoUserPool: []
       x-amazon-apigateway-integration:
-        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:789073296014:function:gureume-api-DeleteService-XK5SOLK461CW/invocations"
+        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:789073296014:function:gurum-api-DeleteService-XK5SOLK461CW/invocations"
         responses:
           default:
             statusCode: "200"
@@ -449,7 +449,7 @@ paths:
       security:
       - CognitoUserPool: []
       x-amazon-apigateway-integration:
-        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:789073296014:function:gureume-api-UpdateService-ORV8V16FOMP3/invocations"
+        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:789073296014:function:gurum-api-UpdateService-ORV8V16FOMP3/invocations"
         responses:
           default:
             statusCode: "200"
@@ -475,7 +475,7 @@ paths:
       security:
       - CognitoUserPool: []
       x-amazon-apigateway-integration:
-        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:789073296014:function:gureume-api-ListPipelines-BS64Y4DP1RT3/invocations"
+        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:789073296014:function:gurum-api-ListPipelines-BS64Y4DP1RT3/invocations"
         responses:
           default:
             statusCode: "200"
@@ -505,7 +505,7 @@ paths:
       security:
       - CognitoUserPool: []
       x-amazon-apigateway-integration:
-        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:789073296014:function:gureume-api-CreatePipeline-1UL2C5QVHHSW0/invocations"
+        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:789073296014:function:gurum-api-CreatePipeline-1UL2C5QVHHSW0/invocations"
         responses:
           default:
             statusCode: "200"
@@ -536,7 +536,7 @@ paths:
       security:
       - CognitoUserPool: []
       x-amazon-apigateway-integration:
-        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:789073296014:function:gureume-api-DescribePipelineState-16P5Y1J4IU4RX/invocations"
+        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:789073296014:function:gurum-api-DescribePipelineState-16P5Y1J4IU4RX/invocations"
         responses:
           default:
             statusCode: "200"
@@ -568,7 +568,7 @@ paths:
       security:
       - CognitoUserPool: []
       x-amazon-apigateway-integration:
-        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:789073296014:function:gureume-api-DescribeEvents-24QJLPT43L1S/invocations"
+        uri: "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:789073296014:function:gurum-api-DescribeEvents-24QJLPT43L1S/invocations"
         responses:
           default:
             statusCode: "200"

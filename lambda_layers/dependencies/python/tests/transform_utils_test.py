@@ -21,7 +21,7 @@ def test_datetime_serialize_incorrect_type():
 
 
 def test_add_prefix():
-    assert transform_utils.add_prefix('MyApp') == "gureume-MyApp"
+    assert transform_utils.add_prefix('MyApp') == "gurum-MyApp"
 
 
 def test_add_prefix_no_string():
@@ -30,7 +30,7 @@ def test_add_prefix_no_string():
 
 
 def test_remove_prefix():
-    assert transform_utils.remove_prefix('gureume-MyApp') == "MyApp"
+    assert transform_utils.remove_prefix('gurum-MyApp') == "MyApp"
 
 
 def test_remove_prefix_no_string():
