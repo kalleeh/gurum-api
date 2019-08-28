@@ -1,0 +1,17 @@
+project:
+  source:
+    provider: str()
+    repo: str()
+  type: str()
+environments: list(include('environment'))
+services: list(include('service'), required=False)
+---
+environment:
+  name: str()
+  config: map()
+  env: map()
+
+service:
+  name: str()
+  type: str()
+  config: map()

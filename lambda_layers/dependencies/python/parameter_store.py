@@ -4,7 +4,7 @@
 """Parameter Store module
 """
 
-from exceptions import ParameterNotFoundError
+from exceptions import ParameterNotFound
 from paginator import paginator
 from logger import configure_logger
 
@@ -39,7 +39,7 @@ class ParameterStore:
             current_value = self.fetch_parameter(name)
             assert current_value == value
             LOGGER.debug('No need to update parameter %s with value %s since they are the same', name, value)
-        except (ParameterNotFoundError, AssertionError):
+        except (ParameterNotFound, AssertionError):
             LOGGER.debug('Putting SSM Parameter %s with value %s', name, value)
             self.client.put_parameter(
                 Name=name,
@@ -71,7 +71,7 @@ class ParameterStore:
                 WithDecryption=False
             )
         except self.client.exceptions.ParameterNotFound:
-            raise ParameterNotFoundError(
+            raise ParameterNotFound(
                 'Parameter Path {0} Not Found'.format(path)
             )
 
@@ -86,6 +86,6 @@ class ParameterStore:
             )
             return response['Parameter']['Value']
         except self.client.exceptions.ParameterNotFound:
-            raise ParameterNotFoundError(
+            raise ParameterNotFound(
                 'Parameter {0} Not Found'.format(name)
             )
