@@ -15,7 +15,7 @@ from paginator import paginator
 
 import transform_utils
 
-from stack_manager import StackManager
+from managers.stack_manager import StackManager
 
 patch_all()
 

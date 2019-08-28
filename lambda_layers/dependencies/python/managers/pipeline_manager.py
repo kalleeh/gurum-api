@@ -17,7 +17,7 @@ from logger import configure_logger
 import config
 import transform_utils
 
-from stack_manager import StackManager
+from managers.stack_manager import StackManager
 
 patch_all()
 
