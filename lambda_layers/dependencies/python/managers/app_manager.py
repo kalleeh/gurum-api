@@ -91,4 +91,8 @@ class AppManager(StackManager):
             clean=True)
         params = params + transform_utils.reuse_vals(reuse_params)
 
+        LOGGER.debug(
+            'Returning parameters: %s',
+            params)
+
         return params
