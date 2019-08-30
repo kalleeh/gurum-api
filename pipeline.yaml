@@ -50,8 +50,8 @@ Resources:
     CodeRepository:
         Type: AWS::CodeCommit::Repository
         Properties:
-            RepositoryName: gureume-api
-            RepositoryDescription: gureume-api service repository
+            RepositoryName: gurum-api
+            RepositoryDescription: gurum-api service repository
             Triggers:
             - Name: MasterTrigger
               CustomData: Project ID 12345
@@ -76,7 +76,7 @@ Resources:
               Value: !Ref AWS::StackName
             -
               Key: 'Project'
-              Value: gureume-api
+              Value: gurum-api
         DeletionPolicy: Retain
 
 #  ▄▄▄▄    █    ██  ██▓ ██▓    ▓█████▄ 
@@ -93,8 +93,8 @@ Resources:
     CodeBuildProject:
         Type: AWS::CodeBuild::Project
         Properties:
-            Name: gureume-api
-            Description: Build project for the gureume-api
+            Name: gurum-api
+            Description: Build project for the gurum-api
             Artifacts:
               Type: CODEPIPELINE
             Environment: 
@@ -117,7 +117,7 @@ Resources:
                 Value: !Ref AWS::StackName
               -
                 Key: 'Project'
-                Value: gureume-api
+                Value: gurum-api
 
 #  ██▓███   ██▓ ██▓███  ▓█████  ██▓     ██▓ ███▄    █ ▓█████ 
 # ▓██░  ██▒▓██▒▓██░  ██▒▓█   ▀ ▓██▒    ▓██▒ ██ ▀█   █ ▓█   ▀ 
@@ -135,7 +135,7 @@ Resources:
             ArtifactStore: 
                 Location: !Ref BuildArtifactsBucket
                 Type: S3
-            Name: gureume-api
+            Name: gurum-api
             RoleArn: !GetAtt CodePipelineExecutionRole.Arn
             Stages:
                 - Name: Source
@@ -179,8 +179,8 @@ Resources:
                       # More info on Possible Values for Cloudformation: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/continuous-delivery-codepipeline-action-reference.html#w2ab2c13c13b9
                         ActionMode: CHANGE_SET_REPLACE
                         RoleArn: !GetAtt CloudFormationExecutionRole.Arn
-                        StackName: gureume-api-Beta
-                        ChangeSetName: gureume-api-ChangeSet-Beta
+                        StackName: gurum-api-Beta
+                        ChangeSetName: gurum-api-ChangeSet-Beta
                         TemplatePath: BuildArtifactAsZip::template-deploy.yaml
                         Capabilities: CAPABILITY_IAM
                       InputArtifacts:
@@ -195,10 +195,10 @@ Resources:
                       Configuration:
                         ActionMode: CHANGE_SET_EXECUTE
                         RoleArn: !GetAtt CloudFormationExecutionRole.Arn
-                        StackName: gureume-api-Beta
-                        ChangeSetName: gureume-api-ChangeSet-Beta
+                        StackName: gurum-api-Beta
+                        ChangeSetName: gurum-api-ChangeSet-Beta
                       OutputArtifacts:
-                        - Name: gureume-apiBetaChangeSet
+                        - Name: gurum-apiBetaChangeSet
                       RunOrder: 2
                 - Name: Prod
                   Actions:
@@ -218,8 +218,8 @@ Resources:
                       Configuration:
                         ActionMode: CHANGE_SET_REPLACE
                         RoleArn: !GetAtt CloudFormationExecutionRole.Arn
-                        StackName: gureume-api-Prod
-                        ChangeSetName: gureume-api-ChangeSet-Prod
+                        StackName: gurum-api-Prod
+                        ChangeSetName: gurum-api-ChangeSet-Prod
                         TemplatePath: BuildArtifactAsZip::template-deploy.yaml
                         Capabilities: CAPABILITY_IAM
                       InputArtifacts:
@@ -234,10 +234,10 @@ Resources:
                       Configuration:
                         ActionMode: CHANGE_SET_EXECUTE
                         RoleArn: !GetAtt CloudFormationExecutionRole.Arn
-                        StackName: gureume-api-Prod
-                        ChangeSetName: gureume-api-ChangeSet-Prod
+                        StackName: gurum-api-Prod
+                        ChangeSetName: gurum-api-ChangeSet-Prod
                       OutputArtifacts:
-                        - Name: gureume-apiProdChangeSet
+                        - Name: gurum-apiProdChangeSet
                       RunOrder: 3
 
 #
@@ -277,8 +277,8 @@ Resources:
                           - 'logs:CreateLogStream'
                           - 'logs:PutLogEvents'
                         Resource:
-                          - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/gureume-api'
-                          - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/gureume-api:*'
+                          - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/gurum-api'
+                          - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/gurum-api:*'
                 - PolicyName: CodeBuildArtifactsBucket
                   PolicyDocument:
                     Version: '2012-10-17'
@@ -382,7 +382,7 @@ Resources:
                           - 'cloudformation:SetStackPolicy'
                           - 'cloudformation:ValidateTemplate'
                         Resource: 
-                          - !Sub 'arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/gureume-api*/*'
+                          - !Sub 'arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/gurum-api*/*'
                           - !Sub 'arn:aws:cloudformation:${AWS::Region}:aws:transform/Serverless-2016-10-31'
 
 

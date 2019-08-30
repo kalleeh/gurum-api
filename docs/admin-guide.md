@@ -86,7 +86,7 @@ Run the following AWS CLI command to create your first pipeline for your SAM bas
 
 ```bash
 aws cloudformation create-stack \
-    --stack-name gureume-api-pipeline \
+    --stack-name gurum-api-pipeline \
     --template-body file://pipeline.yaml \
     --capabilities CAPABILITY_NAMED_IAM
 ```
@@ -95,7 +95,7 @@ This may take a couple of minutes to complete, therefore give it a minute or two
 
 ```bash
 aws cloudformation describe-stacks \
-    --stack-name gureume-api-pipeline \
+    --stack-name gurum-api-pipeline \
     --query 'Stacks[].Outputs'
 ```
 

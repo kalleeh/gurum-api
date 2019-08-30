@@ -16,25 +16,25 @@ Description: >
     Author: Karl Wallbom <wallbomk@amazon.com'
 Metadata:
   AWS::ServerlessRepo::Application:
-    Name: gureum-application-platform
+    Name: gurum-application-platform
     Description: >
-      'The Gureum Application Platform helps organizations provide a simple and
+      'The Gurum Application Platform helps organizations provide a simple and
        efficient way to programmatically give their developers access to AWS environments.'
-    Author: Gureum Application Platform Team
+    Author: Gurum Application Platform Team
     SpdxLicenseId: Apache-2.0
     LicenseUrl: ../LICENSE.txt
     ReadmeUrl: ../README.md
     Labels: ['container', 'application', 'platform', 'cicd', 'devops']
-    HomePageUrl: https://github.com/kalleeh/gureume-api
+    HomePageUrl: https://github.com/kalleeh/gurum-api
     SemanticVersion: 0.0.1
-    SourceCodeUrl: https://github.com/kalleeh/gureume-api
+    SourceCodeUrl: https://github.com/kalleeh/gurum-api
 
 Parameters:
 
   PlatformPrefix:
     Description: String to use as prefix for platform resources
     Type: String
-    Default: "gureume"
+    Default: "gurum"
 
 Globals:
   Function:
@@ -769,7 +769,7 @@ Resources:
   CognitoUserPoolIDParam:
       Type: "AWS::SSM::Parameter"
       Properties:
-          Name: "/gureume/api/cognito-user-pool-id"
+          Name: "/gurum/api/cognito-user-pool-id"
           Type: "String"
           Value: !Ref UserPool
           Description: "Cognito User Pool ID to be used by clients."
@@ -777,7 +777,7 @@ Resources:
   CognitoIdentityPoolIDParam:
       Type: "AWS::SSM::Parameter"
       Properties:
-          Name: "/gureume/api/cognito-identity-pool-id"
+          Name: "/gurum/api/cognito-identity-pool-id"
           Type: "String"
           Value: !Ref IdentityPool
           Description: "Cognito User Pool ID to be used by clients."
@@ -785,7 +785,7 @@ Resources:
   CognitoAppClientIDParam:
       Type: "AWS::SSM::Parameter"
       Properties:
-          Name: "/gureume/api/cognito-app-client-id"
+          Name: "/gurum/api/cognito-app-client-id"
           Type: "String"
           Value: !Ref UserPoolClient
           Description: "Cognito App Client ID to be used by clients."
@@ -793,7 +793,7 @@ Resources:
   APIGatewayProdEndpointParam:
       Type: "AWS::SSM::Parameter"
       Properties:
-          Name: "/gureume/api/api-endpoint"
+          Name: "/gurum/api/api-endpoint"
           Type: "String"
           Value: !Sub "https://${ApiGatewayApi}.execute-api.${AWS::Region}.amazonaws.com/v1/"
           Description: "API Endpoint for the API."

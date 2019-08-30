@@ -1,8 +1,8 @@
 #!/bin/bash
-STACK_NAME="gureume-api"
+STACK_NAME="gurum-api"
 ACCOUNT_ID=$(aws sts get-caller-identity --output text --query 'Account')
 REGION=$(aws configure get region)
-S3_BUCKET="gureume-deployment-artifacts-$ACCOUNT_ID-$REGION"
+S3_BUCKET="gurum-deployment-artifacts-$ACCOUNT_ID-$REGION"
 
 # Only create the artifacts bucket if one does not exist.
 if aws s3 ls "s3://$S3_BUCKET" 2>&1 | grep -q 'NoSuchBucket'; then
@@ -14,6 +14,8 @@ fi
 if [ ! -d "lambda_layers/aws-xray-sdk" ]; then
     pip3 install aws-xray-sdk --target lambda_layers/aws-xray-sdk/python
 fi
+
+# Clear local pycache in lambda layer dependencies
 find lambda_layers -type d -name "__pycache__" -exec rm -r {} \;
 
 aws cloudformation package --template-file src/template.yaml --s3-bucket $S3_BUCKET --s3-prefix 'cfn' --output-template-file template-deploy.yaml

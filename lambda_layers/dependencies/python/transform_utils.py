@@ -156,7 +156,7 @@ def build_nested_helper(path, value, container):
     if not tail:
         # found end of path, write value to key
         container[head] = value
-    elif not head or 'gureume' in head:
+    elif not head or 'gurum' in head:
         # don't create container if empty or is platform name
         build_nested_helper('/'.join(tail), value, container)
     else:

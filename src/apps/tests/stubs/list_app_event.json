@@ -25,7 +25,7 @@
                 "email_verified": "false",
                 "iss": "https://cognito-idp.eu-west-1.amazonaws.com/eu-west-1_MkM8NwiuN",
                 "cognito:username": "16cbbcd4-f273-4fcd-b0e1-fd836d0f21be",
-                "cognito:roles": "arn:aws:iam::789073296014:role/gureume-team1-role",
+                "cognito:roles": "arn:aws:iam::789073296014:role/gurum-team1-role",
                 "aud": "1ts0lglioorltjrs0j3k3bniv5",
                 "event_id": "849b391c-9101-11e8-2111-691549160de3",
                 "token_use": "id",

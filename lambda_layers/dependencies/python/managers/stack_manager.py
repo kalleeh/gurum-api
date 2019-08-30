@@ -118,14 +118,14 @@ class StackManager():
                 exc_info=True)
 
             raise AlreadyExists from ex
-        except self.client.exceptions.InsufficientCapabilities as ex:
+        except self.client.exceptions.InsufficientCapabilitiesException as ex:
             LOGGER.exception(
                 'Error: The template contains resources with capabilities \
                 that weren\'t specified in the Capabilities parameter.',
                 exc_info=True)
 
             raise InsufficientCapabilities from ex
-        except self.client.exceptions.LimitExceeded as ex:
+        except self.client.exceptions.LimitExceededException as ex:
             LOGGER.exception(
                 'Error: The quota for the resource has already been reached.',
                 exc_info=True)
@@ -224,7 +224,7 @@ class StackManager():
                     'ROLLBACK_COMPLETE' in e.response['Error']['Message']:
                 raise Exception(
                     'Stack is in inconsistent state. Please re-create it.')
-        except self.client.exceptions.InsufficientCapabilities as ex:
+        except self.client.exceptions.InsufficientCapabilitiesException as ex:
             LOGGER.debug(
                 'Error: The template contains resources with capabilities \
                 that weren\'t specified in the Capabilities parameter.')

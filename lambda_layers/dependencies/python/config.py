@@ -15,7 +15,7 @@ from logger import configure_logger
 
 LOGGER = configure_logger(__name__)
 
-PLATFORM_PREFIX = os.getenv('PLATFORM_PREFIX', 'gureume')
+PLATFORM_PREFIX = os.getenv('PLATFORM_PREFIX', 'gurum')
 PLATFORM_ACCOUNT_ID = os.getenv('PLATFORM_ACCOUNT_ID', '')
 PLATFORM_REGION = os.getenv('PLATFORM_REGION', 'eu-west-1')
 PLATFORM_ECS_CLUSTER = os.getenv('PLATFORM_ECS_CLUSTER', '{}-{}'.format(PLATFORM_PREFIX, 'cluster'))
