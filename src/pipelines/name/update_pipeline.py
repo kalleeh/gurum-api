@@ -15,6 +15,7 @@ from exceptions import NoSuchObject, PermissionDenied
 from aws_xray_sdk.core import patch_all
 from logger import configure_logger
 
+import transform_utils
 import response_builder
 
 from managers.pipeline_manager import PipelineManager
@@ -55,18 +56,18 @@ def patch(event, _context):
 
     # Configure default values if not present
     if 'subtype' not in payload:
-        payload['subtype'] = 'shared-lb'
+        payload['subtype'] = 'github'
     if 'version' not in payload:
         payload['version'] = 'latest'
 
-    if 'app_name' in payload and not pm.has_permissions(payload['app_name']):
-        raise PermissionDenied
+    if 'app_name' in payload and not pm.has_permissions(transform_utils.add_prefix(payload['app_name'])):
+        return response_builder.error('Application Permission denied.', 401)
 
-    if 'app_dev' in payload and not pm.has_permissions(payload['app_dev']):
-        raise PermissionDenied
+    if 'app_dev' in payload and not pm.has_permissions(transform_utils.add_prefix(payload['app_dev'])):
+        return response_builder.error('Application (dev) Permission denied.', 401)
 
-    if 'app_test' in payload and not pm.has_permissions(payload['app_test']):
-        raise PermissionDenied
+    if 'app_test' in payload and not pm.has_permissions(transform_utils.add_prefix(payload['app_test'])):
+        return response_builder.error('Application (test) Permission denied.', 401)
 
     try:
         resp = pm.update_stack(
