@@ -12,8 +12,8 @@ Amazon Web Services, Inc. or Amazon Web Services EMEA SARL or both.
 from aws_xray_sdk.core import patch_all
 from logger import configure_logger
 
-import response_builder
 import transform_utils
+import response_builder
 
 from managers.pipeline_manager import PipelineManager
 
@@ -56,12 +56,12 @@ def get(event, _context):
                 'ParameterValue')
             data['pipelines'].append(
                 {
-                    'name': name,
+                    'name': transform_utils.remove_prefix(name),
                     'created_at': stack['CreationTime'],
                     'updated_at': stack['LastUpdatedTime'],
-                    'app_dev': params['ServiceDev'],
-                    'app_test': params['ServiceTest'],
-                    'app': params['ServiceProd']
+                    'app_dev': transform_utils.remove_prefix(params['ServiceDev']),
+                    'app_test': transform_utils.remove_prefix(params['ServiceTest']),
+                    'app': transform_utils.remove_prefix(params['ServiceProd'])
                 })
 
         return response_builder.success(data)
