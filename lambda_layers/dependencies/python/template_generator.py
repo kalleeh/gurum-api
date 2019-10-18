@@ -10,7 +10,7 @@ Amazon Web Services, Inc. or Amazon Web Services EMEA SARL or both.
 """
 
 from logger import configure_logger
-import config
+import platform_config
 
 LOGGER = configure_logger(__name__)
 
@@ -29,7 +29,7 @@ def generate_template_url(stack_type, payload):
         prefix_path = 'services'
 
     template_url = 'https://s3.amazonaws.com/{}/{}/{}-{}-{}.yaml'.format(
-        config.PLATFORM_BUCKET,
+        platform_config.PLATFORM_BUCKET,
         prefix_path,
         stack_type,
         payload['subtype'],

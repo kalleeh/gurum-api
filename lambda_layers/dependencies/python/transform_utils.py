@@ -10,7 +10,7 @@ Amazon Web Services, Inc. or Amazon Web Services EMEA SARL or both.
 """
 
 import datetime
-import config
+import platform_config
 
 from logger import configure_logger
 
@@ -41,7 +41,7 @@ def add_prefix(string_to_add_prefix_to):
     """ String modifier to add platform prefix to application names
     """
     processed_string = '{}-{}'.format(
-        config.PLATFORM_PREFIX,
+        platform_config.PLATFORM_PREFIX,
         string_to_add_prefix_to)
 
     return processed_string
@@ -52,9 +52,9 @@ def remove_prefix(string_to_remove_prefix_from):
     """
     processed_string = string_to_remove_prefix_from
 
-    if string_to_remove_prefix_from.startswith(config.PLATFORM_PREFIX):
+    if string_to_remove_prefix_from.startswith(platform_config.PLATFORM_PREFIX):
         processed_string = string_to_remove_prefix_from[
-            len(config.PLATFORM_PREFIX)+1:]
+            len(platform_config.PLATFORM_PREFIX)+1:]
 
     return processed_string
 

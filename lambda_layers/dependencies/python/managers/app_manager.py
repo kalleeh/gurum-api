@@ -14,7 +14,7 @@ import boto3
 from aws_xray_sdk.core import patch_all
 from logger import configure_logger
 
-import config
+import platform_config
 import transform_utils
 import elb_helper
 
@@ -61,13 +61,13 @@ class AppManager(StackManager):
         params = {}
         LOGGER.debug('Generating parameters.')
         parameter_store = ParameterStore(
-            config.PLATFORM_REGION,
+            platform_config.PLATFORM_REGION,
             boto3
         )
 
         ssm_params = parameter_store.get_parameters()
         LOGGER.debug(
-            'Loaded SSM Dictionary into Config: %s',
+            'Loaded SSM Dictionary intoattaatta Config: %s',
             ssm_params)
 
         # mark parameters that should be re-used in CloudFormation and

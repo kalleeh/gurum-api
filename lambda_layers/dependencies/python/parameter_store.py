@@ -8,7 +8,7 @@ from exceptions import ParameterNotFound
 from paginator import paginator
 from logger import configure_logger
 
-import config
+import platform_config
 import transform_utils
 
 LOGGER = configure_logger(__name__)
@@ -24,7 +24,7 @@ class ParameterStore:
     def get_parameters(self):
         """Returns a Dict with platform parameters under the platform namespace
         """
-        params = self.fetch_parameters_by_path('/{}'.format(config.PLATFORM_PREFIX))
+        params = self.fetch_parameters_by_path('/{}'.format(platform_config.PLATFORM_PREFIX))
         LOGGER.debug(
             'Got params from SSM: %s',
             params)

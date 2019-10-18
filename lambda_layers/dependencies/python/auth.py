@@ -12,7 +12,7 @@ Amazon Web Services, Inc. or Amazon Web Services EMEA SARL or both.
 from aws_xray_sdk.core import patch_all
 from logger import configure_logger
 
-import config
+import platform_config
 import transform_utils
 
 patch_all()
@@ -56,7 +56,7 @@ class Auth:
     """
 
     def __init__(self, event, required_permission, stack_type='any'):
-        self._user, self._groups, self._roles = config.get_user_context(event)
+        self._user, self._groups, self._roles = platform_config.get_user_context(event)
         self.required_permission = required_permission
         self.stack_type = stack_type
 
@@ -77,13 +77,13 @@ class Auth:
     def _tags_are_valid(self, tags, stack_type):
         stack_tags = transform_utils.kv_to_dict(tags, 'Key', 'Value')
 
-        if not config.PLATFORM_TAGS['TYPE'] in stack_tags:
+        if not platform_config.PLATFORM_TAGS['TYPE'] in stack_tags:
             return False
 
-        if not stack_type == config.PLATFORM_TAGS['TYPE']:
+        if not stack_type == platform_config.PLATFORM_TAGS['TYPE']:
             return False
 
-        if stack_tags[config.PLATFORM_TAGS['GROUPS']] == self._groups:
+        if stack_tags[platform_config.PLATFORM_TAGS['GROUPS']] == self._groups:
             return True
 
         return False

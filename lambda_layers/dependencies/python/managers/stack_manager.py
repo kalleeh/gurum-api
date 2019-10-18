@@ -20,7 +20,7 @@ from botocore.exceptions import ValidationError, ClientError
 from aws_xray_sdk.core import patch_all
 from logger import configure_logger
 
-import config
+import platform_config
 import stack_validator
 import template_generator
 import transform_utils
@@ -42,10 +42,10 @@ class StackManager():
         self.event = event
         self.client = boto3.client(
             'cloudformation',
-            region_name=config.PLATFORM_REGION)
-        self._user, self._groups, self._roles = config.get_user_context(
+            region_name=platform_config.PLATFORM_REGION)
+        self._user, self._groups, self._roles = platform_config.get_user_context(
             self.event)
-        self._params = config.get_request_params(self.event)
+        self._params = platform_config.get_request_params(self.event)
         self._stack_type = stack_type
 
     def list_stacks(self, keys):
@@ -109,7 +109,7 @@ class StackManager():
                 Capabilities=[
                     'CAPABILITY_NAMED_IAM',
                 ],
-                RoleARN=config.PLATFORM_DEPLOYMENT_ROLE,
+                RoleARN=platform_config.PLATFORM_DEPLOYMENT_ROLE,
                 Tags=tags
             )
         except self.client.exceptions.AlreadyExistsException as ex:
@@ -201,7 +201,7 @@ class StackManager():
                     Capabilities=[
                         'CAPABILITY_NAMED_IAM',
                     ],
-                    RoleARN=config.PLATFORM_DEPLOYMENT_ROLE,
+                    RoleARN=platform_config.PLATFORM_DEPLOYMENT_ROLE,
                     Tags=tags
                 )
             else:
@@ -212,7 +212,7 @@ class StackManager():
                     Capabilities=[
                         'CAPABILITY_NAMED_IAM',
                     ],
-                    RoleARN=config.PLATFORM_DEPLOYMENT_ROLE,
+                    RoleARN=platform_config.PLATFORM_DEPLOYMENT_ROLE,
                     Tags=tags
                 )
         except ClientError as e:
@@ -425,10 +425,10 @@ class StackManager():
         """
         LOGGER.debug(
             'Validating type %s is %s:',
-            tags[config.PLATFORM_TAGS['TYPE']],
+            tags[platform_config.PLATFORM_TAGS['TYPE']],
             self._stack_type)
         return self._stack_type == 'any' or \
-            tags[config.PLATFORM_TAGS['TYPE']] == self._stack_type
+            tags[platform_config.PLATFORM_TAGS['TYPE']] == self._stack_type
 
     @abstractmethod
     def _generate_params(self, payload):
@@ -458,12 +458,12 @@ class StackManager():
         LOGGER.debug(
             'Fetching platform Tags.')
 
-        tags[config.PLATFORM_TAGS['TYPE']] = self._stack_type
-        tags[config.PLATFORM_TAGS['SUBTYPE']] = payload['subtype']
-        tags[config.PLATFORM_TAGS['VERSION']] = payload['version']
-        tags[config.PLATFORM_TAGS['GROUPS']] = self._groups
-        tags[config.PLATFORM_TAGS['REGION']] = config.PLATFORM_REGION
-        tags[config.PLATFORM_TAGS['OWNER']] = self._user
+        tags[platform_config.PLATFORM_TAGS['TYPE']] = self._stack_type
+        tags[platform_config.PLATFORM_TAGS['SUBTYPE']] = payload['subtype']
+        tags[platform_config.PLATFORM_TAGS['VERSION']] = payload['version']
+        tags[platform_config.PLATFORM_TAGS['GROUPS']] = self._groups
+        tags[platform_config.PLATFORM_TAGS['REGION']] = platform_config.PLATFORM_REGION
+        tags[platform_config.PLATFORM_TAGS['OWNER']] = self._user
         tags = transform_utils.dict_to_kv(tags, 'Key', 'Value')
 
         LOGGER.debug(
