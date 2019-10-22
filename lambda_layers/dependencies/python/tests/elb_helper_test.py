@@ -10,10 +10,11 @@ import random
 
 listener_arn = 'arn:aws:elasticloadbalancing:eu-west-1:789073296014:listener/app/gurum-platform/4ee4cd0d1fc306f9/d20a70244b82ce4e'
 
-def test_get_next_rule_priority():
-    result = elb_helper.get_next_rule_priority(listener_arn)
-    assert result == 0
-
 def test_get_random_rule_priority():
     result = elb_helper.get_random_rule_priority(listener_arn)
     assert result >= 0 and result < 50000
+
+def test_uniqueness():
+    result1 = elb_helper.get_random_rule_priority(listener_arn)
+    result2 = elb_helper.get_random_rule_priority(listener_arn)
+    assert result1 != result2
