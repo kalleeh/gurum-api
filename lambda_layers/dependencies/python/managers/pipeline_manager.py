@@ -14,7 +14,7 @@ import boto3
 from aws_xray_sdk.core import patch_all
 from logger import configure_logger
 
-import config
+import platform_config
 import transform_utils
 
 from managers.stack_manager import StackManager
@@ -34,7 +34,7 @@ class PipelineManager(StackManager):
         self._stack_type = 'pipeline'
         self.codepipeline = boto3.client(
             'codepipeline',
-            region_name=config.PLATFORM_REGION)
+            region_name=platform_config.PLATFORM_REGION)
 
         StackManager.__init__(
             self,

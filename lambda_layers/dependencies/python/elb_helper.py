@@ -14,7 +14,7 @@ import boto3
 
 from logger import configure_logger
 
-import config
+import platform_config
 
 LOGGER = configure_logger(__name__)
 
@@ -22,7 +22,7 @@ LOGGER = configure_logger(__name__)
 def get_random_rule_priority(listener_arn):
     """ Returns a random available rule priority number for a given ALB Listener Arn
     """
-    client = boto3.client('elbv2', region_name=config.PLATFORM_REGION)
+    client = boto3.client('elbv2', region_name=platform_config.PLATFORM_REGION)
     rules = {}
 
     try:
