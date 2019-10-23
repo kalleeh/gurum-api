@@ -19,30 +19,6 @@ import platform_config
 LOGGER = configure_logger(__name__)
 
 
-def get_next_rule_priority(listener_arn):
-    """ Returns the next rule priority number for a given ALB Listener Arn
-    """
-    client = boto3.client('elbv2', region_name=platform_config.PLATFORM_REGION)
-    rules = {}
-
-    try:
-        rules = client.describe_rules(
-            ListenerArn=listener_arn,
-        )['Rules']
-    except Exception as ex:
-        LOGGER.exception(ex)
-        raise
-
-    rules = [rule for rule in rules if rule['Priority'].isdigit()]
-
-    if not rules:
-        return 1
-
-    sorted_rules = sorted(rules, key=lambda x: int(x['Priority']), reverse=True)
-    priority = int(sorted_rules[0]['Priority'])+1
-
-    return priority
-
 def get_random_rule_priority(listener_arn):
     """ Returns a random available rule priority number for a given ALB Listener Arn
     """

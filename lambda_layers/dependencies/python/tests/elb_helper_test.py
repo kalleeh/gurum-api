@@ -3,17 +3,37 @@
 
 # pylint: skip-file
 
-from pytest import raises
+from pytest import raises, fixture
+from unittest import mock
+
 from datetime import datetime
 import elb_helper
 import random
 
-listener_arn = 'arn:aws:elasticloadbalancing:eu-west-1:789073296014:listener/app/gurum-platform/4ee4cd0d1fc306f9/d20a70244b82ce4e'
+listener_arn = 'arn:aws:elasticloadbalancing:eu-west-1:012345678901:listener/app/gurum-platform/4ee400231fc306f9/d20a7078382ce4e'
+rules = {
+    "Rules": [
+        {
+            "Priority": "2280"
+        },
+        {
+            "Priority": "26934"
+        }
+    ]
+}
 
-def test_get_next_rule_priority():
-    result = elb_helper.get_next_rule_priority(listener_arn)
-    assert result == 0
+@mock.patch('elb_helper.boto3.client')
+def test_get_random_rule_priority(client):
+    client().describe_rules.return_value = rules
 
-def test_get_random_rule_priority():
     result = elb_helper.get_random_rule_priority(listener_arn)
     assert result >= 0 and result < 50000
+
+@mock.patch('elb_helper.boto3.client')
+def test_uniqueness(client):
+    client().describe_rules.return_value = rules
+
+    result1 = elb_helper.get_random_rule_priority(listener_arn)
+    result2 = elb_helper.get_random_rule_priority(listener_arn)
+    assert result1 != result2
+ 
