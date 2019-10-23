@@ -82,8 +82,9 @@ class AppManager(StackManager):
 
         # we need to dynamically generate the priorty param to insert
         # since it's required by CFN.
-        params['Priority'] = str(elb_helper.get_next_rule_priority(
+        params['Priority'] = str(elb_helper.get_random_rule_priority(
             ssm_params['platform']['loadbalancer']['listener-arn']))
+
         params = transform_utils.dict_to_kv(
             params,
             'ParameterKey',
