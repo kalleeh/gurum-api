@@ -717,16 +717,17 @@ definitions:
     properties:
       name:
         type: string
-      tasks:
-        type: int
-      health_check_path:
-        type: string
-      image:
-        type: string
+      config:
+        type: array
+        items:
+          type: string
+      env_vars:
+        type: array
+        items:
+          type: string
     required:
       - name
-      - tasks
-      - health_check_path
+      - config
   CreatePipelineRequest:
     type: object
     properties:
