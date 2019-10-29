@@ -69,7 +69,7 @@ def post(event, _context):
             payload
         )
     except AlreadyExists:
-        return response_builder.error('An app with that name already exists.', 400)
+        return response_builder.error('An app with that name already exists.', 409)
     except Exception as ex:
         LOGGER.debug(
             'Exception: %s',

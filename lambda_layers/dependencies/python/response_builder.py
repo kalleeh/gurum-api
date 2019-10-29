@@ -16,22 +16,16 @@ from transform_utils import datetime_serialize
 
 def success(data, code=200):
     return {
-        'body': prepareBody(data),
-        'statusCode': code,
-        'headers': {
-            'Content-Type': 'application/json',
-        },
+        "body": prepareBody(data),
+        "statusCode": code
     }
 
 
 def error(data, code=500):
-    return {
-        'body': prepareBody(data),
-        'statusCode': code,
-        'headers': {
-            'Content-Type': 'application/json',
-        },
-    }
+    raise Exception({
+        "body": prepareBody(data),
+        "statusCode": code
+    })
 
 
 def prepareBody(data):
