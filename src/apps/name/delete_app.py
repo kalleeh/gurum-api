@@ -25,13 +25,6 @@ LOGGER = configure_logger(__name__)
 def delete(event, _context):
     """ Validates that the app belongs to the authenticated user
     and deletes the app.
-
-    Args:
-        name (string): Name of the app (CloudFormation Stack)
-    Basic Usage:
-        >>> DELETE /apps/my-app
-    Returns:
-        List: List of JSON objects containing app information
     """
     app = AppManager(event)
 

@@ -44,19 +44,6 @@ class AppManager(StackManager):
     def _generate_params(self, payload):
         """ Dynamically generates a CloudFormation compatible
         dict with the params passed in from a request payload.
-
-        Args:
-        Basic Usage:
-            >>> resp = _generate_params(params)
-        Returns:
-            List: List of dicts containing key:value pairs
-            representing CloudFormation Params
-            [
-                {
-                    'ParameterKey': 'Name',
-                    'ParamaterValue': 'value-of-parameter'
-                }
-            ]
         """
         params = {}
         LOGGER.debug('Generating parameters.')

@@ -25,13 +25,6 @@ LOGGER = configure_logger(__name__)
 
 def get(event, _context):
     """ Describes detailed information about a service
-
-    Args:
-        name (string): Name of the service (CloudFormation Stack)
-    Basic Usage:
-        >>> GET /services/my-service
-    Returns:
-        List: List of JSON object containing service information
     """
     sm = ServiceManager(event)
 

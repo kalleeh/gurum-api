@@ -26,23 +26,6 @@ LOGGER = configure_logger(__name__)
 
 def put(event, _context):
     """ Send an approval result to the approval stage of a pipeline.
-
-    Args:
-        summary (string): Short description of the reason for approval result.
-    Basic Usage:
-        >>> PUT /pipelines/my-pipeline/states
-    Returns:
-        Dict: Dict with list of JSON object containing pipeline information
-        {
-            'pipelines'
-            [
-                {
-                    'name': 'mystack',
-                    'description': 'status'
-                    ...
-                }
-            ]
-        }
     """
     pm = PipelineManager(event)
 

@@ -12,7 +12,8 @@ Amazon Web Services, Inc. or Amazon Web Services EMEA SARL or both.
 from abc import ABCMeta, abstractmethod
 
 from exceptions import AlreadyExists, InvalidInput, NoSuchObject, \
-    PermissionDenied, InsufficientCapabilities, LimitExceeded, UnknownError
+    PermissionDenied, InsufficientCapabilities, LimitExceeded, \
+    UnknownParameter, UnknownError
 
 import boto3
 from botocore.exceptions import ValidationError, ClientError
@@ -131,6 +132,11 @@ class StackManager():
                 exc_info=True)
 
             raise LimitExceeded from ex
+        except ClientError as e:
+            LOGGER.exception(e)
+            if e.response['Error']['Code'] == 'ValidationError' and \
+                    'do not exist in the template' in e.response['Error']['Message']:
+                raise UnknownParameter from e
         except Exception as ex:
             LOGGER.exception(
                 'Unknown error.', exc_info=True)
@@ -217,6 +223,9 @@ class StackManager():
                 )
         except ClientError as e:
             LOGGER.exception(e)
+            if e.response['Error']['Code'] == 'ValidationError' and \
+                    'do not exist in the template' in e.response['Error']['Message']:
+                raise UnknownParameter(e.response['Error']['Message'])
             if e.response['Error']['Code'] == 'ValidationError' and \
                     'does not exist' in e.response['Error']['Message']:
                 raise NoSuchObject from e

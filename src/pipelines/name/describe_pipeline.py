@@ -25,23 +25,6 @@ LOGGER = configure_logger(__name__)
 
 def get(event, _context):
     """ Describes detailed information about a pipeline
-
-    Args:
-        name (string): Name of the pipeline (CloudFormation Stack)
-    Basic Usage:
-        >>> GET /pipelines/my-pipeline
-    Returns:
-        Dict: Dict with list of JSON object containing pipeline information
-        {
-            'pipelines'
-            [
-                {
-                    'name': 'mystack',
-                    'description': 'status'
-                    ...
-                }
-            ]
-        }
     """
     pm = PipelineManager(event)
 

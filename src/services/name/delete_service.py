@@ -25,12 +25,6 @@ LOGGER = configure_logger(__name__)
 def delete(event, _context):
     """ Validates that the service belongs to the authenticated user
     and deletes the service.
-
-    Args:
-        name (string): Name of the service (CloudFormation Stack)
-    Basic Usage:
-    Returns:
-        List: List of JSON objects containing service information
     """
     sm = ServiceManager(event)
 

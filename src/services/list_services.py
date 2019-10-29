@@ -26,13 +26,6 @@ def get(event, _context):
     """ Returns the services belonging to the authenticated user.
     It uses filter_stacks() to filter the CloudFormation stacks with type 'service'
     and owner belonging to the same Cognito group as the user is logged in as.
-
-    Args:
-        None:
-    Basic Usage:
-        >>> GET /services
-    Returns:
-        List: List of JSON objects containing service information
     """
     sm = ServiceManager(event)
 

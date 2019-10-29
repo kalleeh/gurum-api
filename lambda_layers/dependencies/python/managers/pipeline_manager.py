@@ -121,19 +121,6 @@ class PipelineManager(StackManager):
     def _generate_params(self, payload):
         """ Dynamically generates a CloudFormation compatible
         dict with the params passed in from a request payload.
-
-        Args:
-        Basic Usage:
-            >>> resp = _generate_params(params)
-        Returns:
-            List: List of dicts containing key:value pairs
-            representing CloudFormation Params
-            [
-                {
-                    'ParameterKey': 'Name',
-                    'ParamaterValue': 'value-of-parameter'
-                }
-            ]
         """
         params = {}
 
@@ -141,21 +128,20 @@ class PipelineManager(StackManager):
         # and modify depending on payload.
         reuse_params = []
 
-        params['GitHubUser'] = payload['github_user'] \
-            if 'github_user' in payload else reuse_params.append('GitHubUser')
-        params['GitHubToken'] = payload['github_token'] \
-            if 'github_token' in payload else reuse_params.append('GitHubToken')
-        params['GitHubRepo'] = payload['github_repo'] \
-            if 'github_repo' in payload else reuse_params.append('GitHubRepo')
+        source = payload['source']
+        params.update(source)
 
-        params['ServiceDev'] = transform_utils.add_prefix(payload['app_dev']) \
-            if 'app_dev' in payload else None
-        params['ServiceTest'] = transform_utils.add_prefix(payload['app_test']) \
-            if 'app_test' in payload else None
-        params['ServiceProd'] = transform_utils.add_prefix(payload['app_name']) \
-            if 'app_name' in payload else None
-        params['GitHubBranch'] = payload['github_branch'] \
-            if 'github_branch' in payload else None
+        #TODO: Make dynamic through generated templates.
+        i = 0
+        environments = ['ServiceDev', 'ServiceTest', 'ServiceProd']
+        for environment_name in payload['environments']:
+            environment = {environments[i]: environment_name}
+            params.update(environment)
+            i = i + 1
+
+        params['GitHubToken'] = payload['GitHubToken'] \
+            if 'GitHubToken' in payload else reuse_params.append('GitHubToken')
+
         params = transform_utils.dict_to_kv(
             params,
             'ParameterKey',

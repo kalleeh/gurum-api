@@ -27,25 +27,6 @@ LOGGER = configure_logger(__name__)
 
 def patch(event, _context):
     """ Updates the pipeline belonging to the authenticated user.
-
-    Args:
-        name (string): Name of the pipeline (CloudFormation Stack)
-    Basic Usage:
-        >>> POST /pipeline
-        >>> Payload Example:
-            [{
-                "app_name": "my-app",
-                "app_dev": "my-app-dev",    [Optional]
-                "app_test": "my-app-test",  [Optional]
-                "github_repo": "2048",
-                "github_branch": "master",
-                "github_token": "b248f1e7360fe21c33e12d4bca3feaweEXAMPLE",
-                "github_user": "mygithubuser",
-                "upgrade_version": "False"  [Optional] Forces platform
-                    version upgrade
-            }]
-    Returns:
-        List: List of JSON objects containing app information
     """
     pm = PipelineManager(event)
 
