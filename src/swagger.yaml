@@ -26,6 +26,10 @@ paths:
           description: "409 response"
           schema:
             $ref: "#/definitions/ErrorModel"
+        "500":
+          description: "500 response"
+          schema:
+            $ref: "#/definitions/ErrorModel"
       security:
       - CognitoUserPool: []
       x-amazon-apigateway-integration:
@@ -44,6 +48,14 @@ paths:
                 }
           ".*.409.*":
             statusCode: "409"
+            responseTemplates:
+              application/json: |
+                #set ($errorMessageObj = $util.parseJson($input.path('$.errorMessage')))
+                {
+                  "body" : "$errorMessageObj.body"
+                }
+          ".*.500.*":
+            statusCode: "500"
             responseTemplates:
               application/json: |
                 #set ($errorMessageObj = $util.parseJson($input.path('$.errorMessage')))
