@@ -13,19 +13,43 @@ paths:
       - "application/json"
       produces:
       - "application/json"
-      responses:
-        '200':
+      responses: &api-responses
+        "200":
           description: "200 response"
           schema:
             $ref: "#/definitions/Empty"
+        "400":
+          description: "400 response"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        "409":
+          description: "409 response"
+          schema:
+            $ref: "#/definitions/ErrorModel"
       security:
       - CognitoUserPool: []
       x-amazon-apigateway-integration:
         uri:
           Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ListApps.Arn}/invocations
-        responses:
-          default:
+        responses: &lambda-responses
+          "default":
             statusCode: "200"
+          ".*.400.*":
+            statusCode: "400"
+            responseTemplates:
+              application/json: |
+                #set ($errorMessageObj = $util.parseJson($input.path('$.errorMessage')))
+                {
+                  "body" : "$errorMessageObj.body"
+                }
+          ".*.409.*":
+            statusCode: "409"
+            responseTemplates:
+              application/json: |
+                #set ($errorMessageObj = $util.parseJson($input.path('$.errorMessage')))
+                {
+                  "body" : "$errorMessageObj.body"
+                }
         requestTemplates:
           application/json: |
             #set($allParams = $input.params())
@@ -51,19 +75,13 @@ paths:
           required: true
           schema:
             $ref: '#/definitions/CreateAppRequest'
-      responses:
-        '200':
-          description: "200 response"
-          schema:
-            $ref: "#/definitions/Empty"
+      responses: *api-responses
       security:
       - CognitoUserPool: []
       x-amazon-apigateway-integration:
         uri:
           Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${CreateApp.Arn}/invocations
-        responses:
-          default:
-            statusCode: "200"
+        responses: *lambda-responses
         requestTemplates:
           application/json: |
             #set($allParams = $input.params())
@@ -90,19 +108,13 @@ paths:
         in: "path"
         required: true
         type: "string"
-      responses:
-        '200':
-          description: "200 response"
-          schema:
-            $ref: "#/definitions/Empty"
+      responses: *api-responses
       security:
       - CognitoUserPool: []
       x-amazon-apigateway-integration:
         uri:
           Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DescribeApp.Arn}/invocations
-        responses:
-          default:
-            statusCode: "200"
+        responses: *lambda-responses
         requestTemplates:
           application/json: |
             #set($allParams = $input.params())
@@ -130,19 +142,13 @@ paths:
         in: "path"
         required: true
         type: "string"
-      responses:
-        '200':
-          description: "200 response"
-          schema:
-            $ref: "#/definitions/Empty"
+      responses: *api-responses
       security:
       - CognitoUserPool: []
       x-amazon-apigateway-integration:
         uri:
           Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DeleteApp.Arn}/invocations
-        responses:
-          default:
-            statusCode: "200"
+        responses: *lambda-responses
         requestTemplates:
           application/json: |
             #set($allParams = $input.params())
@@ -170,19 +176,13 @@ paths:
         in: "path"
         required: true
         type: "string"
-      responses:
-        '200':
-          description: "200 response"
-          schema:
-            $ref: "#/definitions/Empty"
+      responses: *api-responses
       security:
       - CognitoUserPool: []
       x-amazon-apigateway-integration:
         uri:
           Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UpdateApp.Arn}/invocations
-        responses:
-          default:
-            statusCode: "200"
+        responses: *lambda-responses
         requestTemplates:
           application/json: |
             #set($allParams = $input.params())
@@ -212,19 +212,13 @@ paths:
         in: "path"
         required: true
         type: "string"
-      responses:
-        '200':
-          description: "200 response"
-          schema:
-            $ref: "#/definitions/Empty"
+      responses: *api-responses
       security:
       - CognitoUserPool: []
       x-amazon-apigateway-integration:
         uri:
           Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DescribeEvents.Arn}/invocations
-        responses:
-          default:
-            statusCode: "200"
+        responses: *lambda-responses
         requestTemplates:
           application/json: |
             #set($allParams = $input.params())
@@ -248,19 +242,13 @@ paths:
       - "application/json"
       produces:
       - "application/json"
-      responses:
-        '200':
-          description: "200 response"
-          schema:
-            $ref: "#/definitions/Empty"
+      responses: *api-responses
       security:
       - CognitoUserPool: []
       x-amazon-apigateway-integration:
         uri:
           Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ListPipelines.Arn}/invocations
-        responses:
-          default:
-            statusCode: "200"
+        responses: *lambda-responses
         requestTemplates:
           application/json: |
             #set($allParams = $input.params())
@@ -286,19 +274,13 @@ paths:
           required: true
           schema:
             $ref: '#/definitions/CreatePipelineRequest'
-      responses:
-        '200':
-          description: "200 response"
-          schema:
-            $ref: "#/definitions/Empty"
+      responses: *api-responses
       security:
       - CognitoUserPool: []
       x-amazon-apigateway-integration:
         uri:
           Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${CreatePipeline.Arn}/invocations
-        responses:
-          default:
-            statusCode: "200"
+        responses: *lambda-responses
         requestTemplates:
           application/json: |
             #set($allParams = $input.params())
@@ -325,19 +307,13 @@ paths:
         in: "path"
         required: true
         type: "string"
-      responses:
-        '200':
-          description: "200 response"
-          schema:
-            $ref: "#/definitions/Empty"
+      responses: *api-responses
       security:
       - CognitoUserPool: []
       x-amazon-apigateway-integration:
         uri:
           Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DescribePipeline.Arn}/invocations
-        responses:
-          default:
-            statusCode: "200"
+        responses: *lambda-responses
         requestTemplates:
           application/json: |
             #set($allParams = $input.params())
@@ -365,19 +341,13 @@ paths:
         in: "path"
         required: true
         type: "string"
-      responses:
-        '200':
-          description: "200 response"
-          schema:
-            $ref: "#/definitions/Empty"
+      responses: *api-responses
       security:
       - CognitoUserPool: []
       x-amazon-apigateway-integration:
         uri:
           Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${CreatePipeline.Arn}/invocations
-        responses:
-          default:
-            statusCode: "200"
+        responses: *lambda-responses
         requestTemplates:
           application/json: |
             #set($allParams = $input.params())
@@ -403,19 +373,13 @@ paths:
         in: "path"
         required: true
         type: "string"
-      responses:
-        '200':
-          description: "200 response"
-          schema:
-            $ref: "#/definitions/Empty"
+      responses: *api-responses
       security:
       - CognitoUserPool: []
       x-amazon-apigateway-integration:
         uri:
           Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DeletePipeline.Arn}/invocations
-        responses:
-          default:
-            statusCode: "200"
+        responses: *lambda-responses
         requestTemplates:
           application/json: |
             #set($allParams = $input.params())
@@ -443,19 +407,13 @@ paths:
         in: "path"
         required: true
         type: "string"
-      responses:
-        '200':
-          description: "200 response"
-          schema:
-            $ref: "#/definitions/Empty"
+      responses: *api-responses
       security:
       - CognitoUserPool: []
       x-amazon-apigateway-integration:
         uri:
           Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UpdatePipeline.Arn}/invocations
-        responses:
-          default:
-            statusCode: "200"
+        responses: *lambda-responses
         requestTemplates:
           application/json: |
             #set($allParams = $input.params())
@@ -485,19 +443,13 @@ paths:
         in: "path"
         required: true
         type: "string"
-      responses:
-        '200':
-          description: "200 response"
-          schema:
-            $ref: "#/definitions/Empty"
+      responses: *api-responses
       security:
       - CognitoUserPool: []
       x-amazon-apigateway-integration:
         uri:
           Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DescribePipelineState.Arn}/invocations
-        responses:
-          default:
-            statusCode: "200"
+        responses: *lambda-responses
         requestTemplates:
           application/json: |
             #set($allParams = $input.params())
@@ -525,19 +477,13 @@ paths:
         in: "path"
         required: true
         type: "string"
-      responses:
-        '200':
-          description: "200 response"
-          schema:
-            $ref: '#/definitions/Empty'
+      responses: *api-responses
       security:
       - CognitoUserPool: []
       x-amazon-apigateway-integration:
         uri:
           Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${PutPipelineState.Arn}/invocations
-        responses:
-          default:
-            statusCode: "200"
+        responses: *lambda-responses
         requestTemplates:
           application/json: |
             #set($allParams = $input.params())
@@ -562,19 +508,13 @@ paths:
       - "application/json"
       produces:
       - "application/json"
-      responses:
-        '200':
-          description: "200 response"
-          schema:
-            $ref: "#/definitions/Empty"
+      responses: *api-responses
       security:
       - CognitoUserPool: []
       x-amazon-apigateway-integration:
         uri:
           Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ListServices.Arn}/invocations
-        responses:
-          default:
-            statusCode: "200"
+        responses: *lambda-responses
         requestTemplates:
           application/json: |
             #set($allParams = $input.params())
@@ -600,19 +540,13 @@ paths:
           required: true
           schema:
             $ref: '#/definitions/CreateServiceRequest'
-      responses:
-        '200':
-          description: "200 response"
-          schema:
-            $ref: "#/definitions/Empty"
+      responses: *api-responses
       security:
       - CognitoUserPool: []
       x-amazon-apigateway-integration:
         uri:
           Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${CreateService.Arn}/invocations
-        responses:
-          default:
-            statusCode: "200"
+        responses: *lambda-responses
         requestTemplates:
           application/json: |
             #set($allParams = $input.params())
@@ -639,19 +573,13 @@ paths:
         in: "path"
         required: true
         type: "string"
-      responses:
-        '200':
-          description: "200 response"
-          schema:
-            $ref: "#/definitions/Empty"
+      responses: *api-responses
       security:
       - CognitoUserPool: []
       x-amazon-apigateway-integration:
         uri:
           Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DescribeService.Arn}/invocations
-        responses:
-          default:
-            statusCode: "200"
+        responses: *lambda-responses
         requestTemplates:
           application/json: |
             #set($allParams = $input.params())
@@ -679,19 +607,13 @@ paths:
         in: "path"
         required: true
         type: "string"
-      responses:
-        '200':
-          description: "200 response"
-          schema:
-            $ref: "#/definitions/Empty"
+      responses: *api-responses
       security:
       - CognitoUserPool: []
       x-amazon-apigateway-integration:
         uri:
           Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${CreateService.Arn}/invocations
-        responses:
-          default:
-            statusCode: "200"
+        responses: *lambda-responses
         requestTemplates:
           application/json: |
             #set($allParams = $input.params())
@@ -717,19 +639,13 @@ paths:
         in: "path"
         required: true
         type: "string"
-      responses:
-        '200':
-          description: "200 response"
-          schema:
-            $ref: "#/definitions/Empty"
+      responses: *api-responses
       security:
       - CognitoUserPool: []
       x-amazon-apigateway-integration:
         uri:
           Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DeleteService.Arn}/invocations
-        responses:
-          default:
-            statusCode: "200"
+        responses: *lambda-responses
         requestTemplates:
           application/json: |
             #set($allParams = $input.params())
@@ -757,19 +673,13 @@ paths:
         in: "path"
         required: true
         type: "string"
-      responses:
-        '200':
-          description: "200 response"
-          schema:
-            $ref: "#/definitions/Empty"
+      responses: *api-responses
       security:
       - CognitoUserPool: []
       x-amazon-apigateway-integration:
         uri:
           Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UpdateService.Arn}/invocations
-        responses:
-          default:
-            statusCode: "200"
+        responses: *lambda-responses
         requestTemplates:
           application/json: |
             #set($allParams = $input.params())
@@ -871,6 +781,13 @@ definitions:
       - name
       - service_type
       - service_bindings
+  ErrorModel:
+    type: object
+    properties:
+      body:
+        type: string
+    required:
+      - body
 x-amazon-apigateway-binary-media-types:
 - "application/octet-stream"
 - "application/x-tar"
