@@ -27,13 +27,6 @@ def get(event, _context):
     It uses filter_stacks() to filter the CloudFormation stacks with type
     'pipeline' and owner belonging to the same Cognito group as the user
     is logged in as.
-
-    Args:
-        None:
-    Basic Usage:
-        >>> GET /pipelines
-    Returns:
-        List: List of JSON objects containing app information
     """
     pm = PipelineManager(event)
 

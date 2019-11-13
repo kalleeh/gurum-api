@@ -25,12 +25,6 @@ LOGGER = configure_logger(__name__)
 def delete(event, _context):
     """ Validates that the pipeline belongs to the authenticated user
     and deletes the pipeline.
-
-    Args:
-        name (string): Name of the pipeline (CloudFormation Stack)
-    Basic Usage:
-    Returns:
-        List: List of JSON objects containing pipeline information
     """
     pm = PipelineManager(event)
 

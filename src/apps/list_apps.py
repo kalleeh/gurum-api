@@ -24,23 +24,6 @@ LOGGER = configure_logger(__name__)
 
 def get(event, _context):
     """ Returns the apps belonging to the authenticated user.
-
-    Args:
-        None:
-    Basic Usage:
-        >>> GET /apps
-    Returns:
-        Dict: Dict with list of JSON object containing app information
-        {
-            'apps'
-            [
-                {
-                    'name': 'mystack',
-                    'description': 'status'
-                    ...
-                }
-            ]
-        }
     """
     LOGGER.debug('Instantiating AppManager.')
     app = AppManager(event)

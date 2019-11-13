@@ -36,4 +36,3 @@ def test_uniqueness(client):
     result1 = elb_helper.get_random_rule_priority(listener_arn)
     result2 = elb_helper.get_random_rule_priority(listener_arn)
     assert result1 != result2
- 

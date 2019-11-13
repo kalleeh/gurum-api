@@ -18,6 +18,7 @@ import platform_config
 import transform_utils
 
 from managers.stack_manager import StackManager
+from parameter_store import ParameterStore
 
 patch_all()
 
@@ -121,46 +122,56 @@ class PipelineManager(StackManager):
     def _generate_params(self, payload):
         """ Dynamically generates a CloudFormation compatible
         dict with the params passed in from a request payload.
-
-        Args:
-        Basic Usage:
-            >>> resp = _generate_params(params)
-        Returns:
-            List: List of dicts containing key:value pairs
-            representing CloudFormation Params
-            [
-                {
-                    'ParameterKey': 'Name',
-                    'ParamaterValue': 'value-of-parameter'
-                }
-            ]
         """
         params = {}
+        LOGGER.debug('Generating parameters.')
+        parameter_store = ParameterStore(
+            platform_config.PLATFORM_REGION,
+            boto3
+        )
+
+        ssm_params = parameter_store.get_parameters()
+        LOGGER.debug(
+            'Loaded SSM Dictionary into Config: %s',
+            ssm_params)
 
         # mark parameters that should be re-used in CloudFormation
         # and modify depending on payload.
         reuse_params = []
 
-        params['GitHubUser'] = payload['github_user'] \
-            if 'github_user' in payload else reuse_params.append('GitHubUser')
-        params['GitHubToken'] = payload['github_token'] \
-            if 'github_token' in payload else reuse_params.append('GitHubToken')
-        params['GitHubRepo'] = payload['github_repo'] \
-            if 'github_repo' in payload else reuse_params.append('GitHubRepo')
+        source = payload['source']
+        params.update(source)
 
-        params['ServiceDev'] = transform_utils.add_prefix(payload['app_dev']) \
-            if 'app_dev' in payload else None
-        params['ServiceTest'] = transform_utils.add_prefix(payload['app_test']) \
-            if 'app_test' in payload else None
-        params['ServiceProd'] = transform_utils.add_prefix(payload['app_name']) \
-            if 'app_name' in payload else None
-        params['GitHubBranch'] = payload['github_branch'] \
-            if 'github_branch' in payload else None
+        #TODO: Make dynamic through generated templates.
+        environments = ['ServiceProd']
+        no_environments = len(payload['environments'])
+
+        if no_environments >= 2:
+            environments.append('ServiceDev')
+        if no_environments == 3:
+            environments.append('ServiceTest')
+
+        i = 0
+        for environment_name in payload['environments']:
+            environment = {environments[i]: transform_utils.add_prefix(environment_name)}
+            params.update(environment)
+            i = i + 1
+
+        params['GitHubToken'] = source['GitHubToken'] \
+            if 'GitHubToken' in source else reuse_params.append('GitHubToken')
+
+        source = payload['source']
+        params.update(source)
+
         params = transform_utils.dict_to_kv(
             params,
             'ParameterKey',
             'ParameterValue',
             clean=True)
         params = params + transform_utils.reuse_vals(reuse_params)
+
+        LOGGER.debug(
+            'Returning parameters: %s',
+            params)
 
         return params

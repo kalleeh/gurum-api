@@ -496,6 +496,7 @@ Resources:
                 - 'cloudformation:CreateStack'
                 - 'cloudformation:ListExports'
                 - 'iam:PassRole'
+                - 'ssm:GetParametersByPath'
               Resource:
                 - '*'
 
@@ -575,6 +576,7 @@ Resources:
                 - 'cloudformation:UpdateStack'
                 - 'cloudformation:ListExports'
                 - 'iam:PassRole'
+                - 'ssm:GetParametersByPath'
               Resource:
                 - '*'
 

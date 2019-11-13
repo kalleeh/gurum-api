@@ -11,7 +11,7 @@ Amazon Web Services, Inc. or Amazon Web Services EMEA SARL or both.
 
 import json
 
-from exceptions import NoSuchObject, PermissionDenied
+from exceptions import NoSuchObject, PermissionDenied, UnknownParameter
 from aws_xray_sdk.core import patch_all
 from logger import configure_logger
 
@@ -27,23 +27,6 @@ LOGGER = configure_logger(__name__)
 def patch(event, _context):
     """ Validates that the app belongs to the authenticated user
     and updates the configuration.
-
-    Args:
-        name (string): Name of the app (CloudFormation Stack)
-    Basic Usage:
-        >>> PATCH /apps/-my-app
-        >>> Payload Example:
-            [{
-                "tasks": "2",
-                "health_check_path": "/",   [Optional]
-                "tasks": "1",               [Optional]
-                "image": "nginx:latest",    [Optional]
-                "subtype": "shared-lb",     [Optional]
-                "version": "latest"         [Optional] No effect unless upgrade_version is True
-                "upgrade_version": "False"  [Optional] Forces platform version upgrade
-            }]
-    Returns:
-        List: List of JSON objects containing app information
     """
     app = AppManager(event)
 
@@ -66,6 +49,8 @@ def patch(event, _context):
         return response_builder.error('No such application.', 400)
     except PermissionDenied:
         return response_builder.error('Permission denied.', 401)
+    except UnknownParameter as ex:
+        return response_builder.error('{}'.format(ex), 400)
     except Exception as ex:
         return response_builder.error('Unknown Error: {}'.format(ex))
     else:

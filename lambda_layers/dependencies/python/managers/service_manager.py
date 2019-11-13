@@ -9,12 +9,16 @@ or other written agreement between Customer and either
 Amazon Web Services, Inc. or Amazon Web Services EMEA SARL or both.
 """
 
+import boto3
+
 from aws_xray_sdk.core import patch_all
 from logger import configure_logger
 
+import platform_config
 import transform_utils
 
 from managers.stack_manager import StackManager
+from parameter_store import ParameterStore
 
 patch_all()
 
@@ -39,28 +43,30 @@ class ServiceManager(StackManager):
     def _generate_params(self, payload):
         """ Dynamically generates a CloudFormation compatible
         dict with the params passed in from a request payload.
-
-        Args:
-        Basic Usage:
-            >>> resp = _generate_params(params)
-        Returns:
-            List: List of dicts containing key:value pairs
-            representing CloudFormation Params
-            [
-                {
-                    'ParameterKey': 'Name',
-                    'ParamaterValue': 'value-of-parameter'
-                }
-            ]
         """
         params = {}
+        LOGGER.debug('Generating parameters.')
+        parameter_store = ParameterStore(
+            platform_config.PLATFORM_REGION,
+            boto3
+        )
 
-        # mark parameters that should be re-used in CloudFormation and modify depending on payload.
-        reuse_params = []
+        ssm_params = parameter_store.get_parameters()
+        LOGGER.debug(
+            'Loaded SSM Dictionary into Config: %s',
+            ssm_params)
 
-        params['ServiceBindings'] = payload['service_bindings'] if 'service_bindings' in payload else None
+        config = payload['config']
+        params.update(config)
 
-        params = transform_utils.dict_to_kv(params, 'ParameterKey', 'ParameterValue', clean=True)
-        params = params + transform_utils.reuse_vals(reuse_params)
+        params = transform_utils.dict_to_kv(
+            params,
+            'ParameterKey',
+            'ParameterValue',
+            clean=True)
+
+        LOGGER.debug(
+            'Returning parameters: %s',
+            params)
 
         return params

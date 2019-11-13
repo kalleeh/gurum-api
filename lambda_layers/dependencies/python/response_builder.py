@@ -22,10 +22,10 @@ def success(data, code=200):
 
 
 def error(data, code=500):
-    raise Exception({
+    raise Exception(json.dumps({
         "body": prepareBody(data),
         "statusCode": code
-    })
+    }))
 
 
 def prepareBody(data):

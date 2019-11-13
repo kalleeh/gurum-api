@@ -27,22 +27,6 @@ LOGGER = configure_logger(__name__)
 
 def post(event, _context):
     """ Creates a new app belonging to the authenticated user.
-
-    Args:
-        None:
-    Basic Usage:
-        >>> POST /apps
-        >>> Payload Example:
-            {
-                "name": "my-app",
-                "health_check_path": "/",   [Optional]
-                "tasks": "1",               [Optional]
-                "image": "nginx:latest",    [Optional]
-                "subtype": "shared-lb",     [Optional]
-                "version": "latest"         [Optional]
-            }
-    Returns:
-        List: List of JSON objects containing app information
     """
     app = AppManager(event)
 

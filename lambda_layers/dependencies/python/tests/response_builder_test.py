@@ -11,7 +11,6 @@ import response_builder
 def test_success_with_string_param():
     expected_response = {
         'body': 'Woo!',
-        'headers': {'Content-Type': 'application/json'},
         'statusCode': 200
     }
 

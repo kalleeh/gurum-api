@@ -25,23 +25,6 @@ LOGGER = configure_logger(__name__)
 
 def get(event, _context):
     """ Describes detailed information about an app
-
-    Args:
-        name (string): Name of the app (CloudFormation Stack)
-    Basic Usage:
-        >>> GET /apps/my-app
-    Returns:
-        Dict: Dict with list of JSON object containing app information
-        {
-            'apps'
-            [
-                {
-                    'name': 'mystack',
-                    'description': 'status'
-                    ...
-                }
-            ]
-        }
     """
     app = AppManager(event)
 

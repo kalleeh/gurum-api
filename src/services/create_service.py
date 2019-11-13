@@ -29,20 +29,6 @@ def post(event, _context):
     Pre-requisites: User must create a new OAuth token on his GitHub-account
     that allows repo access to the requested repository for the service
     to be able to pull source.
-
-    Args:
-        name (string): Name of the service (CloudFormation Stack)
-    Basic Usage:
-        >>> POST /service
-        >>> Payload Example:
-            [{
-                "service_name": "my-service",
-                "service_type": "s3|sqs",
-                "service_bindings": "app1,app2",
-                "service_version": "0.1|latest"     [Optional]
-            }]
-    Returns:
-        List: List of JSON objects containing service information
     """
     sm = ServiceManager(event)
 

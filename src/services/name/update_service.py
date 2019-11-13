@@ -26,19 +26,6 @@ LOGGER = configure_logger(__name__)
 
 def patch(event, _context):
     """ Updates the service belonging to the authenticated user.
-
-    Args:
-        name (string): Name of the service (CloudFormation Stack)
-    Basic Usage:
-        >>> POST /service
-        >>> Payload Example:
-            [{
-                "service_name": "my-service",
-                "service_bindings": "myapp1",
-                "upgrade_version": "False"  [Optional] Forces platform version upgrade
-            }]
-    Returns:
-        List: List of JSON objects containing service information
     """
     sm = ServiceManager(event)
 
