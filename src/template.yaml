@@ -799,3 +799,19 @@ Resources:
           Type: "String"
           Value: !Sub "https://${ApiGatewayApi}.execute-api.${AWS::Region}.amazonaws.com/v1/"
           Description: "API Endpoint for the API."
+
+  APIDeploymentRoleArn:
+      Type: "AWS::SSM::Parameter"
+      Properties:
+          Name: "/gurum/api/deployment-role-arn"
+          Type: "String"
+          Value: !GetAtt DeploymentRole.Arn
+          Description: "IAM ARN to the Deployment Role."
+
+  GurumProductsBucket:
+      Type: "AWS::SSM::Parameter"
+      Properties:
+          Name: "/gurum/products/bucket"
+          Type: "String"
+          Value: !Ref ProductsBucket
+          Description: "S3 Bucket holding the Gurum Products."
