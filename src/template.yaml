@@ -683,6 +683,7 @@ Resources:
                 - 'cloudformation:CreateStack'
                 - 'cloudformation:ListExports'
                 - 'iam:PassRole'
+                - 'ssm:GetParametersByPath'
               Resource:
                 - '*'
 
