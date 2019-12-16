@@ -11,6 +11,7 @@ Amazon Web Services, Inc. or Amazon Web Services EMEA SARL or both.
 
 import json
 
+from exceptions import AlreadyExists
 from aws_xray_sdk.core import patch_all
 from logger import configure_logger
 
@@ -36,6 +37,9 @@ def post(event, _context):
     data['services'] = []
 
     payload = json.loads(event['body-json'][0])
+    LOGGER.debug(
+        'Received payload: %s',
+        payload)
 
     # Configure default values if not present
 
@@ -51,7 +55,13 @@ def post(event, _context):
             name,
             payload
         )
+    except AlreadyExists:
+        return response_builder.error('A service with that name already exists.', 409)
     except Exception as ex:
+        LOGGER.debug(
+            'Exception: %s',
+            ex,
+            exc_info=True)
         return response_builder.error('Unknown Error: {}'.format(ex))
     else:
         data['services'] = resp
