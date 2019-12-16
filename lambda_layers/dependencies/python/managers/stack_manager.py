@@ -84,14 +84,6 @@ class StackManager():
 
     def create_stack(self, stack_name, payload):
         """ Creates a new stack.
-
-        Args:
-            type: (app|pipeline|service)
-            stack_name:
-            payload:
-        Basic Usage:
-        Returns:
-            List: List of ..
         """
 
         params = self._generate_params(payload)
@@ -177,14 +169,7 @@ class StackManager():
         return stacks
 
     def update_stack(self, payload):
-        """
-        Args:
-            type: (app|pipeline|service)
-            stack_name:
-            payload:
-        Basic Usage:
-        Returns:
-            List: List of ..
+        """ Updates a CloudFormation stack.
         """
         stack_name = transform_utils.add_prefix(self._params['name'])
         LOGGER.debug(
@@ -249,12 +234,6 @@ class StackManager():
 
     def delete_stack(self):
         """ Deletes a CloudFormation stack.
-
-        Args:
-            name (string): Name of the CloudFormation Stack
-        Basic Usage:
-        Returns:
-            List: List of JSON objects containing stack information
         """
         stack_name = transform_utils.add_prefix(self._params['name'])
         LOGGER.debug(
