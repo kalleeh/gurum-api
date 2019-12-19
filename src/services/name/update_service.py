@@ -11,7 +11,7 @@ Amazon Web Services, Inc. or Amazon Web Services EMEA SARL or both.
 
 import json
 
-from exceptions import NoSuchObject, PermissionDenied
+from exceptions import NoSuchObject, PermissionDenied, UnknownParameter
 from aws_xray_sdk.core import patch_all
 from logger import configure_logger
 
@@ -34,15 +34,19 @@ def patch(event, _context):
 
     payload = json.loads(event['body-json'][0])
 
+    # Configure default values if not present
     if 'subtype' not in payload:
         payload['subtype'] = 's3'
     if 'version' not in payload:
         payload['version'] = 'latest'
 
-    bindings = payload['service_bindings'].split(',')
-    for binding in bindings:
-        if not sm.has_permissions(binding):
-            return response_builder.error('{} doesn\'t exist or not enough permissions.'.format(binding), 400)
+    try:
+        bindings = payload['ServiceBindings'].split(',')
+        for binding in bindings:
+            if not sm.has_permissions(binding):
+                return response_builder.error('{} doesn\'t exist or not enough permissions.'.format(binding), 400)
+    except KeyError:
+        return response_builder.error('ServiceBindings not provided in payload.', 400)
 
     try:
         resp = sm.update_stack(
@@ -52,6 +56,8 @@ def patch(event, _context):
         return response_builder.error('No such service.', 400)
     except PermissionDenied:
         return response_builder.error('Permission denied.', 401)
+    except UnknownParameter as ex:
+        return response_builder.error('{}'.format(ex), 400)
     except Exception as ex:
         return response_builder.error('Unknown Error: {}'.format(ex))
     else:

@@ -42,7 +42,7 @@ def post(event, _context):
 
     # Configure default values if not present
     if 'subtype' not in payload:
-        payload['subtype'] = 'github'
+        payload['subtype'] = 'github/cfn'
     if 'version' not in payload:
         payload['version'] = 'latest'
 
