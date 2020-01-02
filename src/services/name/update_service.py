@@ -40,13 +40,7 @@ def patch(event, _context):
     if 'version' not in payload:
         payload['version'] = 'latest'
 
-    try:
-        bindings = payload['ServiceBindings'].split(',')
-        for binding in bindings:
-            if not sm.has_permissions(binding):
-                return response_builder.error('{} doesn\'t exist or not enough permissions.'.format(binding), 400)
-    except KeyError:
-        return response_builder.error('ServiceBindings not provided in payload.', 400)
+    validate_permissions(sm, payload)
 
     try:
         resp = sm.update_stack(
@@ -64,3 +58,14 @@ def patch(event, _context):
         data['services'] = resp
 
         return response_builder.success(data)
+
+def validate_permissions(sm, payload):
+    try:
+        bindings = payload['ServiceBindings'].split(',')
+        for binding in bindings:
+            if not sm.has_permissions(binding):
+                return response_builder.error('{} doesn\'t exist or not enough permissions.'.format(binding), 400)
+    except KeyError:
+        return response_builder.error('ServiceBindings not provided in payload.', 400)
+    else:
+        return None

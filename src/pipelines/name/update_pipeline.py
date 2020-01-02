@@ -41,14 +41,7 @@ def patch(event, _context):
     if 'version' not in payload:
         payload['version'] = 'latest'
 
-    if 'app_name' in payload and not pm.has_permissions(transform_utils.add_prefix(payload['app_name'])):
-        return response_builder.error('Application Permission denied.', 401)
-
-    if 'app_dev' in payload and not pm.has_permissions(transform_utils.add_prefix(payload['app_dev'])):
-        return response_builder.error('Application (dev) Permission denied.', 401)
-
-    if 'app_test' in payload and not pm.has_permissions(transform_utils.add_prefix(payload['app_test'])):
-        return response_builder.error('Application (test) Permission denied.', 401)
+    validate_permissions(pm, payload)
 
     try:
         resp = pm.update_stack(
@@ -64,3 +57,13 @@ def patch(event, _context):
         data['pipelines'] = resp
 
         return response_builder.success(data)
+
+def validate_permissions(pm, payload):
+    if 'app_name' in payload and not pm.has_permissions(transform_utils.add_prefix(payload['app_name'])):
+        raise PermissionDenied('Application Permission denied.')
+
+    if 'app_dev' in payload and not pm.has_permissions(transform_utils.add_prefix(payload['app_dev'])):
+        raise PermissionDenied('Application (dev) Permission denied.')
+
+    if 'app_test' in payload and not pm.has_permissions(transform_utils.add_prefix(payload['app_test'])):
+        raise PermissionDenied('Application (test) Permission denied.')
