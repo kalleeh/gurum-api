@@ -28,12 +28,21 @@ def generate_template_url(stack_type, payload):
     elif stack_type == 'service':
         prefix_path = 'services'
 
-    template_url = 'https://s3.amazonaws.com/{}/{}/{}/{}.yaml'.format(
-        platform_config.PLATFORM_BUCKET,
-        prefix_path,
-        payload['subtype'],
-        payload['version']
-    )
+    if platform_config.PLATFORM_REGION == 'us-east-1':
+        template_url = "https://s3.amazonaws.com/{}/{}/{}/{}.yaml".format(
+            platform_config.PLATFORM_BUCKET,
+            prefix_path,
+            payload['subtype'],
+            payload['version']
+        )
+    else:
+        template_url = "https://s3-{}.amazonaws.com/{}/{}/{}/{}".format(
+            platform_config.PLATFORM_REGION,
+            platform_config.PLATFORM_BUCKET,
+            prefix_path,
+            payload['subtype'],
+            payload['version']
+        )
 
     LOGGER.debug(
         'Returning template URL: %s',

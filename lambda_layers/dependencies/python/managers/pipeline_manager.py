@@ -151,11 +151,12 @@ class PipelineManager(StackManager):
         if no_environments == 3:
             environments.append('ServiceTest')
 
-        i = 0
+        i = no_environments - 1
         for environment_name in payload['environments']:
+            environment_name = '{}-{}'.format(payload['name'], environment_name)
             environment = {environments[i]: transform_utils.add_prefix(environment_name)}
             params.update(environment)
-            i = i + 1
+            i = i - 1
 
         params['GitHubToken'] = source['GitHubToken'] \
             if 'GitHubToken' in source else reuse_params.append('GitHubToken')
