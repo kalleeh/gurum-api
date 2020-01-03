@@ -35,9 +35,8 @@ def patch(event, _context):
 
     payload = json.loads(event['body-json'][0])
 
-    # Configure default values if not present
-    if 'subtype' not in payload:
-        payload['subtype'] = 'github'
+    if 'type' not in payload:
+        payload['type'] = 'github/cfn'
     if 'version' not in payload:
         payload['version'] = 'latest'
 
