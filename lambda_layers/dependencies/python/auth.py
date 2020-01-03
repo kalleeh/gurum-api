@@ -48,17 +48,17 @@ class Auth:
     Args:
         required_permission (string): Permission required to
             perform operation (read, write, admin, owner)
-        stack_type (string): Optionally validates the stack
+        product_type (string): Optionally validates the stack
             type the operation is to be performed on.
     Basic Usage:
         >>> @authenticate_access('read','app')
         >>> my_decorated_function():
     """
 
-    def __init__(self, event, required_permission, stack_type='any'):
+    def __init__(self, event, required_permission, product_type='any'):
         self._user, self._groups, self._roles = platform_config.get_user_context(event)
         self.required_permission = required_permission
-        self.stack_type = stack_type
+        self.product_type = product_type
 
     def validate_permissions(self, tags):
         """
@@ -71,16 +71,16 @@ class Auth:
         # Secondly validate that the tags on the stack
         # matches the users groups and that it's a part of the platform.
 
-        if not self._tags_are_valid(tags, self.stack_type):
+        if not self._tags_are_valid(tags, self.product_type):
             raise PermissionError('Permission denied.', 403)
 
-    def _tags_are_valid(self, tags, stack_type):
+    def _tags_are_valid(self, tags, product_type):
         stack_tags = transform_utils.kv_to_dict(tags, 'Key', 'Value')
 
-        if not platform_config.PLATFORM_TAGS['TYPE'] in stack_tags:
+        if not platform_config.PLATFORM_TAGS['PRODUCT_TYPE'] in stack_tags:
             return False
 
-        if not stack_type == platform_config.PLATFORM_TAGS['TYPE']:
+        if not product_type == platform_config.PLATFORM_TAGS['PRODUCT_TYPE']:
             return False
 
         if stack_tags[platform_config.PLATFORM_TAGS['GROUPS']] == self._groups:

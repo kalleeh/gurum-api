@@ -15,32 +15,32 @@ import platform_config
 LOGGER = configure_logger(__name__)
 
 
-def generate_template_url(stack_type, payload):
+def generate_template_url(product_type, payload):
     """Generates a template URL to pass to CloudFormation based on input
     parameters for type, region, version etc.
     """
     LOGGER.debug('Generating template URL.')
 
-    if stack_type == 'app':
+    if product_type == 'app':
         prefix_path = 'apps'
-    elif stack_type == 'pipeline':
+    elif product_type == 'pipeline':
         prefix_path = 'pipelines'
-    elif stack_type == 'service':
+    elif product_type == 'service':
         prefix_path = 'services'
 
     if platform_config.PLATFORM_REGION == 'us-east-1':
         template_url = "https://s3.amazonaws.com/{}/{}/{}/{}.yaml".format(
             platform_config.PLATFORM_BUCKET,
             prefix_path,
-            payload['subtype'],
+            payload['product_flavor'],
             payload['version']
         )
     else:
-        template_url = "https://s3-{}.amazonaws.com/{}/{}/{}/{}".format(
+        template_url = "https://s3-{}.amazonaws.com/{}/{}/{}/{}.yaml".format(
             platform_config.PLATFORM_REGION,
             platform_config.PLATFORM_BUCKET,
             prefix_path,
-            payload['subtype'],
+            payload['product_flavor'],
             payload['version']
         )
 

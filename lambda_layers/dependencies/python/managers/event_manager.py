@@ -29,12 +29,12 @@ Stack Event Manager
 
 class EventManager(StackManager):
     def __init__(self, event):
-        self._stack_type = 'any'
+        self._product_type = 'any'
 
         StackManager.__init__(
             self,
             event=event,
-            stack_type=self._stack_type
+            product_type=self._product_type
         )
 
     def get_stack_events(self, max_items=10):

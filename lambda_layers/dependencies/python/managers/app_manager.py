@@ -33,12 +33,12 @@ Application Stack Manager
 
 class AppManager(StackManager):
     def __init__(self, event):
-        self._stack_type = 'app'
+        self._product_type = 'app'
 
         StackManager.__init__(
             self,
             event=event,
-            stack_type=self._stack_type
+            product_type=self._product_type
         )
 
     def _generate_params(self, payload):

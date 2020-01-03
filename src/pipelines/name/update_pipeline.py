@@ -35,8 +35,8 @@ def patch(event, _context):
 
     payload = json.loads(event['body-json'][0])
 
-    if 'type' not in payload:
-        payload['type'] = 'github/cfn'
+    if 'product_flavor' not in payload:
+        payload['product_flavor'] = 'github/cfn'
     if 'version' not in payload:
         payload['version'] = 'latest'
 

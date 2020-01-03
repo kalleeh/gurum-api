@@ -32,7 +32,7 @@ Application Stack Manager
 
 class PipelineManager(StackManager):
     def __init__(self, event):
-        self._stack_type = 'pipeline'
+        self._product_type = 'pipeline'
         self.codepipeline = boto3.client(
             'codepipeline',
             region_name=platform_config.PLATFORM_REGION)
@@ -40,7 +40,7 @@ class PipelineManager(StackManager):
         StackManager.__init__(
             self,
             event=event,
-            stack_type=self._stack_type
+            product_type=self._product_type
         )
 
     def get_pipeline_state(self, pipeline_name):

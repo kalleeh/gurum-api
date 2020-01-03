@@ -24,8 +24,8 @@ PLATFORM_BUCKET = os.getenv('PLATFORM_BUCKET', None)
 
 # Tags for the platform
 PLATFORM_TAGS = {}
-PLATFORM_TAGS['TYPE'] = os.getenv('PLATFORM_TAGS_TYPE', '{}-{}'.format(PLATFORM_PREFIX, 'platform-type'))
-PLATFORM_TAGS['SUBTYPE'] = os.getenv('PLATFORM_TAGS_SUBTYPE', '{}-{}'.format(PLATFORM_PREFIX, 'platform-subtype'))
+PLATFORM_TAGS['PRODUCT_TYPE'] = os.getenv('PLATFORM_TAGS_PRODUCT_TYPE', '{}-{}'.format(PLATFORM_PREFIX, 'product-type'))
+PLATFORM_TAGS['PRODUCT_FLAVOR'] = os.getenv('PLATFORM_TAGS_PRODUCT_FLAVOR', '{}-{}'.format(PLATFORM_PREFIX, 'product-flavor'))
 PLATFORM_TAGS['VERSION'] = os.getenv('PLATFORM_TAGS_VERSION', '{}-{}'.format(PLATFORM_PREFIX, 'platform-version'))
 PLATFORM_TAGS['OWNER'] = os.getenv('PLATFORM_TAGS_OWNER', '{}-{}'.format(PLATFORM_PREFIX, 'owner'))
 PLATFORM_TAGS['REGION'] = os.getenv('PLATFORM_TAGS_REGION', '{}-{}'.format(PLATFORM_PREFIX, 'region'))

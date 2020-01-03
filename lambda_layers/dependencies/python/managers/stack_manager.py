@@ -39,7 +39,7 @@ CloudFormation Stack Manager
 class StackManager():
     __metaclass__ = ABCMeta
 
-    def __init__(self, event, stack_type):
+    def __init__(self, event, product_type):
         self.event = event
         self.client = boto3.client(
             'cloudformation',
@@ -47,7 +47,7 @@ class StackManager():
         self._user, self._groups, self._roles = platform_config.get_user_context(
             self.event)
         self._params = platform_config.get_request_params(self.event)
-        self._stack_type = stack_type
+        self._product_type = product_type
 
     def list_stacks(self, keys):
         """ List of stacks validating they are stacks in the platform
@@ -55,7 +55,7 @@ class StackManager():
         keys (arg) for those stacks.
 
         Args:
-            stack_type (string): Filter based on stack type, valid options are
+            product_type (string): Filter based on stack type, valid options are
                 'app','pipeline' or 'any'
         Basic Usage:
             >>> list_stacks('app')
@@ -68,7 +68,7 @@ class StackManager():
                 }
             ]
         """
-        LOGGER.debug('Listing stacks of type %s', self._stack_type)
+        LOGGER.debug('Listing stacks of type %s', self._product_type)
 
         try:
             stacks = self.client.describe_stacks()
@@ -89,7 +89,7 @@ class StackManager():
         params = self._generate_params(payload)
         tags = self._generate_tags(payload)
         template_url = template_generator.generate_template_url(
-            self._stack_type,
+            self._product_type,
             payload)
 
         LOGGER.debug('Creating stack: %s', stack_name)
@@ -182,7 +182,7 @@ class StackManager():
         try:
             if payload['upgrade_version']:
                 template_url = template_generator.generate_template_url(
-                    self._stack_type,
+                    self._product_type,
                     payload)
 
                 stack = self.client.update_stack(
@@ -311,7 +311,7 @@ class StackManager():
                     LOGGER.debug(
                         '%s is not not the correct type (%s)',
                         stack['StackName'],
-                        self._stack_type)
+                        self._product_type)
                     continue
                 if not stack_validator.is_owned_by_group(self._groups, stack_tags):
                     LOGGER.debug(
@@ -413,10 +413,10 @@ class StackManager():
         """
         LOGGER.debug(
             'Validating type %s is %s:',
-            tags[platform_config.PLATFORM_TAGS['TYPE']],
-            self._stack_type)
-        return self._stack_type == 'any' or \
-            tags[platform_config.PLATFORM_TAGS['TYPE']] == self._stack_type
+            tags[platform_config.PLATFORM_TAGS['PRODUCT_TYPE']],
+            self._product_type)
+        return self._product_type == 'any' or \
+            tags[platform_config.PLATFORM_TAGS['PRODUCT_TYPE']] == self._product_type
 
     @abstractmethod
     def _generate_params(self, payload):
@@ -446,8 +446,8 @@ class StackManager():
         LOGGER.debug(
             'Fetching platform Tags.')
 
-        tags[platform_config.PLATFORM_TAGS['TYPE']] = self._stack_type
-        tags[platform_config.PLATFORM_TAGS['SUBTYPE']] = payload['subtype']
+        tags[platform_config.PLATFORM_TAGS['PRODUCT_TYPE']] = self._product_type
+        tags[platform_config.PLATFORM_TAGS['PRODUCT_FLAVOR']] = payload['product_flavor']
         tags[platform_config.PLATFORM_TAGS['VERSION']] = payload['version']
         tags[platform_config.PLATFORM_TAGS['GROUPS']] = self._groups
         tags[platform_config.PLATFORM_TAGS['REGION']] = platform_config.PLATFORM_REGION
