@@ -36,7 +36,7 @@ def get_random_rule_priority(listener_arn):
     priorities = [int(rule['Priority']) for rule in rules if rule['Priority'].isdigit()]
 
     if not priorities:
-        return 1
+        priorities = []
 
     allocated_set = set(priorities)
     possible_range_set = set(range(50000))

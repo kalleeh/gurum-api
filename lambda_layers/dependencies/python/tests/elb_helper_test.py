@@ -22,6 +22,11 @@ rules = {
     ]
 }
 
+empty_rules = {
+    "Rules": [
+    ]
+}
+
 @mock.patch('elb_helper.boto3.client')
 def test_get_random_rule_priority(client):
     client().describe_rules.return_value = rules
@@ -36,3 +41,10 @@ def test_uniqueness(client):
     result1 = elb_helper.get_random_rule_priority(listener_arn)
     result2 = elb_helper.get_random_rule_priority(listener_arn)
     assert result1 != result2
+
+@mock.patch('elb_helper.boto3.client')
+def test_no_existing_rules(client):
+    client().describe_rules.return_value = empty_rules
+
+    result = elb_helper.get_random_rule_priority(listener_arn)
+    assert result > 1 and result < 50000
