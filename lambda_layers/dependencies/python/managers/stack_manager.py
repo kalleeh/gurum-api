@@ -422,7 +422,6 @@ class StackManager():
     def _get_existing_parameters(self, stack_name):
         # Get existing parameters for stack.
         summary = self.client.get_template_summary(StackName=stack_name)
-        print(summary)
         existing_parameters = [parameter['ParameterKey'] for parameter in \
                                 summary['Parameters']]
 
