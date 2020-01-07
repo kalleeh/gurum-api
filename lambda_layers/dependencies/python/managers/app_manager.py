@@ -41,21 +41,14 @@ class AppManager(StackManager):
             product_type=self._product_type
         )
 
-    def _generate_params(self, payload):
+    def _generate_params(self, payload, existing_parameters=None):
         """ Dynamically generates a CloudFormation compatible
         dict with the params passed in from a request payload.
         """
         params = {}
         LOGGER.debug('Generating parameters.')
-        parameter_store = ParameterStore(
-            platform_config.PLATFORM_REGION,
-            boto3
-        )
 
-        ssm_params = parameter_store.get_parameters()
-        LOGGER.debug(
-            'Loaded SSM Dictionary into Config: %s',
-            ssm_params)
+        ssm_params = self._get_ssm_parameters()
 
         config = payload['config']
         params.update(config)
@@ -75,3 +68,17 @@ class AppManager(StackManager):
             params)
 
         return params
+
+    def _get_ssm_parameters(self):
+        parameter_store = ParameterStore(
+            platform_config.PLATFORM_REGION,
+            boto3
+        )
+
+        ssm_params = parameter_store.get_parameters()
+
+        LOGGER.debug(
+            'Loaded SSM Dictionary into Config: %s',
+            ssm_params)
+
+        return ssm_params

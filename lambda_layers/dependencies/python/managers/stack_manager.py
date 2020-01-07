@@ -176,7 +176,8 @@ class StackManager():
             'Updating stack %s',
             stack_name)
 
-        params = self._generate_params(payload)
+        existing_parameters = self._get_existing_parameters(stack_name)
+        params = self._generate_params(payload, existing_parameters)
         tags = self._generate_tags(payload)
 
         try:
@@ -417,6 +418,15 @@ class StackManager():
             self._product_type)
         return self._product_type == 'any' or \
             tags[platform_config.PLATFORM_TAGS['PRODUCT_TYPE']] == self._product_type
+
+    def _get_existing_parameters(self, stack_name):
+        # Get existing parameters for stack.
+        summary = self.client.get_template_summary(StackName=stack_name)
+        print(summary)
+        existing_parameters = [parameter['ParameterKey'] for parameter in \
+                                summary['Parameters']]
+
+        return existing_parameters
 
     @abstractmethod
     def _generate_params(self, payload):

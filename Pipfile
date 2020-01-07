@@ -8,6 +8,7 @@ name = "pypi"
 pyyaml = "*"
 yamale = "*"
 requests = "*"
+aws-xray-sdk = "*"
 
 [dev-packages]
 tox = "*"
