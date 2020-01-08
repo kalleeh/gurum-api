@@ -448,7 +448,7 @@ class StackManager():
 
         tags[platform_config.PLATFORM_TAGS['PRODUCT_TYPE']] = self._product_type
         tags[platform_config.PLATFORM_TAGS['PRODUCT_FLAVOR']] = payload['product_flavor']
-        tags[platform_config.PLATFORM_TAGS['VERSION']] = payload['version']
+        tags[platform_config.PLATFORM_TAGS['PRODUCT_VERSION']] = payload['version']
         tags[platform_config.PLATFORM_TAGS['GROUPS']] = self._groups
         tags[platform_config.PLATFORM_TAGS['REGION']] = platform_config.PLATFORM_REGION
         tags[platform_config.PLATFORM_TAGS['OWNER']] = self._user

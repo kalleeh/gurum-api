@@ -16,7 +16,7 @@ import platform_config
 LOGGER = configure_logger(__name__)
 
 def is_part_of_platform(stack_tags):
-    platform_tags = platform_config.PLATFORM_TAGS['VERSION']
+    platform_tags = platform_config.PLATFORM_TAGS['PRODUCT_VERSION']
 
     if platform_tags in stack_tags:
         LOGGER.debug('Found %s in tags', platform_tags)
