@@ -42,8 +42,8 @@ def post(event, _context):
 
     name = transform_utils.add_prefix(payload['name'])
 
-    if 'subtype' not in payload:
-        payload['subtype'] = 'ecs-fargate'
+    if 'product_flavor' not in payload:
+        payload['product_flavor'] = 'ecs-fargate'
     if 'version' not in payload:
         payload['version'] = 'latest'
 

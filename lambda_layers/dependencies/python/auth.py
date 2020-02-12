@@ -77,10 +77,10 @@ class Auth:
     def _tags_are_valid(self, tags, stack_type):
         stack_tags = transform_utils.kv_to_dict(tags, 'Key', 'Value')
 
-        if not platform_config.PLATFORM_TAGS['TYPE'] in stack_tags:
+        if not platform_config.PLATFORM_TAGS['PRODUCT_TYPE'] in stack_tags:
             return False
 
-        if not stack_type == platform_config.PLATFORM_TAGS['TYPE']:
+        if not stack_type == platform_config.PLATFORM_TAGS['PRODUCT_TYPE']:
             return False
 
         if stack_tags[platform_config.PLATFORM_TAGS['GROUPS']] == self._groups:

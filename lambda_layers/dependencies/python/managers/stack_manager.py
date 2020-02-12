@@ -413,10 +413,10 @@ class StackManager():
         """
         LOGGER.debug(
             'Validating type %s is %s:',
-            tags[platform_config.PLATFORM_TAGS['TYPE']],
+            tags[platform_config.PLATFORM_TAGS['PRODUCT_TYPE']],
             self._stack_type)
         return self._stack_type == 'any' or \
-            tags[platform_config.PLATFORM_TAGS['TYPE']] == self._stack_type
+            tags[platform_config.PLATFORM_TAGS['PRODUCT_TYPE']] == self._stack_type
 
     @abstractmethod
     def _generate_params(self, payload):
@@ -446,8 +446,8 @@ class StackManager():
         LOGGER.debug(
             'Fetching platform Tags.')
 
-        tags[platform_config.PLATFORM_TAGS['TYPE']] = self._stack_type
-        tags[platform_config.PLATFORM_TAGS['SUBTYPE']] = payload['subtype']
+        tags[platform_config.PLATFORM_TAGS['PRODUCT_TYPE']] = self._stack_type
+        tags[platform_config.PLATFORM_TAGS['PRODUCT_FLAVOR']] = payload['product_flavor']
         tags[platform_config.PLATFORM_TAGS['VERSION']] = payload['version']
         tags[platform_config.PLATFORM_TAGS['GROUPS']] = self._groups
         tags[platform_config.PLATFORM_TAGS['REGION']] = platform_config.PLATFORM_REGION
