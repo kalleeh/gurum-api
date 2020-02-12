@@ -36,8 +36,8 @@ def patch(event, _context):
     payload = json.loads(event['body-json'][0])
 
     # Configure default values if not present
-    if 'subtype' not in payload:
-        payload['subtype'] = 'shared-lb'
+    if 'product_flavor' not in payload:
+        payload['product_flavor'] = 'shared-lb'
     if 'version' not in payload:
         payload['version'] = 'latest'
 

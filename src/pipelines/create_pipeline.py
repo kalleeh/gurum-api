@@ -41,8 +41,8 @@ def post(event, _context):
     name = transform_utils.add_prefix(payload['name'])
 
     # Configure default values if not present
-    if 'subtype' not in payload:
-        payload['subtype'] = 'github/cfn'
+    if 'product_flavor' not in payload:
+        payload['product_flavor'] = 'github/cfn'
     if 'version' not in payload:
         payload['version'] = 'latest'
 
