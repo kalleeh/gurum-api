@@ -34,7 +34,7 @@ The templates below are included in this repository and reference architecture:
 This repository does not include a shared lambda layer with the [AWS X-Ray SDK](https://github.com/aws/aws-xray-sdk-python). You can either disable the use of AWS X-Ray in the source code or follow below instructions to create a [Lambda Deployment Package](https://docs.aws.amazon.com/lambda/latest/dg/lambda-python-how-to-create-deployment-package.html) that is referenced in the template.yaml and automatically attached as a [AWS Lambda Layer](https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html) to the required lambda functions.
 
 ```bash
-[project_root] pip install aws-xray-sdk --target lambda_layers/aws-xray-sdk/python
+[project_root] pip3 install aws-xray-sdk --target lambda_layers/aws-xray-sdk/python
 ```
 
 ### Manual Deployment
