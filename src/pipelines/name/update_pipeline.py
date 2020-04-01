@@ -37,7 +37,7 @@ def patch(event, _context):
 
     # Configure default values if not present
     if 'product_flavor' not in payload:
-        payload['product_flavor'] = 'github'
+        payload['product_flavor'] = 'github/cfn'
     if 'version' not in payload:
         payload['version'] = 'latest'
 
