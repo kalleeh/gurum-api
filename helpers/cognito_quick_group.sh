@@ -19,7 +19,7 @@ fi
 
 # MODIFY TRUST POLICY JSON
 MYDIR="$(dirname "$(which "$0")")"
-sed -i.bak "s/###RESERVED_FOR_QUICK_GROUP_SCRIPT###/$IDENTITY_POOL_ID/g" $MYDIR/group_trust_policy.json
+sed "s/###RESERVED_FOR_QUICK_GROUP_SCRIPT###/$IDENTITY_POOL_ID/g" $MYDIR/group_trust_policy.json > $MYDIR/group_trust_policy.deploy
 
 # USER CREATION
 echo "Enter a group name:"
@@ -30,9 +30,10 @@ ROLE_NAME="gurum-$GROUP_NAME-role"
 ROLE_ARN=$(aws iam create-role \
     --path '/gurum/groups/' \
     --role-name $ROLE_NAME \
-    --assume-role-policy-document file://$MYDIR/group_trust_policy.json \
+    --assume-role-policy-document file://$MYDIR/group_trust_policy.deploy \
     --description "Gurum Cognito Group Assume Role for $GROUP_NAME" \
     --tags Key=gurum-groups,Value=$GROUP_NAME | jq -r '.Role.Arn')
+rm $MYDIR/group_trust_policy.deploy # clean up temporary deploy file
 
 ## Attach IAM role policy
 ACCOUNT_ID=$(aws sts get-caller-identity --output text --query 'Account')
