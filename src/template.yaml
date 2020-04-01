@@ -12,7 +12,6 @@ Transform:
 - AWS::Serverless-2016-10-31
 Description: >
     'This SAM template creates the management API for the container platform.
-    Last Modified: July 3rd 2019
     Author: Karl Wallbom <wallbomk@amazon.com'
 Metadata:
   AWS::ServerlessRepo::Application:
@@ -130,6 +129,19 @@ Resources:
         - ClientId: !Ref UserPoolClient
           ProviderName: !GetAtt UserPool.ProviderName
 
+  IdentityPoolRoleMapping:
+    Type: "AWS::Cognito::IdentityPoolRoleAttachment"
+    Properties:
+      IdentityPoolId: !Ref IdentityPool
+      RoleMappings:
+        cognitoProvider:
+          IdentityProvider: !Join [ "", ["cognito-idp.", !Sub "${AWS::Region}", ".amazonaws.com/", !Ref UserPool, ":", !Ref UserPoolClient] ]
+          Type: Token
+          AmbiguousRoleResolution: Deny
+      Roles:
+        authenticated: !GetAtt CognitoAuthorizedRole.Arn
+        unauthenticated: !GetAtt CognitoUnAuthorizedRole.Arn
+
   # Create a role for unauthorized access to AWS resources. Very limited access.
   # Only allows users in the previously created Identity Pool
   CognitoUnAuthorizedRole:
@@ -225,15 +237,7 @@ Resources:
             Action:
               - 'sts:AssumeRole'
 
-  # Assigns the roles to the Identity Pool
-  IdentityPoolRoleMapping:
-    Type: 'AWS::Cognito::IdentityPoolRoleAttachment'
-    Properties:
-      IdentityPoolId: !Ref IdentityPool
-      Roles:
-        authenticated: !GetAtt CognitoAuthorizedRole.Arn
-        unauthenticated: !GetAtt CognitoUnAuthorizedRole.Arn
-  
+  # Deployment role used by the API to delegate to CloudFormation
   DeploymentRole:
     Type: AWS::IAM::Role
     Properties:
