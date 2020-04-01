@@ -19,7 +19,7 @@ fi
 
 # MODIFY TRUST POLICY JSON
 MYDIR="$(dirname "$(which "$0")")"
-sed -i.bak "s/###REPLACEIDENTITYPOOLID###/$IDENTITY_POOL_ID/g" $MYDIR/group_trust_policy.json
+sed -i.bak "s/###RESERVED_FOR_QUICK_GROUP_SCRIPT###/$IDENTITY_POOL_ID/g" $MYDIR/group_trust_policy.json
 
 # USER CREATION
 echo "Enter a group name:"

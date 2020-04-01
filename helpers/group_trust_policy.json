@@ -9,7 +9,7 @@
       "Action": "sts:AssumeRoleWithWebIdentity",
       "Condition": {
         "StringEquals": {
-          "cognito-identity.amazonaws.com:aud": "###REPLACEIDENTITYPOOLID###"
+          "cognito-identity.amazonaws.com:aud": "###RESERVED_FOR_QUICK_GROUP_SCRIPT###"
         }
       }
     }
