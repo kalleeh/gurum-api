@@ -120,7 +120,7 @@ Resources:
       GenerateSecret: false
       UserPoolId: !Ref UserPool
 
-  # Creates a federated Identity pool
+  # Creates a Federated Identity pool
   IdentityPool:
     Type: 'AWS::Cognito::IdentityPool'
     Properties:
@@ -130,11 +130,31 @@ Resources:
         - ClientId: !Ref UserPoolClient
           ProviderName: !GetAtt UserPool.ProviderName
 
+  # Creates an IAM Policy using Tag Based authorization to dynamically authorize
+  # cognito federated roles to their resources based on gurum-groups tag.
+  GurumGroupPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: gurum-group-policy
+      Path: '/gurum/'
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: 'Allow'
+            Action:
+              - 'codecommit:*'
+              - 'logs:FilterLogEvents'
+            Resource: '*'
+            Condition:
+              StringEquals:
+                'aws:ResourceTag/gurum-groups': '${aws:PrincipalTag/gurum-groups}'
+
   # Create a role for unauthorized access to AWS resources. Very limited access.
   # Only allows users in the previously created Identity Pool
   CognitoUnAuthorizedRole:
     Type: 'AWS::IAM::Role'
     Properties:
+      Path: '/gurum/'
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -171,6 +191,7 @@ Resources:
   CognitoAuthorizedRole:
     Type: 'AWS::IAM::Role'
     Properties:
+      Path: '/gurum/'
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -211,20 +232,6 @@ Resources:
                   - 'cognito-identity:UpdateIdentityPool'
                 Resource: !Sub 'arn:aws:cognito-identity:${AWS::Region}:${AWS::AccountId}:identitypool/${IdentityPool}'
 
-  CognitoESAccessRole:
-    Type: 'AWS::IAM::Role'
-    Properties:
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/AmazonESCognitoAccess
-      AssumeRolePolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-          - Effect: 'Allow'
-            Principal:
-              Service: 'es.amazonaws.com'
-            Action:
-              - 'sts:AssumeRole'
-
   # Assigns the roles to the Identity Pool
   IdentityPoolRoleMapping:
     Type: 'AWS::Cognito::IdentityPoolRoleAttachment'
@@ -237,7 +244,7 @@ Resources:
   DeploymentRole:
     Type: AWS::IAM::Role
     Properties:
-      Path: /
+      Path: '/gurum/'
       AssumeRolePolicyDocument: 
         Version: "2012-10-17"
         Statement:
